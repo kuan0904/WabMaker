@@ -1,0 +1,26 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* 最新足球賽事 *@
+@foreach (var item in Model.DataResult.Data)
+{
+    var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+    <div class="col-md-4 col-xs-12 mb-30">
+        <div class="list-inner">
+
+            <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="hot-title">
+                <div class="event-date">@item.Item.Date.ToDateString("yyyy.MM.dd")</div>
+                @if (mainImage != null)
+                {
+                    <div class="imgbox" style="background-image: url(@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath))"></div>
+                }
+                <h3 class="mb-10 mt-10">@item.ItemLanguage.Subject</h3>
+                <p>@_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Content), 100)</p>
+                @*<a href="@(Url.Action("NewCompetition", "Order", new { id = item.Item.ID  }))" class="btn btn-block btn-style-thirteen">我要報名</a>*@
+            </a>
+        </div>
+    </div>
+}

@@ -1,0 +1,145 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+
+@model WebMaker.Entity.ViewModels.OrderViewModel
+@{
+    ViewBag.Title = Model.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var structure = Model.ItemViewModel.Item.cms_Structure;
+    var mainImage = Model.ItemViewModel.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+    var imgUrl = mainImage == null ? "" :
+        (mainImage.FileType == (int)FileType.YouTube) ?
+        _YouTube.SetThumbnail(mainImage.FilePath) ://YouTube縮圖
+        mainImage.FilePath;//封面
+
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemViewModel.ItemLanguage.Content), 200);
+    //檔案下載
+    var filedownloads = Model.ItemViewModel.ItemFiles.Where(x => x.SourceType == (int)SourceType.ItemFile && x.StructureID == new Guid("c3a94bc2-a6be-4f0f-8a99-489abdc153f0")).ToList();
+
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemViewModel.ItemLanguage.Subject" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@imgUrl" />
+    <meta property="og:description" content="@description" />
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@imgUrl) 0/cover no-repeat;">
+        <div class="auto-container">
+            <h2>@Model.ItemViewModel.ItemLanguage.Subject</h2>
+            <p>@Model.ItemViewModel.ItemLanguage.Description</p>
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">首頁</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Get", "Item", new { routeName = Model.ItemViewModel.Item.RouteName })">@Model.ItemViewModel.ItemLanguage.Subject</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">我要報名</a></li>
+            </ol>
+        </div>
+
+        <div class="row w-back-g pb-15 pt-15">
+            <div class="col-xs-12">
+                <div class="hotnews-title">
+                    <span class="hotnews-title-inner mb-20">我要報名</span>
+                    <span class="title-star">星號(*)為必填欄位</span>
+                </div>
+                @*<h3 class="text-orange mb-20 p-lg-rl-50">課程名稱：<span class="text-black">詩文郎讀上口專班</span></h3>*@
+
+                @using (Html.BeginForm("SignUp", "Order", new { id = "" }, FormMethod.Post))
+                {
+                    <input type="hidden" id="returnUrl" value="@Url.Action("Order", "Member", new { type = structure.ID })" />
+                    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="singup-inner mb-50 p-lg-rl-50">
+                        <h3 class="text-orange">更新個人資料</h3>
+                        <hr>
+                        <div class="form-group row">
+                            <label class="col-sm-2 form-label text-right">EMAIL</label>
+                            <div class="col-sm-9">
+                                @Model.User.Email
+                            </div>
+                        </div>
+                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_Profile"), Model)
+
+                    </div>
+                    <div class="singup-inner mb-50 p-lg-rl-50">
+                        <h3 class="text-orange">報名活動</h3>
+                        <hr>
+                       
+                        @Html.HiddenFor(model => model.Order.ItemID)
+                        @Html.Hidden("Order.PayType", (int)PayType.ATM)
+                        @Html.Hidden("Order.DeliveryType", (int)DeliveryType.None)
+                        @Html.Hidden("Order.ShippingFee", 0)
+
+                        <div class="form-group row">
+                            <label class="col-sm-2 form-label text-right">費用</label>
+                            <div class="col-sm-9">
+                                $@Model.ItemViewModel.Item.SalePrice.ToString("0")
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 form-label text-right">匯款資訊(*)</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="Order_PayInfo" name="Order.PayInfo" class="form-control" placeholder="戶名 / 銀行名稱 / 帳號末五碼"
+                                       data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" data-val-required="請輸入匯款資訊">
+                                @Html.ValidationMessageFor(model => model.Order.PayInfo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 form-label text-right">備註</label>
+                            <div class="col-sm-9">
+                                @Html.EditorFor(model => model.Order.OrderNote, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Order.OrderNote, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">授權同意書</label>
+                            <div class="col-sm-5">
+                                <div class="checkbox">
+                                    <label>
+                                        <input id="IsArgee" name="IsArgee" type="checkbox" data-val="true" data-rule-required="true" data-msg-required="請勾選同意">
+                                        我已詳細閱讀並同意<a class="text-oragne underline" href="@Url.Content("~/PrivacyPolicy")" target="_blank">授權同意書</a>
+                                    </label>
+                                </div>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="IsArgee" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">檔案下載</label>
+                            <div class="col-sm-5">
+                                @foreach (var file in filedownloads)
+                                {
+                                    <a class="text-oragne underline" href="@file.FilePath" download="@file.OriName">@file.OriName</a><br>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <a href="@Url.Action("Get", "Item", new { routeName = Model.ItemViewModel.Item.RouteName })" class="btn btn-default border-n n-back-g text-gray text28">Cancel</a>
+                            <button id="SaveBtn" type="button" class="btn btn-default border-n n-back-g text-black text28">Submit</button>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </div>
+</section>

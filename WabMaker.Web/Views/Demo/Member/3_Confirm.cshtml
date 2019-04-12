@@ -1,0 +1,25 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model MyTool.Commons.CiResult<WebMaker.Entity.ViewModels.ValidCodeResultViewModel>
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "驗證信";
+}
+
+<h3>@Model.Data.ValidType.GetDisplayName()</h3>
+<br>
+
+@if (!Model.IsSuccess)
+{
+    <p class="text-danger">@Model.Message</p>
+}
+else
+{
+    <p>@Model.Message</p>
+
+    if (Model.Data.ValidType == ValidType.ForgotPassword)
+    {
+        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_ResetPassword"),
+         new WebMaker.Entity.ViewModels.ResetPasswordViewModel { UserID = Model.Data.UserID })
+    }
+}

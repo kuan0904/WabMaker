@@ -1,0 +1,22 @@
+﻿@using MyTool.Services
+
+@* alert訊息 *@
+<input type="hidden" id="AlertMessage" value="@(TempData["AlertMessage"].FieldToString())" />
+<input type="hidden" id="AlertType" value="@(TempData["AlertType"].FieldToString())" />
+
+
+@* confirm modal *@
+<div id="confirm_box" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="width: 300px;">
+        <div class="modal-content">
+            <div class="modal-body" style="font-size:14px">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-top: -10px;">×</button>
+                <div class="confirm_message"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm_cancel" type="button" class="btn btn-sm btn-default">Cancel</button>
+                <button id="confirm_ok" type="button" class="btn btn-sm btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

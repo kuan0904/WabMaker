@@ -1,0 +1,31 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+<section class="character-section">
+    <div class="single-item-carousel owl-carousel owl-theme">
+
+        @foreach (var item in Model.DataResult.Data)
+        {
+            var mainImage = item.ItemFiles.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+            if (mainImage != null)
+            {
+                <div class="character-box" style="background: url(@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)) center/cover no-repeat;">
+                    <a href="@item.ItemLanguage.LinkUrl" target="@(item.ItemLanguage.IsBlankUrl?"_blank":"_self")">
+                        <div class="character-inner">
+                            @*<h2 class="text plr-15 template" placeholder="(標題1)"> </h2>
+                                <h4 class="text plr-15 template" placeholder="(標題2)"> </h4>
+                                @Html.Raw(item.ItemLanguage.TemplateText)*@
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+
+    </div>
+</section>
+
+
+
+

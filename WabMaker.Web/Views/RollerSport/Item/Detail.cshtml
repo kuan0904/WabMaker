@@ -1,0 +1,236 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    var imgUrl = mainImage == null ? "" : RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath);
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+    //相關檔案
+    var filedownloads = Model.ItemFiles.Where(x => x.SourceType == SourceType.ItemFile && x.StructureID == new Guid("43e5672d-7412-47f0-b918-1dc3a281e27c")).ToList();
+
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemLanguage.Subject" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@RouteHelper.SetUrlPath("/html/RollerSport/images/default.jpg", imgUrl, true)" />
+    <meta property="og:description" content="@description" />
+}
+
+<div class="main-content">
+
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index", "Home")">HOME</a></li>
+            </ol>
+        </div>
+    </div><!-- breadArea END -->
+
+    <div class="container">
+
+        <a href="javascript: history.go(-1)" class="btn btn-back">
+            <span class="fa fa-angle-left"></span>BACK
+        </a>
+
+        <div class="row">
+
+            <div class="col-md-8 col-sm-8 main-content">
+                <div class="main-content-inner">
+
+                    <article class="post-layout post">
+
+                        <div class="post-header">
+                            @if (!string.IsNullOrEmpty(imgUrl))
+                            {
+                                <div class="post-featured-image">
+                                    <a href="@imgUrl">
+                                        <img class="image-full modal-image size-full" src="@imgUrl" width="1350" height="900" />
+                                    </a>
+                                </div>
+                            }
+
+                            <div class="post-information">
+                                <ul class="category">
+                                    <li class="entry-category">
+                                        @if (Model.ParentItems != null)
+                                        {
+                                            foreach (var category in Model.ParentItems)
+                                            {
+                                                <a href="@Url.Action("Get", "Item", new { routeName = category.RouteName })">@category.Subject</a>
+                                            }
+                                        }
+                                    </li>
+                                </ul>
+                                <h1>@Model.ItemLanguage.Subject</h1>
+                                <div class="meta-info">
+                                    <div class="post-author">
+                                        <span>By</span>
+                                        <a href="#">@(Model.ItemLanguage.Author)</a>
+                                        <span> - </span>
+                                    </div>
+                                    <span class="post-date"><time>@Model.Item.Date.ToDateString()</time></span>
+                                    <div class="post-views">
+                                        <i class="fa fa-eye"></i>@Model.Item.ViewCount
+                                    </div>
+                                    <div class="post-comments">
+                                        <a href="#respond"><i class="fa fa-comments"></i>0</a>
+                                    </div>
+                                    <div class="post-keywords">
+                                        <i class="fa fa-tags"></i>
+                                        @{ var keywordArr = Model.ItemLanguage.Keywords?.Split(','); }
+                                        @if (keywordArr != null)
+                                        {
+                                            foreach (var k in keywordArr)
+                                            {
+                                                <a href="@Url.Action("Search", "Home", new { q = k })"><i>@k</i></a>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div><!-- meta-info END -->
+
+                            <div class="post-sharing">
+                                <span class="post-share-title">SHARE</span>
+                                <div class="sharing-group">
+                                    <a class="btn-share facebook ShareFacebook" href="javascript:">
+                                        <div class="icon-elements facebook"></div>
+                                        <div class="social-text">Facebook</div>
+                                    </a>
+
+                                    <a class="btn-share twitter ShareTwitter" href="javascript:"><div class="icon-elements twitter"></div><div class="social-text">Twitter</div></a>
+
+                                    @*<a class="btn-share google" href="#" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><div class="icon-elements googleplus"></div></a>*@
+
+                                    <a class="btn-share pinterest" id="SharePinterest" href="javascript:"><div class="icon-elements pinterest"></div></a>
+
+                                    @*<a class="btn-share whatsapp" href="#"><div class="icon-elements whatsapp"></div></a>*@
+
+                                    <div class="clearfix"></div>
+                                </div><!-- sharing-group END -->
+                            </div><!-- post-sharing END -->
+                        </div><!-- post-header END -->
+
+                        <div class="post-content">
+                            @Html.Raw(Model.ItemLanguage.Content)
+
+                            <!--檔案下載-->
+                            <h2>相關檔案</h2>
+                            <section class="section-top-0 section-sm-top-0">
+                                <div class="shell">
+                                    <div class="range">
+                                        <div class="cell-md-10 cell-lg-8">
+                                            <div class="table-mobile">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>檔案下載</th>
+                                                            <th>檔案名稱</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @{ var i = 1;}
+                                                        @foreach (var file in filedownloads)
+                                                        {
+                                                            <tr>
+                                                                <td>@i</td>
+                                                                <td><a href="@file.FilePath" target="_blank"><img src="~/html/RollerSport/images/download-file.svg" alt="" width="50"></a></td>
+                                                                <td>@file.OriName</td>
+                                                            </tr>
+                                                            i++;
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div><!-- post-content END -->
+
+                        <div class="post-footer">
+                            <div class="post-sharing">
+                                <span class="post-share-title">SHARE</span>
+                                <div class="sharing-group">
+                                    <a class="btn-share facebook ShareFacebook" href="javascript:">
+                                        <div class="icon-elements facebook"></div>
+                                        <div class="social-text">Facebook</div>
+                                    </a>
+
+                                    <a class="btn-share twitter ShareTwitter" href="javascript:"><div class="icon-elements twitter"></div><div class="social-text">Twitter</div></a>
+
+                                    @*<a class="btn-share google" href="javascript:" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><div class="icon-elements googleplus"></div></a>*@
+
+                                    <a class="btn-share pinterest" id="SharePinterest" href="javascript:"><div class="icon-elements pinterest"></div></a>
+
+                                    @*<a class="btn-share whatsapp" href="javascript:"><div class="icon-elements whatsapp"></div></a>*@
+
+                                    <div class="clearfix"></div>
+                                </div><!-- sharing-group END -->
+                            </div><!-- post-sharing END -->
+                        </div><!-- post-footer END -->
+
+                    </article>
+
+                </div><!-- main-content-inner END -->
+
+            </div><!-- col-md-8 td-main-content END -->
+
+            <div class="col-md-4 col-sm-4 main-sidebar">
+                <!-- <div class=main-sidebar-inner> -->
+                @* todo banner 內頁1 *@
+                <div class="block-wrap">
+                    <ul class="banner-group">
+                        <li class="col-md-12 col-sm-4 col-xs-4 thumbnail">
+                            <a href="#" title="img-banner-300x200" target="_blank">
+                                <img src="images/img-banner-300x200.jpg" alt="" title="">
+                            </a>
+                        </li>
+                        <li class="col-md-12 col-sm-4 col-xs-4 thumbnail">
+                            <a href="#" title="img-banner-300x200" target="_blank">
+                                <img src="images/img-banner-300x200.jpg" alt="" title="">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="block-wrap">
+                    <div class=block-title>訂閱電子報</div>
+                    <div class="epaper-box">
+                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_SubEpaper"), new WebMaker.Entity.ViewModels.SendEmailViewModel())
+                    </div>
+                </div>
+
+                <div class="block-wrap">
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Hot"))
+                </div>
+
+                <div class="block-wrap">
+                    <iframe src="https://www.facebook.com/plugins/page.php?href=https://www.facebook.com/tpersf/&tabs=timeline&width=300&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=1355515061131043" width="300" height="500" scrolling="no" frameborder="0" allowTransparency="true" style="display: block; width: 300px; margin: auto;"></iframe>
+                </div>
+                @* todo banner 內頁2 *@
+                <div class="block-wrap">
+                    <ul class="banner-group">
+                        <li class="col-md-12 col-sm-4 col-xs-4 thumbnail">
+                            <a href="#" title="img-banner-300x200" target="_blank">
+                                <img src="images/img-banner-300x200.jpg" alt="" title="">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- </div> --><!-- main-sidebar-inner END -->
+            </div><!-- col-md-4 END -->
+
+
+        </div><!-- row END -->
+
+    </div><!-- container END -->
+
+</div><!-- main-content END -->

@@ -1,0 +1,223 @@
+﻿@using MyTool.ViewModels
+@using WebMaker.BLL.Helpers
+@using WabMaker.Web.Helpers
+@{
+    SiteInfoViewModel SiteInfo = ApplicationHelper.SiteInfo;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    @if (SiteInfo != null)
+    {
+        @Html.Partial("_BaseMeta", SiteInfo)
+    }
+    <!-- Stylesheets -->
+    <link href="~/html/MiniSoccer/css/bootstrap.css" rel="stylesheet">
+    <link href="~/html/MiniSoccer/plugins/revolution/css/settings.css" rel="stylesheet" type="text/css">
+    <!-- REVOLUTION SETTINGS STYLES -->
+    <link href="~/html/MiniSoccer/plugins/revolution/css/layers.css" rel="stylesheet" type="text/css">
+    <!-- REVOLUTION LAYERS STYLES -->
+    <link href="~/html/MiniSoccer/plugins/revolution/css/navigation.css" rel="stylesheet" type="text/css">
+    <!-- REVOLUTION NAVIGATION STYLES -->
+    <link href="~/html/MiniSoccer/css/style.css?v=2019.3.21" rel="stylesheet">
+    <link href="~/html/MiniSoccer/css/responsive.css" rel="stylesheet">
+    <link href="~/html/MiniSoccer/css/custom.css?v=2019.3.21" rel="stylesheet">
+    <!-- FONT AWESOME -->
+    <link href="~/html/MiniSoccer/font-awesome/css/all.css" rel="stylesheet">
+    <link href="~/html/MiniSoccer/font-awesome/css/fontawesome.css" rel="stylesheet">
+    <link rel="shortcut icon" href="~/html/MiniSoccer/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="~/html/MiniSoccer/images/favicon.png" type="image/x-icon">
+    <!-- Responsive -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script><![endif]-->
+    <!--[if lt IE 9]><script src="js/respond.js"></script><![endif]-->
+    @RenderSection("css", required: false)
+    @RenderSection("meta", required: false)
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <div class="preloader"></div>
+
+        <!-- Main Header / Header Style One-->
+        <header class="main-header header-style-one">
+            <!-- Main Box -->
+            <div class="main-box">
+                <div class="auto-container">
+                    <div class="outer-container clearfix">
+                        <!--Logo Box-->
+                        <div class="logo-box">
+                            <div class="logo"><a href="@Url.Action("Index","Home")"><img src="~/html/MiniSoccer/images/logo-m.png" alt=""></a></div>
+                            <div class="logo-fixed"><a href="@Url.Action("Index","Home")"><img src="~/html/MiniSoccer/images/logo-m.png" alt=""></a></div>
+                        </div>
+                        <!--Nav Outer-->
+                        <div class="nav-outer clearfix">
+                            <!-- Main Menu -->
+                            <nav class="main-menu">
+                                <div class="navbar-header">
+                                    <!-- Toggle Button -->
+                                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+
+                                <div class="navbar-collapse collapse clearfix">
+                                    <ul class="navigation clearfix">
+                                        @Html.Action("Menu", "Item", new { position = MyTool.Enums.MenuPosition.Top })
+
+
+                                        @if (SessionManager.UserID != Guid.Empty &&
+                                             SessionManager.AccountType == MyTool.Enums.AccountType.Member)
+                                        {
+                                            //已登入
+                                            @*@SessionManager.UserName*@
+                                            <li>
+                                                <a href="@Url.Action("Index", "Member")"><i class="fas fa-user"></i> 會員中心</a>
+                                            </li>
+                                            <li>
+                                                <a href="@Url.Action("LogOut", "Member")"><i class="fas fa-door-open"></i>登出</a>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            //未登入
+                                            <li>
+                                                <a href="@Url.Action("Login", "Member")"><i class="fas fa-user"></i> 登入/註冊</a>
+                                            </li>
+                                        }
+
+                                    </ul>
+                                </div>
+                                @*<div class="search-box-outer">
+                                        <div class="dropdown">
+                                            <button class="search-box-btn dropdown-toggle" type="button" id="dropdownMenu3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><span class="fa fa-search"></span></button>
+                                            <ul class="dropdown-menu pull-right search-panel" aria-labelledby="dropdownMenu3">
+                                                <li class="panel-outer">
+                                                    <div class="form-container">
+                                                        <form method="get" action="@Url.Action("Search", "Home")">
+                                                            <div class="form-group">
+                                                                <input type="search" name="q" value="" placeholder="Search Here" required="">
+                                                                <button type="submit" class="search-btn"><span class="fa fa-search"></span></button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>*@
+                            </nav>
+                            <!-- Main Menu End-->
+
+                        </div>
+                        <!--Nav Outer End-->
+                    </div>
+                </div>
+            </div>
+
+        </header>
+        <!--End Main Header -->
+
+        @RenderBody()
+
+        <!--Main Footer-->
+        <section class="footer-section">
+            <footer class="main-footer">
+                <div class="auto-container">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <a href=""><img src="~/html/MiniSoccer/images/logo-l.png?v=2018.12.14" alt=""></a>
+                            <p>@SiteInfo.Footer2</p>
+                        </div>
+                        <div class="col-md-4 mt-md-25">                          
+                            @if (!string.IsNullOrEmpty(SiteInfo.Footer))
+                            {
+                                @Html.Raw(SiteInfo.Footer)
+                            }                          
+                        </div>
+                        <div class="col-md-3 mt-md-25">
+                            @if (!string.IsNullOrEmpty(SiteInfo.Facebook))
+                            {
+                            <a class="fb mr-10" href="@SiteInfo.Facebook" title="" target="_blank">
+                                <span class="fa-stack fa-2x">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                            }
+                            @if (!string.IsNullOrEmpty(SiteInfo.YouTube))
+                            {
+                            <a class="youtube" href="@SiteInfo.YouTube" title="" target="_blank">
+                                <span class="fa-stack fa-2x">
+                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                    <i class="fab fa-youtube fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mt-10">
+                            <div class="copyright">
+                                @(SiteInfo?.Copyright)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </section>
+        <!--End Main Footer-->
+    </div>
+    <!--End pagewrapper-->
+    <!--Scroll to top-->
+    <div class="scroll-to-top scroll-to-target" data-target="html">
+        <i class="fas fa-long-arrow-alt-up fa-lg"></i>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    <script src="~/html/MiniSoccer/js/jquery.js"></script>
+    <!--Revolution Slider-->
+    <script src="~/html/MiniSoccer/plugins/revolution/js/jquery.themepunch.revolution.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/jquery.themepunch.tools.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.actions.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.carousel.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.kenburn.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.layeranimation.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.migration.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.navigation.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.parallax.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.slideanims.min.js"></script>
+    <script src="~/html/MiniSoccer/plugins/revolution/js/extensions/revolution.extension.video.min.js"></script>
+    <script src="~/html/MiniSoccer/js/main-slider-script.js"></script>
+    <script src="~/html/MiniSoccer/js/bootstrap.min.js"></script>
+    <script src="~/html/MiniSoccer/js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="~/html/MiniSoccer/js/jquery.fancybox.pack.js"></script>
+    <script src="~/html/MiniSoccer/js/jquery.fancybox-media.js"></script>
+    <script src="~/html/MiniSoccer/js/owl.js"></script>
+    <script src="~/html/MiniSoccer/js/wow.js"></script>
+    <script src="~/html/MiniSoccer/js/appear.js"></script>
+    <script src="~/html/MiniSoccer/js/script.js"></script>
+    @Html.Partial("_ShowMessage")
+    @Html.Partial("_BaseScripts")
+    <script>
+        $(document).on('change', '#setail_competition_area', function (event) {
+            filterCourse();
+        });
+        filterCourse();
+
+        function filterCourse() {
+            $(".competition_area_box").each(function () {
+                if ($(this).data("categories").indexOf($('#setail_competition_area').val()) >= 0) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

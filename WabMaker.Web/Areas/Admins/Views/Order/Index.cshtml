@@ -1,0 +1,110 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.Models.cms_Structure
+
+@{
+    ViewBag.Title = Model.OrderName;
+
+    //包含流程
+    var orderStatus = Model.OrderStatuses.ToContainList<OrderStatus>();
+    orderStatus.Remove(OrderStatus.Delete);
+    orderStatus.Remove(OrderStatus.AdminEdit);
+    //包含付款方式
+    var payTypes = Model.PayTypes.ToContainList<PayType>();
+    //包含類型
+    var orderContentTypes = Model.OrderContentTypes.ToContainList<OrderContentType>();
+
+    //是會員名單or訂單列表
+    //WebMaker.Entity.ViewModels.ItemViewModel item = ViewBag.Item;
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action(null, null, new { StructureID = Model.ID, LangType = Model.DefaultLanguage})" />
+<input type="hidden" id="ImageUploadUrl" value="@Url.Action("CKEditorUpload")" />
+
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+
+    <div class="toolbar row">
+        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+            <input type="text" name="SearchString" class="form-control" placeholder="搜尋姓名、訂單編號、內容@(payTypes.Contains(PayType.ATMVirtual)?"、虛擬帳號":"")" />
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+            @if (ViewBag.SelectGroupItem != null)
+            {
+                @Html.DropDownList("GroupArticleID", (List<SelectListItem>)ViewBag.SelectGroupItem, "篩選群組", new { @class = "form-control selectpicker", data_live_search = "true" })
+            }
+            
+            @* 篩選文章: parentid 決定上層 *@
+            <select class="form-control selectpicker" data-live-search="true" id="ArticleID" name="ArticleID">
+                <option data-parentid="" value="">篩選文章</option>
+                @foreach (var item in (List<WebMaker.Entity.ViewModels.ItemViewModel>)ViewBag.SelectItem)
+            {
+                    <option value="@item.Item.ID" data-parentid="@item.ParentID">@item.ItemLanguage.Subject</option>
+                }
+            </select>
+            @*@Html.DropDownList("ArticleID", (List<SelectListItem>)ViewBag.SelectItem, "篩選文章", new { @class = "form-control selectpicker", data_live_search = "true" })*@
+     
+           </div>
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+            <div class="input-group input-daterange">
+                <input type="text" class="form-control" name="StartTime" placeholder="日期開始範圍" autocomplete="off"/>
+                <div class="input-group-addon">to</div>
+                <input type="text" class="form-control" name="EndTime" placeholder="日期結束範圍" autocomplete="off"/>
+            </div>
+        </div>
+        <div class="col-lg-1 col-md-4 col-sm-3 col-xs-6">
+            @mHelper.Switch("顯示資訊", "DisplayProfile", false)
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-3 col-xs-6">
+            @if (payTypes.Contains(PayType.ATMVirtual))
+            {
+                @mHelper.Switch("篩選已自動入帳", "SelectAutoPay", false)
+            }
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
+            @if (!orderContentTypes.Contains(OrderContentType.Detail))
+            {
+                @Html.DropDownList("SelectOrderStatus", _Enum.EnumtoSelect(orderStatus), new { @class = "form-control selectpicker", multiple = "multiple", title = "篩選狀態" })
+            }
+            else
+            {
+                @Html.DropDownList("SelectOrderDetailStatus", _Enum.EnumtoSelect(orderStatus), new { @class = "form-control selectpicker", multiple = "multiple", title = "篩選狀態" })
+            }
+        </div>
+    </div>
+
+    <div id="mainTable" class="container-fluid"></div>
+</div>
+
+<div id="editView" style="display:none;"></div>
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+        site.showMaster();
+
+        //合併時才顯示訂單下拉選單
+        $(document).on('change', "#Order_OrderStatus", function (event) {
+            if ($(this).val() == '@((int)OrderStatus.Combine)') {
+                $("#CombinOrderBlock").show();
+            } else {
+                $("#CombinOrderBlock").hide();
+            }
+        });
+
+        //雙層select
+        if ($("#GroupArticleID").length > 0) {
+        site.dynamicSelect.init($(".toolbar"), $("#GroupArticleID"), $("#ArticleID"));
+        }
+    </script>
+}
+@section css{
+    <style>
+        .child-column {
+          border-bottom: 1px dashed #ccc;
+          padding: 5px 0;
+        }
+    </style>
+    }
+

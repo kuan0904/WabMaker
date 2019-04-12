@@ -1,0 +1,161 @@
+﻿@using WabMaker.Web.Helpers
+@using WabMaker.Web.WebViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    //封面圖
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    var imgUrl = mainImage == null ? "" :
+        (mainImage.FileType == FileType.YouTube) ?
+        _YouTube.SetThumbnail(mainImage.FilePath) ://YouTube縮圖
+        mainImage.FilePath;//封面
+
+    //內頁圖
+    var subImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemSubImage);
+    var subImageUrl = subImage?.FilePath;
+
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+    //相關檔案
+    var filedownloads = Model.ItemFiles.Where(x => x.SourceType == SourceType.ItemFile).ToList();
+
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemLanguage.Subject" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@imgUrl" />
+    <meta property="og:description" content="@description" />
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@subImageUrl) 0/cover no-repeat;">
+        <div class="auto-container">
+            <h2>@ViewBag.Title</h2>
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Home")">首頁</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <a href="@Url.Action()">@ViewBag.Title</a>
+                </li>
+            </ol>
+        </div>
+        <div class="row">
+            <div class="col-md-8 col-xs-12 mb-30">
+                <div class="hotnews-detail p-20">
+                    @*<div class="border-b-g pb-10">作者 :<span class="text-black">@Model.ItemLanguage.Author</span></div>*@
+                    <div class="row">
+                        @*<div class="col-xs-6 pt-10 mb-10">
+                                <div class="date">
+                                    刊登時間 : <span>@Model.Item.Date.ToDateString("yyyy.MM.dd")</span>
+                                    @Model.Item.ViewCount
+                                </div>
+                            </div>*@
+                        <div class="col-xs-6 pt-10 mb-10 text-right">
+                            <div class="fb pull-right mr-10">
+                                <div class="fb-like" data-href="@RouteHelper.Url(true)" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="false"></div>
+                            </div>
+                        </div>
+                    </div>
+                    @*@if (Model.ParentItems != null)
+                        {
+                            foreach (var category in Model.ParentItems)
+                            {
+                                <a href="@Url.Action("Get","Item", new { routeName = category.RouteName })">@category.Subject</a>
+                            }
+                        }*@
+                    @*if (mainImage != null)
+                    {
+                        <div class="banner">
+                            <img src="@imgUrl" />
+                        </div>
+                    }*@
+
+                    <p class="pt-10 mb-10">
+                        @Html.Raw(Model.ItemLanguage.Content)
+                    </p>
+
+                    @{ var keywordArr = Model.ItemLanguage.Keywords?.Split(','); }
+                    @if (keywordArr != null)
+                    {
+                        <div class="conkeywords">
+                            <ul>
+                                @foreach (var k in keywordArr)
+                                {
+                                    <li><a href="@Url.Action("Search", "Home", new { q = k })"><i>@k</i></a></li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+
+                <div class="hotnews-recommend mt-15 mb-15">
+                    <div class="hotnews-title news-view-title">
+                        <span class="hotnews-title-inner ">相關檔案</span>
+                    </div>
+                    <ul class="ml-15 mr-15 disc-style">
+
+                        @foreach (var file in filedownloads)
+                        {
+                            <li><a class="text-oragne underline" href="@file.FilePath" download="@file.OriName">@file.OriName</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="hotnews-recommend">
+                    <div class="hotnews-title news-view-title"><span class="hotnews-title-inner">其他賽事</span></div>
+                </div>
+                <div class="row">
+                    @* 延伸閱讀 *@
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Related"), Model)
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-12 mb-30">
+                <div class="hotnews-recommend p-20 mb-20">
+                    <div class="hotnews-recommend p-20 mb-20">
+                        <div class="hotnews-title">
+                            <span class="hotnews-title-inner">
+                                選擇賽事地區
+                            </span>
+                        </div>
+
+
+                        @Html.Action("Partial", "Item", new ItemPageModel
+                   {
+                       ViewName = "Detail_Competition_area",
+                       IsPaged = false,
+                       SortColumn = SortColumn.Date,
+                       StructureJson = _Json.ModelToJson(new List<Guid> { new Guid("19895d5b-95e0-48aa-9a87-a06ce4dca71a") }),//分區報名
+                       CategoryJson = _Json.ModelToJson(Model.Item.ID.ToListObject()),//自己
+
+                   })
+
+                        @*<div class="add-block mb-20 mt-40">
+                                <a href="#">
+                                    <img src="images/allianz-junior-world-cup-ad.png" alt="">
+                                </a>
+                            </div>
+                            <div class="add-block mb-20">
+                                <a href="#">
+                                    <img src="images/add02.jpg" alt="">
+                                </a>
+                            </div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

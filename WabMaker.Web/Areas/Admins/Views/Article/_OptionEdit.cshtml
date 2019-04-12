@@ -1,0 +1,180 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using MyTool.ViewModels
+@using WebMaker.Entity.ViewModels
+@model WebMaker.Entity.ViewModels.EditItemViewModel
+
+@{
+    WebMaker.Entity.Models.cms_Structure structure = Model.Item.cms_Structure;
+    WebMaker.Entity.Models.cms_Structure discStructure = structure.ParentStructure.FirstOrDefault(x => x.ItemTypes.HasValue((int)ItemType.OrderDiscount));
+
+    List<WebMaker.Entity.Models.cms_ItemFile> coverImage = Model.ItemFiles?.Where(x => x.SourceType == (int)SourceType.ItemConver).ToList();
+    List<WebMaker.Entity.Models.cms_ItemFile> subImage = Model.ItemFiles?.Where(x => x.SourceType == (int)SourceType.ItemSubImage).ToList();
+    var frontLanguageTypes = WebMaker.BLL.Helpers.SessionManager.Client.FrontLanguageTypes;
+    bool isCreate = Model.Item.ID == Guid.Empty;
+
+    //包含類型
+    List<ItemType> ItemTypes = structure.ItemTypes.ToContainList<ItemType>();
+    //包含欄位
+    List<ContentType> ContentTypes = structure.ContentTypes.ToContainList<ContentType>();
+    //必填欄位
+    List<ContentType> RequiredTypes = structure.RequiredTypes.ToContainList<ContentType>();
+    //包含計價方式
+    List<PriceType> PriceTypes = structure.PriceTypes.ToContainList<PriceType>();
+}
+
+@if (ContentTypes.Contains(ContentType.Department))
+{
+    <td>
+        @Html.DropDownList("Item.DepartmentID", Model.DepartmentSelectList, "(選擇)", new { @class = "form-control selectpicker" })
+        @Html.ValidationMessageFor(model => model.Item.SalePrice, "", new { @class = "text-danger" })
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.Subject))
+{
+    var isRequired = RequiredTypes.Contains(ContentType.Subject);
+    <td>
+        @if (ContentTypes.Contains(ContentType.SubjectMulti))
+        {
+            <div class="string-replace" data-type="1">
+                <textarea id="ItemLanguage_Subject" rows="10" cols="20" class="form-control string-replace-target" data-val="true" @(isRequired ? "data-val-required=必填" : "")
+                          placeholder="選項1
+選項2
+選項3"></textarea>
+                <input name="ItemLanguage.Subject" type="hidden" class="string-replace-hidden" value="@Model.ItemLanguage.Subject" />
+            </div>
+        }
+        else
+        {
+            @Html.EditorFor(model => model.ItemLanguage.Subject, new { htmlAttributes = new { @class = "form-control", data_val = "true", data_val_required = isRequired ? "必填" : "" } })
+        }
+        @Html.ValidationMessageFor(model => model.ItemLanguage.Subject, "", new { @class = "text-danger" })
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.OrderCreateRole))
+{
+    <td>
+        @mHelper.CheckboxList("CreateRoleSelectList", Model.CreateRoleSelectList)
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.Options))
+{
+    var isRequired = RequiredTypes.Contains(ContentType.Options);
+    <td>
+        <div class="string-replace" data-type="1">
+            <textarea id="Item_Options" rows="10" cols="20" class="form-control string-replace-target" data-val="true" @(isRequired ? "data-val-required=必填" : "")
+                      placeholder="選項1
+選項2
+選項3"></textarea>
+            @Html.ValidationMessageFor(model => model.Item.Options, "", new { @class = "text-danger" })
+
+            <input name="Item.Options" type="hidden" class="string-replace-hidden" value="@Model.Item.Options" />
+        </div>
+
+
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.DiscountType))
+{
+    <td>
+        @Html.DropDownList("Item.DiscountType",
+                     _Enum.EnumtoSelect<DiscountType>(Model.Item.DiscountType), new { @class = "selectpicker" })
+        @Html.ValidationMessageFor(model => model.Item.DiscountType, "", new { @class = "text-danger" })
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.DateLimit))
+{
+    <td>
+        <div class="input-group">
+            <input type="text" class="form-control date-picker" id="Item_DateLimit" name="Item.DateLimit" value="@Model.Item.DateLimit.ToDateString()" data-val="true" data-val-required="">
+            <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+            </span>
+        </div>
+        @Html.ValidationMessageFor(model => model.Item.DateLimit, "", new { @class = "text-danger" })
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.StockCount))
+{
+    <td>
+        <input class="form-control text-box single-line" data-val="true" data-val-number="欄位 數量 必須是數字。" data-val-required="數量 欄位是必要項。"
+               id="Item_StockCount" name="Item.StockCount" type="text" value="@Model.Item.StockCount">
+        @Html.ValidationMessageFor(model => model.Item.StockCount, "", new { @class = "text-danger" })
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.SaleLimit))
+{
+    <td>
+        <input class="form-control text-box single-line" data-val="true" data-val-number="欄位 數量限制必須是數字。" data-val-required="數量限制 欄位是必要項。"
+               id="Item_StockCount" name="Item.SaleLimit" type="text" value="@Model.Item.SaleLimit">
+        @Html.ValidationMessageFor(model => model.Item.SaleLimit, "", new { @class = "text-danger" })
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.SalePrice))
+{
+    <td>
+        <input class="form-control text-box single-line" data-val="true" data-val-number="欄位 金額 必須是數字。" data-val-required="金額 欄位是必要項。"
+               id="Item_SalePrice" name="Item.SalePrice" type="text" value="@Model.Item.SalePrice.ToString("0")">
+        @Html.ValidationMessageFor(model => model.Item.SalePrice, "", new { @class = "text-danger" })
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.PriceType))
+{
+    <td>
+        @Html.DropDownList("Item.PriceType",
+                     _Enum.EnumtoSelect<PriceType>(PriceTypes, Model.Item.PriceType), new { @class = "selectpicker" })
+    </td>
+}
+
+        @if (ContentTypes.Contains(ContentType.PeopleRange))
+        {
+<td>
+        <div class="input-group GroupRange">
+            <input type="number" class="form-control" name="Item.PeopleMin" min="1" value="@Model.Item.PeopleMin">
+            <div class="input-group-addon">~</div>
+            <input type="number" class="form-control" name="Item.PeopleMax" min="1" value="@Model.Item.PeopleMax">
+        </div>
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.Description))
+{
+    <td>
+        @Html.EditorFor(model => model.ItemLanguage.Description, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.ValidationMessageFor(model => model.ItemLanguage.Description, "", new { @class = "text-danger" })
+    </td>
+}
+
+
+@if (discStructure != null)
+{
+    <td>
+        <ul id="categoryTree" class="mTree checkTree select-mapping-source">
+            @Html.Partial("_TreeCheck", new CheckTreeModel { tree = Model.CategoryTree, relationType = (ItemRelationType)structure.ParentRelationType })
+        </ul>
+    </td>
+}
+
+<td>
+    @Html.Hidden("isCreate", isCreate)
+    @Html.HiddenFor(model => model.ParentID)
+    @Html.HiddenFor(model => model.Item.ID)
+    @Html.HiddenFor(model => model.Item.Sort)
+    @Html.HiddenFor(model => model.Item.StructureID)
+    @Html.HiddenFor(model => model.Item.RouteName)
+
+    @Html.HiddenFor(model => model.ItemLanguage.ItemID)
+    @Html.HiddenFor(model => model.ItemLanguage.LanguageType)
+
+    <a id="SaveBtn" class="edittable-action-save" title="Remove"><i class="fa fa-floppy-o"></i></a>
+    <a class="edittable-action-cancel" title="Cancel"><i class="fa fa-chevron-circle-left"></i></a>
+</td>

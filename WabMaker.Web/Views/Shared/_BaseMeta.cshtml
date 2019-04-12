@@ -1,0 +1,24 @@
+﻿@using WabMaker.Web.Helpers
+@{
+    MyTool.ViewModels.SiteInfoViewModel SiteInfo = Model;
+    string title = !string.IsNullOrEmpty(ViewBag.Title) ? ViewBag.Title + "- " : "";
+    string siteName = !string.IsNullOrEmpty(SiteInfo?.SiteName) ? SiteInfo.SiteName : "";
+}
+
+<title>@title@siteName</title>
+
+@if (SiteInfo != null)
+{
+    if (!string.IsNullOrEmpty(SiteInfo.MetaTagDescription))
+    {
+        <meta name="description" content="@SiteInfo.MetaTagDescription">
+    }
+    if (!string.IsNullOrEmpty(SiteInfo.MetaTagKeyword))
+    {
+        <meta name="keywords" content="@SiteInfo.MetaTagKeyword">
+    }
+    if (!string.IsNullOrEmpty(SiteInfo.MetaTagAuthor))
+    {
+        <meta name="author" content="@SiteInfo.MetaTagAuthor">
+    }
+}

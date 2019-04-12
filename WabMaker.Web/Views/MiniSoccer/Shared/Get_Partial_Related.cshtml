@@ -1,0 +1,15 @@
+﻿@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services;
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+
+@* 延伸閱讀(Detail) *@
+@Html.Action("Partial", "Item", new ItemPageModel
+{
+    ViewName = "Partial_Related",
+    PageSize = 3,
+    SortColumn = SortColumn.Random,
+    StructureJson = _Json.ModelToJson(new List<Guid> { Model.Item.StructureID }),
+    CategoryJson = _Json.ModelToJson(Model.ParentItems?.Select(x => x.ID).ToList()),
+    ExceptID = Model.Item.ID
+})

@@ -1,0 +1,134 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using MyTool.ViewModels
+@using WebMaker.Entity.ViewModels
+@model WebMaker.Entity.ViewModels.EditItemViewModel
+
+@{
+    WebMaker.Entity.Models.cms_Structure structure = Model.Item.cms_Structure;
+    WebMaker.Entity.Models.cms_Structure discStructure = structure.ParentStructure.FirstOrDefault(x => x.ItemTypes.HasValue((int)ItemType.OrderDiscount));
+
+    List<WebMaker.Entity.Models.cms_ItemFile> coverImage = Model.ItemFiles?.Where(x => x.SourceType == (int)SourceType.ItemConver).ToList();
+    List<WebMaker.Entity.Models.cms_ItemFile> subImage = Model.ItemFiles?.Where(x => x.SourceType == (int)SourceType.ItemSubImage).ToList();
+    var frontLanguageTypes = WebMaker.BLL.Helpers.SessionManager.Client.FrontLanguageTypes;
+    bool isNew = Model.Item.ID == Guid.Empty;
+    ViewBag.Title = (isNew ? "新增" : "編輯") + structure.Name;
+    //包含類型
+    List<ItemType> ItemTypes = structure.ItemTypes.ToContainList<ItemType>();
+    //包含欄位
+    List<ContentType> ContentTypes = structure.ContentTypes.ToContainList<ContentType>();
+    //必填欄位
+    List<ContentType> RequiredTypes = structure.RequiredTypes.ToContainList<ContentType>();
+}
+
+@if (ContentTypes.Contains(ContentType.Department))
+{
+    <td>
+        @(Model.Item.mgt_Department?.Name)
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.Subject))
+{
+    <td>
+        @if (!string.IsNullOrEmpty(Model.ItemLanguage.Subject))
+        {
+            @Html.Raw(Model.ItemLanguage.Subject.Replace(",", "<br>"))
+        }
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.OrderCreateRole))
+{  //允許身分
+    var allowRoles = Model.Item.cms_ItemOrderRoleRelation.Where(x => x.ItemOrderRoleType == (int)ItemOrderRoleType.OrderCreateRole).Select(x => x.mgt_Role.Name).ToList();
+    <td>
+        @string.Join(",", allowRoles)
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.Options))
+{
+    <td>
+        @*<div class="option-panel option-@(Model.Item.ID) collapse">
+                @(!string.IsNullOrEmpty(Model.Item.Options) ? "......" : "")
+            </div>*@
+        @mHelper.Switch("", "InnerSwitch", true, "data-toggle=collapse data-target=.option-" + Model.Item.ID)
+        <div class="switch-panel option-@(Model.Item.ID) collapse in">
+            @if (!string.IsNullOrEmpty(Model.Item.Options))
+            {
+                @Html.Raw(Model.Item.Options.Replace(",", "<br>"))
+            }
+        </div>
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.DiscountType))
+{
+    <td>
+        @(Model.Item.DiscountType.GetDisplayName<DiscountType>())
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.DateLimit))
+{
+    <td>
+        @Model.Item.DateLimit.ToDateString()
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.StockCount))
+{
+    <td>
+        @Model.Item.StockCount
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.SaleLimit))
+{
+    <td>
+        @Model.Item.SaleLimit
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.SalePrice))
+{
+    <td>
+        @Model.Item.SalePrice.ToString("0")
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.PriceType))
+{
+    <td>
+        @(Model.Item.PriceType.GetDisplayName<PriceType>())
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.PeopleRange))
+{
+    <td>
+        @(Model.Item.PeopleMin == Model.Item.PeopleMax ?
+                Model.Item.PeopleMin.ToString() : Model.Item.PeopleMin + " ~ " + Model.Item.PeopleMax)
+    </td>
+}
+
+@if (ContentTypes.Contains(ContentType.Description))
+{
+    <td>
+        @Model.ItemLanguage.Description
+    </td>
+}
+
+@if (discStructure != null)
+{
+    <td>@Html.Raw(string.Join("<br>", Model.ParentItems.Where(x => x.ItemTypes.HasValue((int)ItemType.OrderDiscount)).Select(x => x.Subject).ToList()))</td>
+}
+
+<td>
+    @if (ContentTypes.Contains(ContentType.Sort))
+    {
+        <a class="edittable-action-sort" title="Sort"><i class="fa fa-arrows"></i></a>
+    }
+    <a class="edittable-action-edit" title="Edit"><i class="fa fa-pencil"></i></a>
+    <a class="edittable-action-remove" title="Remove"><i class="fa fa-trash-o"></i></a>
+</td>

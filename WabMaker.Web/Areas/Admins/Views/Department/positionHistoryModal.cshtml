@@ -1,0 +1,512 @@
+﻿<style>
+    .timeline-centered {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+        .timeline-centered:before, .timeline-centered:after {
+            content: " ";
+            display: table;
+        }
+
+        .timeline-centered:after {
+            clear: both;
+        }
+
+        .timeline-centered:before, .timeline-centered:after {
+            content: " ";
+            display: table;
+        }
+
+        .timeline-centered:after {
+            clear: both;
+        }
+
+        .timeline-centered:before {
+            content: '';
+            position: absolute;
+            display: block;
+            width: 1px;
+            background: #21a9e1;
+            /*left: 50%;*/
+            top: 20px;
+            bottom: 20px;
+            margin-left: 15px;
+        }
+
+        .timeline-centered .timeline-entry {
+            position: relative;
+            /*width: 50%;
+        float: right;*/
+            margin-top: 5px;
+            margin-left: 30px;
+            margin-bottom: 10px;
+            clear: both;
+        }
+
+            .timeline-centered .timeline-entry:before, .timeline-centered .timeline-entry:after {
+                content: " ";
+                display: table;
+            }
+
+            .timeline-centered .timeline-entry:after {
+                clear: both;
+            }
+
+            .timeline-centered .timeline-entry:before, .timeline-centered .timeline-entry:after {
+                content: " ";
+                display: table;
+            }
+
+            .timeline-centered .timeline-entry:after {
+                clear: both;
+            }
+
+            .timeline-centered .timeline-entry.begin {
+                margin-bottom: 0;
+                display: inline-block;
+            }
+
+            .timeline-centered .timeline-entry.left-aligned {
+                float: left;
+            }
+
+                .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner {
+                    margin-left: 0;
+                    margin-right: -18px;
+                }
+
+                    .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-time {
+                        left: auto;
+                        right: -100px;
+                        text-align: left;
+                    }
+
+                    .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-icon {
+                        float: right;
+                    }
+
+                    .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-label {
+                        margin-left: 0;
+                        margin-right: 70px;
+                    }
+
+                        .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-label:after {
+                            left: auto;
+                            right: 0;
+                            margin-left: 0;
+                            margin-right: -9px;
+                            -moz-transform: rotate(180deg);
+                            -o-transform: rotate(180deg);
+                            -webkit-transform: rotate(180deg);
+                            -ms-transform: rotate(180deg);
+                            transform: rotate(180deg);
+                        }
+
+            .timeline-centered .timeline-entry .timeline-entry-inner {
+                position: relative;
+                margin-left: -20px;
+                /*auto width*/
+                /*display: inline-block;*/
+            }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:before, .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    content: " ";
+                    display: table;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    clear: both;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:before, .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    content: " ";
+                    display: table;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    clear: both;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time {
+                    position: absolute;
+                    left: -100px;
+                    text-align: right;
+                    padding: 10px;
+                    -webkit-box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                    box-sizing: border-box;
+                }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span {
+                        display: block;
+                    }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span:first-child {
+                            font-size: 15px;
+                            font-weight: bold;
+                        }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span:last-child {
+                            font-size: 12px;
+                        }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon {
+                    background: #fff;
+                    color: #737881;
+                    display: block;
+                    width: 11px;
+                    height: 11px;
+                    margin-top: 15px;
+                    -webkit-background-clip: padding-box;
+                    -moz-background-clip: padding;
+                    background-clip: padding-box;
+                    -webkit-border-radius: 10px;
+                    -moz-border-radius: 10px;
+                    border-radius: 10px;
+                    text-align: center;
+                    /*-moz-box-shadow: 0 0 0 5px #f5f5f6;
+                -webkit-box-shadow: 0 0 0 5px #f5f5f6;
+                box-shadow: 0 0 0 5px #f5f5f6;*/
+                    line-height: 20px;
+                    font-size: 15px;
+                    float: left;
+                }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-primary {
+                        background-color: #303641;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-secondary {
+                        background-color: #ee4749;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-success {
+                        background-color: #00a651;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-info {
+                        background-color: #21a9e1;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-warning {
+                        background-color: #fad839;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-danger {
+                        background-color: #cc2424;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-empty {
+                        background-color: #ffffff;
+                        color: #fff;
+                        border: 1px solid #21a9e1;
+                        width: 11px;
+                        height: 11px;
+                    }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label {
+                    position: relative;
+                    background: #f5f5f6;
+                    padding: 1em;
+                    margin-left: 30px;
+                    -webkit-background-clip: padding-box;
+                    -moz-background-clip: padding;
+                    background-clip: padding-box;
+                    -webkit-border-radius: 3px;
+                    -moz-border-radius: 3px;
+                    border-radius: 3px;
+                }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        border-style: solid;
+                        border-width: 9px 9px 9px 0;
+                        border-color: transparent #f5f5f6 transparent transparent;
+                        left: 0;
+                        top: 10px;
+                        margin-left: -9px;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2, .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label p {
+                        color: #737881;
+                        font-family: "Noto Sans",sans-serif;
+                        font-size: 12px;
+                        margin: 0;
+                        line-height: 1.428571429;
+                    }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label p + p {
+                            margin-top: 15px;
+                        }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 {
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                    }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 a {
+                            color: #303641;
+                        }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 span {
+                            -webkit-opacity: .6;
+                            -moz-opacity: .6;
+                            opacity: .6;
+                            -ms-filter: alpha(opacity=60);
+                            filter: alpha(opacity=60);
+                        }
+    #positionHistoryModal .timeline-label span {
+    }
+</style>
+<!-- Modal 職位歷程 -->
+<div id="positionHistoryModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">職位變更歷程</h4>
+            </div>
+            <div class="modal-body">
+                <p>總部>教練組></p>
+                <div class="row" style="padding:0 20px;">
+
+                    <div class="timeline-centered">
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-feather"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>90-95花式A級</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>96-101花式A級</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>102花式A級</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>103花式A級</p>
+                                </div>
+                            </div>
+                        </article>
+
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>104-105花式A級</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>106-107花式A級</p>
+                                   @*<div><span>王尉奇</span>
+                                        <span>王淵棟</span>
+                                        <span>王筱筑</span>
+                                        <span>朱鈴姬</span>
+                                        <span>吳泳鋒</span>
+                                        <span>李婉寧</span>
+                                        <span>李雅慧</span>
+                                        <span>杜旭昇</span>
+                                        <span>佘紹文</span>
+                                       <span>易清風</span>
+                                       <span>林信宜</span>
+                                       <span>唐竺瑋</span></div>*@                                  
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry begin">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-empty">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p style="color: #428bca;">新增</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    #userHistoryModal .userInfo .userPhoto {
+        text-align: center;
+        font-size: 65px;
+        color: #585858; 
+    }
+
+    #userHistoryModal .userInfo .userName {
+        font-size: 18px;
+        font-weight: 700;
+        color: #3dabff;
+    }
+
+    #userHistoryModal .userInfo p {
+        font-size: 12px;
+        margin-bottom: 6px;
+        color: #535353;
+    }
+</style>
+<div id="userHistoryModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">個人歷程</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row userInfo">
+                    <div class="col-md-4 userPhoto"><i class="fa fa-user"></i></div>
+                    <div class="col-md-8 row">
+                        <p class="userName">王文文</p>
+                        <p>男 | 台北市</p>
+                        <p><b>生日:</b> 1955/12/12</p>
+                        <p><b>電話:</b> 0911333888</p>
+                    </div>
+                </div>
+                <div class="row" style="padding:0 20px;">
+
+                    <div class="timeline-centered">
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-feather"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>104花式A級教練</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>104競速B級裁判</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>105花式A級裁判</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>第五屆監事</p>
+                                </div>
+                            </div>
+                        </article>
+
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>第六屆理事</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-info">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p>第七屆理事長</p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="timeline-entry begin">
+                            <div class="timeline-entry-inner">
+                                <div class="timeline-icon bg-empty">
+                                    <i class="entypo-suitcase"></i>
+                                </div>
+                                <div class="timeline-label">
+                                    <p style="color: #428bca;">新增</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

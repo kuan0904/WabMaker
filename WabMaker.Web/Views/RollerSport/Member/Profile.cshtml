@@ -1,0 +1,124 @@
+﻿@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services
+@model WebMaker.Entity.ViewModels.UserViewModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "基本資料";
+}
+
+<div class="main-content">
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+                <li><a href="@Url.Action("Index","Member")">會員中心</a></li>
+                <li class="active">@ViewBag.Title</li>
+            </ol>
+        </div>
+    </div>
+    <!-- breadArea END -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+            </div>
+            <div class="col-md-10">
+                <div class="account">
+                    <h2>@ViewBag.Title</h2>
+                </div>
+
+                @* 套版start *@
+                @using (Html.BeginForm(null, null, FormMethod.Post))
+                {
+                    <input type="hidden" id="returnUrl" value="@Url.Action()" />
+                    <input type="hidden" id="successMessage" data-title="修改基本資料" value="@MyTool.Enums.MessageType.Confirm" />
+
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>建立時間</th>
+                                <th>身分</th>
+                                <th>証號</th>
+                                <th>期限</th>
+                            </tr>
+                        </thead>
+                        @foreach (var item in Model.RoleRelations)
+                        {
+                            <tr>
+                                <td>@item.CreateTime.ToDateString()</td>
+                                <td>@item.mgt_Role.Name</td>
+                                <td>@item.RoleNumber</td>
+                                <td>@(item.IsTimeLimited ? item.StartTime.ToDateString() + "~" + item.EndTime.ToDateString() : "")</td>
+                            </tr>
+                        }
+                    </table>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                        <label for="id-number" class="label-helper">
+                            登入帳號 / E-mail
+                            @if (Model.User.EmailIsVerify)
+                            {
+                                <span class="label label-success label-sm">已驗證</span>
+                            }
+                            else
+                            {
+                                <a class="btn btn-warning sendConfirmBtn LinkAjax" data-url="@Url.Action("SendValidCodeSelf")" data-title="重寄驗證信">重寄驗證信</a>
+                            }
+                        </label>
+                        @Html.EditorFor(model => model.User.Email, new { htmlAttributes = new { @class = "form-control account-num" } })
+                        @Html.ValidationMessageFor(model => model.User.Email, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                        <label class="label-helper">
+                            Facebook 帳號
+                        </label>
+                        <div>
+                            @(Model.User.LoginTypes.HasValue((int)MyTool.Enums.LoginType.Facebook) ? "綁定完成" : "未綁定")
+                        </div>
+                    </div>
+
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_Profile"), Model)
+
+                    <input id="SaveBtn" type="button" value="儲存" class="DoneBtn" />
+                }
+                @* 套版end *@
+
+            </div>
+            <!-- col-sm-12 -main-content END -->
+            <!-- col-md-8 td-main-content END -->
+        </div>
+        <!-- row END -->
+    </div>
+    <!-- container END -->
+</div>
+
+@* 會員資格申請 new *@
+@Html.Action("Partial", "Item", new ItemPageModel
+{
+    //CacheName = "Member_Apply",
+    ViewName = "Member_Apply",
+    IsPaged = false,
+    SortColumn = SortColumn.Sort,
+    StructureJson = _Json.ModelToJson(new List<Guid> {
+                  new Guid("cad7be08-2c1c-4cad-8546-da5bfb1d0f7b") })//會員資格申請
+
+})
+
+@section scripts{
+    <script>
+        $(function () {
+            $("#User_Email").change(function () {
+                $(".sendConfirmBtn").addClass("disabled");
+            });
+
+            //init contain check
+            web.containCheck.sum($(".wrapper"));
+        });
+    </script>
+}

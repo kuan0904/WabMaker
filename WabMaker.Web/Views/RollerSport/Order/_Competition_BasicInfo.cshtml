@@ -1,0 +1,158 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@* 比賽報名-基本資料 *@
+@model WebMaker.Entity.ViewModels.EditOrderViewModel
+@{
+    var structure = Model.OrderViewModel.ItemViewModel.Item.cms_Structure;
+    //訂單狀態(Editing才可編輯)
+    var orderStatus = Model.OrderViewModel.Order.OrderStatus;
+}
+<div class="col-lg-12 row @(orderStatus == (int)OrderStatus.Editing && Model.IsEditing || orderStatus == 0?"step-bg":"")">
+    <div class="account g-form">
+
+        <div class="col-lg-12">           
+            <h3>
+                <span class="step">步驟 1</span>
+                聯絡資料
+                @if (orderStatus == (int)OrderStatus.Editing && Model.IsCheckSuccess)
+                {
+                    if (Model.IsEditing)
+                    {
+                        <button id="SaveBtn" type="button" class="btn btn-sm btn-primary">儲存</button>
+                        @Ajax.RawActionLink("取消", "GetCompetition", "Order", new { id = Model.OrderViewModel.Order.ID, block = OrderEditBlock.BasicInfo, isEditing = false },
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "BasicInfo" }, new { @class = "btn btn-sm btn-default orderCancelBtn" })
+
+                        @Html.HiddenFor(model => model.Block)
+                    }
+                    else
+                    {
+                        @Ajax.RawActionLink("編輯", "GetCompetition", "Order", new { id = Model.OrderViewModel.Order.ID, block = OrderEditBlock.BasicInfo, isEditing = true },
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "BasicInfo" }, new { @class = "btn btn-sm btn-success orderEditBtn" })
+                    }
+                }
+                else if (orderStatus == 0)
+                {
+                    @*<button id="SaveBtn" type="button" class="btn btn-info btn-sm">新增</button>*@
+                    @*@Html.HiddenFor(model => model.Block)*@
+                }
+            </h3>
+        </div>
+
+
+        @if (Model.IsEditing)
+        {
+            @Html.HiddenFor(model => model.OrderViewModel.Order.ItemID)
+            @Html.HiddenFor(model => model.OrderViewModel.Order.ID)
+            @Html.Hidden("OrderViewModel.Order.PayType", (int)PayType.ATMVirtual)
+            @Html.Hidden("OrderViewModel.Order.DeliveryType", (int)DeliveryType.None)
+            @Html.Hidden("OrderViewModel.Order.ShippingFee", 0)
+        }
+
+        @*<div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">單位名稱</label>
+
+            @if (Model.IsEditing)
+            {
+                <input type="text" id="OrderViewModel_Order_TeamName" name="OrderViewModel.Order.TeamName" class="form-control account-num" value="@Model.OrderViewModel.Order.TeamName"
+                       data-val="true" data-val-length="不得大於100個字元" data-val-length-max="100" data-val-required="請輸入團隊名稱">
+                @Html.ValidationMessageFor(model => model.OrderViewModel.Order.TeamName, "", new { @class = "text-danger" })
+            }
+            else
+            {
+                <div>@Model.OrderViewModel.Order.TeamName</div>
+            }
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">教練</label>
+
+            @if (Model.IsEditing)
+            {
+                <input type="text" id="OrderViewModel_Order_Coach" name="OrderViewModel.Order.Coach" class="form-control account-num" value="@Model.OrderViewModel.Order.Coach"
+                       data-val="true" data-val-length="不得大於100個字元" data-val-length-max="100" data-val-required="請輸入教練名稱">
+                @Html.ValidationMessageFor(model => model.OrderViewModel.Order.Coach, "", new { @class = "text-danger" })
+            }
+            else
+            {
+                <div>@Model.OrderViewModel.Order.Coach</div>
+            }
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">領隊</label>
+
+            @if (Model.IsEditing)
+            {
+                <input type="text" id="OrderViewModel_Order_Leader" name="OrderViewModel.Order.Leader" class="form-control account-num" value="@Model.OrderViewModel.Order.Leader"
+                       data-val="true" data-val-length="不得大於100個字元" data-val-length-max="100" data-val-required="請輸入領隊名稱">
+                @Html.ValidationMessageFor(model => model.OrderViewModel.Order.Leader, "", new { @class = "text-danger" })
+            }
+            else
+            {
+                <div>@Model.OrderViewModel.Order.Leader</div>
+            }
+        </div>
+
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">管理</label>
+
+            @if (Model.IsEditing)
+            {
+                <input type="text" id="OrderViewModel_Order_Manager" name="OrderViewModel.Order.Manager" class="form-control account-num" value="@Model.OrderViewModel.Order.Manager"
+                       data-val="true" data-val-length="不得大於100個字元" data-val-length-max="100" data-val-required="請輸入管理名稱">
+                @Html.ValidationMessageFor(model => model.OrderViewModel.Order.Manager, "", new { @class = "text-danger" })
+            }
+            else
+            {
+                <div>@Model.OrderViewModel.Order.Manager</div>
+            }
+        </div>*@
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">聯絡人</label>
+            <div>
+                @Model.OrderViewModel.User.Name
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">聯絡Email (會員帳號)</label>
+            <div>
+                @Model.OrderViewModel.User.Email
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">聯絡電話 (會員電話)</label>
+            <div>
+                @Model.OrderViewModel.User.Phone
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">備註</label>
+
+            @if (Model.IsEditing)
+            {
+                @Html.EditorFor(model => model.OrderViewModel.Order.OrderNote, new { htmlAttributes = new { @class = "form-control account-num" } })
+            }
+            else
+            {
+                <div>
+                    @Model.OrderViewModel.Order.OrderNote
+                </div>
+            }
+        </div>
+
+        @if (orderStatus != (int)OrderStatus.Editing && orderStatus == 0)
+        {
+            <div class="col-lg-12 col-md-12 col-sm-12 mt-3 center">
+                <button id="SaveBtn" type="button" class="btn btn-info mt-5 center" style="width: 100%; max-width: 300px; border-radius: 4rem;">新增</button>
+            </div>
+        }
+    </div>
+</div>

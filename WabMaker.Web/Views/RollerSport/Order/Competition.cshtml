@@ -1,0 +1,244 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@* 比賽報名 *@
+@model WebMaker.Entity.ViewModels.EditOrderViewModel
+@{
+    ViewBag.Title = (Model.IsAdmin ? "[管理員編輯] " : "") + Model.OrderViewModel.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var structure = Model.OrderViewModel.ItemViewModel.Item.cms_Structure;
+    var orderStatus = Model.OrderViewModel.Order.OrderStatus;
+    bool isNew = Model.OrderViewModel.Order.ID == Guid.Empty;
+    //var mainImage = Model.ItemViewModel.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    //var imgUrl = mainImage == null ? "" :
+    //    (mainImage.FileType == (int)FileType.YouTube) ?
+    //    _YouTube.SetThumbnail(mainImage.FilePath) ://YouTube縮圖
+    //    mainImage.FilePath;//封面
+
+    //var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemViewModel.ItemLanguage.Content), 200);
+    //檔案下載
+    //var filedownloads = Model.ItemViewModel.ItemFiles.Where(x => x.SourceType == (int)SourceType.ItemFile && x.StructureID == new Guid("c3a94bc2-a6be-4f0f-8a99-489abdc153f0")).ToList();
+}
+
+<div class="main-content">
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+                <li><a href="@Url.Action("Index","Member")">會員中心</a></li>
+                <li><a href="@Url.Action("Order", "Member", new { type = structure.ID })">比賽報名紀錄</a></li>
+                <li class="active">@ViewBag.Title</li>
+            </ol>
+        </div>
+    </div>
+    <!-- breadArea END -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="account center">
+                    <h2>@ViewBag.Title</h2>
+                    @if (Model.OrderViewModel.Order.ID != Guid.Empty)
+                    {
+                        <p>訂單編號: @(Model.OrderViewModel.Order.OrderNumber)</p>
+                        <p>狀態: @(Model.OrderViewModel.Order.OrderStatus.GetDisplayName<OrderStatus>())</p>
+                        <p>建立時間: @(Model.OrderViewModel.Order.CreateTime.ToDateString())</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @using (Html.BeginForm("EditCompetition", "Order", new { id = "" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            //防止重複post
+            @*@Html.GenerateVerficationToken()*@
+
+            //新增回到訂單列表, 編輯回同頁url#block。送出 > change status > success
+            <input type="hidden" id="returnUrl" value="@(isNew ? Url.Action("ToEditCompetition"): Url.Action())" />
+            <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div id="BasicInfo" class="row mb-5">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "_Competition_BasicInfo"),
+               new EditOrderViewModel
+               {
+                   OrderViewModel = Model.OrderViewModel,
+                   Block = OrderEditBlock.BasicInfo,
+                   IsEditing = isNew,
+                   IsCheckSuccess = Model.IsCheckSuccess
+               })
+            </div>
+
+            <hr>
+            <div id="UnitList" class="row mb-5">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "_Competition_UnitList"),
+               new EditOrderViewModel
+               {
+                   OrderViewModel = Model.OrderViewModel,
+                   Block = OrderEditBlock.UnitList,
+                   IsEditing = false,
+                   IsCheckSuccess = Model.IsCheckSuccess,
+                   IsAdmin = Model.IsAdmin
+               })
+            </div>
+
+            <hr>
+            <div id="TeamMember" class="row mb-5">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "_Competition_TeamMember"),
+               new EditOrderViewModel
+               {
+                   OrderViewModel = Model.OrderViewModel,
+                   Block = OrderEditBlock.TeamMember,
+                   IsEditing = false,
+                   IsCheckSuccess = Model.IsCheckSuccess,
+                   IsAdmin = Model.IsAdmin
+               })
+            </div>
+
+            <hr>
+            <div id="OrderItem" class="row mb-5">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "_Competition_OrderItem"),
+               new EditOrderViewModel
+               {
+                   OrderViewModel = Model.OrderViewModel,
+                   Block = OrderEditBlock.OrderItem,
+                   IsEditing = false,
+                   IsCheckSuccess = Model.IsCheckSuccess,
+                   IsAdmin = Model.IsAdmin
+               })
+            </div>
+
+            <div id="OrderButtonBlock" class="row">
+                <div class="col-lg-12 mt-5 mb-5 text-center">
+
+                    @if (Model.IsCheckSuccess)
+                    {
+                        //編輯中(->刪除、送出)
+                        if (orderStatus == (int)OrderStatus.Editing)
+                        {
+                            //無修改紀錄才可刪除
+                            if (Model.OrderViewModel.Order.erp_OrderLog.Count <= 1)
+                            {
+                                <button id="OrderDeleteBtn" type="button" class="btn btn-danger" data-url="@Url.Action("ChangeStatus", new { id = Model.OrderViewModel.Order.ID, status = OrderStatus.Delete, captchaRequired = true })">刪除</button>
+                            }
+                            <button id="OrderSendBtn" type="button" class="btn btn-info" data-url="@Url.Action("ChangeStatus", new { id = Model.OrderViewModel.Order.ID, status = OrderStatus.NonPayment, toSuccessView = true, captchaRequired = true })">送出報名</button>
+                        }
+                        //待付款(->再修改)
+                        else if (orderStatus == (int)OrderStatus.NonPayment)
+                        {
+                            <button id="OrderUpdateBtn" type="button" class="btn btn-warning" data-url="@Url.Action("ChangeStatus", new { id = Model.OrderViewModel.Order.ID, status = OrderStatus.Editing, captchaRequired = true })">重新修改</button>
+                        }
+                        //完成(->作廢)
+                        else if (orderStatus == (int)OrderStatus.Done)
+                        {
+                            <button id="OrderInvalidBtn" type="button" class="btn btn-danger" data-url="@Url.Action("ChangeStatus", new { id = Model.OrderViewModel.Order.ID, status = OrderStatus.Invalid, captchaRequired = true })">作廢</button>
+                        }
+                        <br>
+                    }
+
+                    @if (!Model.IsCheckSuccess || orderStatus != (int)OrderStatus.Editing)
+                    {
+                        <a href="@Url.Action("Order", "Member", new { type = structure.ID })">
+                            <button type="button" class="DoneBtn btn-sm">返回會員中心</button>
+                        </a>
+                    }
+
+                </div>
+            </div>
+
+        }
+    </div>
+    <!-- container END -->
+</div>
+
+@section css{
+    <link href="~/Content/bootstrap-select.min.css" rel="stylesheet" />
+    <style>
+        .teamMemberSelect {
+            min-width: 150px;
+            left: 0 !important;
+        }
+    </style>
+
+    @if (Model.IsAdmin)
+    {
+        <style>
+            .main-content {
+                background: #d5d5d5;
+            }
+
+            .container table td, .container table th {
+                border-color: #adadad !important
+            }
+
+        </style>
+    }
+}
+@section scripts{
+    <script src="~/Scripts/bootstrap-select.min.js"></script>
+    <script>
+        $(function () {
+
+            $("#OrderDeleteBtn").click(function (e) {
+                e.preventDefault();
+                web.ConfirmCaptcha.showFn();
+                web.showConfirm('@ViewBag.Title', "確定要刪除嗎?", goToLink, $(this));
+            });
+
+            $("#OrderSendBtn").click(function (e) {
+                e.preventDefault();
+                web.ConfirmCaptcha.showFn();
+                web.showConfirm('@ViewBag.Title', "確定要送出嗎?", goToLink, $(this));
+            });
+
+            $("#OrderUpdateBtn").click(function (e) {
+                e.preventDefault();
+                web.ConfirmCaptcha.showFn();
+                web.showConfirm('@ViewBag.Title', "確定要重新修改嗎?<br>修改後匯款帳號將會重新產生，請於報名截止前完成修改。", goToLink, $(this));
+            });
+
+            $("#OrderInvalidBtn").click(function (e) {
+                e.preventDefault();
+                web.ConfirmCaptcha.showFn();
+                web.showConfirm('@ViewBag.Title', "確定要作廢嗎?<br>作廢後請聯絡主辦單位進行退款。", goToLink, $(this));
+            });
+
+            function goToLink($item) {
+                window.location = $item.data('url') + "&captcha=" + $("#confirm_box input").val();
+            }
+
+            $(document).on("click", ".orderEditBtn", function (e) {
+                $(".orderEditBtn, #OrderButtonBlock [type=button]").attr("disabled", true);
+            });
+
+            $(document).on("click", ".orderCancelBtn", function (e) {
+                $(".orderEditBtn, #OrderButtonBlock [type=button]").attr("disabled", false);
+            });
+
+            web.autoRow.init();
+            @*web.dynamicSelect.data = jQuery.parseJSON('@Html.Raw(Model.OrderViewModel.SelectOptionJson)');*@
+        });
+
+        var SubItemSelectJson = jQuery.parseJSON('@Html.Raw(Model.OrderViewModel.SubItemSelectJson)');
+        var TeamMemberSelectJson = jQuery.parseJSON('@Html.Raw(Model.OrderViewModel.TeamMemberSelectJson)');
+        var UnitSelectJson = jQuery.parseJSON('@Html.Raw(Model.OrderViewModel.UnitsSelectJson)');
+
+        function OnEditBlock() {
+            $("#OrderItemTableBody tr").each(function (i, item) {
+                web.dynamicSelect.init($(item), ".dynamicItem", SubItemSelectJson);
+                web.dynamicSelect.init($(item), ".teamMemberSelect", TeamMemberSelectJson);
+            });
+            $("#TeamMemberTableBody tr").each(function (i, item) {
+                web.dynamicSelect.init($(item), ".unitsSelect", UnitSelectJson);
+            });
+        }
+
+        function OnAddBlockRow() {
+            web.dynamicSelect.init($("#OrderItemTableBody tr:last"), ".dynamicItem", SubItemSelectJson);
+            web.dynamicSelect.init($("#OrderItemTableBody tr:last"), ".teamMemberSelect", TeamMemberSelectJson);
+            web.dynamicSelect.init($("#TeamMemberTableBody tr:last"), ".unitsSelect", UnitSelectJson);
+        }
+    </script>
+}

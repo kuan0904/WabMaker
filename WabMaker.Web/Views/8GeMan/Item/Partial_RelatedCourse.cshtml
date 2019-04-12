@@ -1,0 +1,37 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* 課程-相關活動 *@
+@foreach (var item in Model.DataResult.Data)
+{
+    var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemConver);
+
+    <div class="list-inner pb-10">
+        @if (mainImage != null)
+        {
+            if (mainImage.FileType == FileType.YouTube)
+            {
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+                </div>
+            }
+            else
+            {
+                <img src="@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)" alt="" />
+            }
+        }
+        <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="hot-title">
+            <h3 class="mb-10">@item.ItemLanguage.Subject</h3>
+            <p>活動日期: <br>@item.Item.StartTime.ToDateString() ~ @item.Item.EndTime.ToDateString()</p>
+            <p>活動地點: <br>@item.ItemLanguage.Address</p>
+            <span>@item.Item.CreateTime.ToString("yyyy.MM.dd")</span>
+            <span class="fr">Join</span>
+        </a>
+    </div>
+}
+
+
+
+

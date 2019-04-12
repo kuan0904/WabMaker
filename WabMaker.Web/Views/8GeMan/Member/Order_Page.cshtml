@@ -1,0 +1,86 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using WabMaker.Web.Helpers
+@model WebMaker.Entity.ViewModels.OrderPageResult
+@{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number_PreNext;
+    buttonModel.PreviousText = string.Format("<i class='fa fa-angle-left'></i>Back");
+    buttonModel.NextText = string.Format("Next<i class='fa fa-angle-right'></i>");
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+
+<div class="pro-pagination mb-20">
+    <div class="product-pagination">
+       <span class="grid-item-list pr-10">顯示 @(Model.DataResult.DataStart) 到 @(Model.DataResult.DataEnd) 筆</span>
+           @* <span class="grid-item-list">顯示 :</span>
+    <div class="country-select clearfix"> </div>*@
+    </div>
+    <ul class="blog-pagination">   
+        @foreach (var item in buttons)
+        {
+            Model.OrderPageModel.CurrentPage = item.Page;
+
+            <li class="@(item.IsCurrent?"active":"")">
+                @Ajax.RawActionLink(item.Name, "GetOrderPageList","Member", Model.OrderPageModel,
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" }, null)
+            </li>
+        }
+    </ul>
+</div>
+<div class="table-responsive mb-45">
+    <table class="table">
+        <thead class="g-back-g">
+            <tr>
+                <th>訂單編號</th>
+                <th>課程名稱</th>
+                <th>報名日期</th>
+                <th>金額</th>
+                <th>管理員訊息</th>
+                <th>狀態</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.DataResult.Data)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Order.OrderNumber)</td>
+                    <td>
+                        @if (item.ItemViewModel != null)
+                        {
+                            //訂單文章標題
+                            if (string.IsNullOrEmpty(item.ItemViewModel.Item.cms_Structure.ViewName))
+                            {
+                                //無文章
+                                @item.ItemViewModel.ItemLanguage.Subject
+                            }
+                            else
+                            {
+                                //link文章
+                                <a href="@Url.Action("Get","Item", new { routeName = item.ItemViewModel.Item.RouteName })" target="_blank">
+                                    @item.ItemViewModel.ItemLanguage.Subject
+                                </a>
+                            }
+                        }
+                        else
+                        {
+                            //所有商品 (RouteName not found)
+                            @*foreach (var detail in item.OrderDetails)
+                            {
+                                <div>
+                                    <a href="@Url.Action("Get","Item", new { routeName = detail.cms_Item.RouteName })" target="_blank">
+                                        @detail.ItemSubject
+                                    </a>
+                                </div>
+                            }*@
+                        }     
+                    </td>                  
+                    <td>@item.Order.CreateTime.ToString("yyyy/MM/dd")</td>
+                    <td>@item.Order.TotalPrice.ToString("0")</td>
+                    <td>@item.Order.PublicNote</td>
+                    <td>@(item.Order.OrderStatus.GetDisplayName<OrderStatus>())</td>                   
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,579 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.Tools
+@using WabMaker.Web.Helpers
+@model WebMaker.Entity.ViewModels.OrderViewModel
+@{
+    WebMaker.Entity.Models.cms_Structure structure = ViewBag.structure;
+    //包含類型
+    var orderContentTypes = structure.OrderContentTypes.ToContainList<OrderContentType>();
+    //包含欄位
+    var contentTypes = structure.ContentTypes.ToContainList<ContentType>();
+    //包含流程
+    var orderStatus = structure.OrderStatuses.ToContainList<OrderStatus>();
+    //允許流程
+    var allowStep = OrderTool.AllowSteps((OrderStatus)Model.Order.OrderStatus, AccountType.Admin, orderStatus);
+
+    //編輯or檢視
+    bool isEdit = ViewBag.IsEdit;
+
+    ViewBag.Title = structure.OrderName;
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+<div class="form-horizontal viewtable">
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="button" value="回前頁" class="CancelBtn btn btn-default" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Order.OrderNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Order.OrderNumber, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Order.CreateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Model.Order.CreateTime.ToString("yyyy/MM/dd HH:mm")
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Order.CreateUser, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <a href="@Url.Action("Index", "Member", new { goToId = Model.Order.CreateUser })" target="_blank">
+                @Model.Order.mgt_User.Name
+            </a>
+        </div>
+    </div>
+
+    @* 訂單狀態 *@
+    @if (!orderContentTypes.Contains(OrderContentType.Detail))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.Order.OrderStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @mHelper.OrderStatus(Model.Order.OrderStatus, Model.Order.OrderStatus.GetDisplayName<OrderStatus>())
+                @if (Model.Order.ToCombineOrder != null)
+                {
+                    <span>併入訂單 @Model.Order.ToCombineOrder.OrderNumber</span>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Order.PayType, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @(Model.Order.PayType.GetDisplayName<PayType>())
+            @if (Model.Order.PayType == (int)PayType.ATMVirtual)
+            {
+                <div><b>虛擬帳號: </b>@Model.Order.VirtualAccount.ToDefault("(未建立)")</div>
+                <div><b>繳費期限: </b>@Model.Order.PayDeadline.ToDateString()</div>
+            }
+            @{  var payMessage = Model.Order.erp_GetPayMessage.FirstOrDefault();}
+            @if (payMessage != null)
+            {
+                <div><b>交易時間: </b>@(payMessage.PayTime.ToDateString("yyyy/MM/dd HH:mm:ss"))</div>
+                <div><b>交易金額: </b>@(payMessage.PayPrice?.ToString("0"))</div>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Order.PayInfo, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Order.PayInfo, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    @*-----配送方式-----*@
+    @if (Model.Order.DeliveryType != (int)DeliveryType.None)
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.Order.DeliveryType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @(Model.Order.DeliveryType.GetDisplayName<DeliveryType>())
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Order.ReceiverName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.Order.ReceiverName, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Order.ReceiverPhone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.Order.ReceiverPhone, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Order.ReceiverAddres, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.Order.ReceiverAddres, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Order.ReceiverEmail, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.Order.ReceiverEmail, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Order.OrderNote, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Order.OrderNote, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+
+    @*-----比賽&&單位資料不再明細中-----*@
+    @if (orderContentTypes.Contains(OrderContentType.TeamName) && !orderContentTypes.Contains(OrderContentType.UnitInOrderDetail))
+    {
+        <div class="form-group">
+            <label class="control-label col-md-2" for="Order_PayType">單位資料</label>
+            <div class="col-md-10">
+                <table class="table">
+                    <tr>
+                        <th>縣市</th>
+                        <th>單位全名</th>
+                        <th>單位簡寫</th>
+                        @if (orderContentTypes.Contains(OrderContentType.Leader))
+                        {
+                            <th>領隊</th>
+                        }
+                        @if (orderContentTypes.Contains(OrderContentType.Coach))
+                        {
+                            <th>教練</th>
+                        }
+                        @if (orderContentTypes.Contains(OrderContentType.Manager))
+                        {
+                            <th>管理</th>
+                        }
+                    </tr>
+                    @foreach (var unit in Model.Units)
+                {
+                        <tr>
+                            <td>@unit.County</td>
+                            <td>@unit.Unit</td>
+                            <td>@unit.UnitShort</td>
+                            @if (orderContentTypes.Contains(OrderContentType.Leader))
+                            {
+                                <td>@unit.Leader</td>
+                            }
+                            @if (orderContentTypes.Contains(OrderContentType.Coach))
+                            {
+                                <td>@unit.Coach</td>
+                            }
+                            @if (orderContentTypes.Contains(OrderContentType.Manager))
+                            {
+                                <td>@unit.Manager</td>
+                            }
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+
+    @*@if (orderContentTypes.Contains(OrderContentType.TeamName))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Order.TeamName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DisplayFor(model => model.Order.TeamName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+        }*@
+
+
+                @*-----選手資料-----*@
+                @if (orderContentTypes.Contains(OrderContentType.TeamMembers))
+                {
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="Order_PayType">選手資料</label>
+                        <div class="col-md-10">
+                            <table class="table">
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>生日</th>
+                                    <th>性別</th>
+                                    <th>身分證字號</th>
+                                    <th>單位</th>
+                                </tr>
+                                @foreach (var member in Model.TeamMembers)
+                                {
+                                    <tr>
+                                        <td>@member.NickName</td>
+                                        <td>@member.Birthday.ToDateString()</td>
+                                        <td>@(member.Gender.GetDisplayName<GenderType>())</td>
+                                        <td>@member.IdentityCard</td>
+                                        <td>@(member.erp_OrderUnit?.Unit)</td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                @*-----商品列表-----*@
+                @using (Html.BeginForm("UpdateDetail", null, FormMethod.Post, new { @class = (isEdit ? "edit-form" : "") }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group" style="max-width: 1000px;">
+                        <h4 class="col-md-1" for="Order_PayType">明細</h4>
+                        <div class="col-md-11">
+                            <table class="table">
+                                <tr>
+                                    @if (orderContentTypes.Contains(OrderContentType.DetailDepartment))
+                                    {
+                                        <th>類型</th>
+                                    }
+                                    <th>名稱</th>
+
+                                    @if (orderContentTypes.Contains(OrderContentType.DetailOption))
+                                    {
+                                        <th>項目</th>
+                                    }
+                                    @if (orderContentTypes.Contains(OrderContentType.TeamMembers))
+                                    {
+                                        <th>選手</th>
+                                    }
+                                    @if (orderContentTypes.Contains(OrderContentType.DetailTeamName))
+                                    {
+                                        <th>團體隊名</th>
+                                    }
+                                    @if (orderContentTypes.Contains(OrderContentType.DetailFileUpload))
+                                    {
+                                        <th>檔案</th>
+                                    }
+
+                                    <th>數量</th>
+                                    <th>單價</th>
+                                    @if (orderContentTypes.Contains(OrderContentType.Discount))
+                                    {
+                                        <th>折扣</th>
+                                    }
+                                    @if (orderContentTypes.Contains(OrderContentType.UnitInOrderDetail))
+                                    {
+                                        <th>團隊</th>
+                                        <th>選手</th>
+                                    }
+                                    @if (orderContentTypes.Contains(OrderContentType.Detail))
+                                    {
+                                        <th>狀態</th>
+                                        <th width="100px">變更狀態</th>
+                                    }
+                                    <th>@* 復原合併 *@</th>
+                                </tr>
+                                @{ int i = 0; }
+                                @foreach (var detail in Model.OrderDetails)
+                                {
+                                    <tr data-id="@detail.ID" data-backtoid="@Model.Order.ID">
+                                        @if (orderContentTypes.Contains(OrderContentType.DetailDepartment))
+                                        {
+                                            <td>@detail.DepartmentName</td>
+                                        }
+                                        <td>@detail.ItemSubject</td>
+
+                                        @if (orderContentTypes.Contains(OrderContentType.DetailOption))
+                                        {
+                                            <td>@detail.Option</td>
+                                        }
+                                        @if (orderContentTypes.Contains(OrderContentType.TeamMembers))
+                                        {
+                                            <td>@(string.Join(",", detail.DetailMembers.Select(x => x.NickName)))</td>
+                                        }
+                                        @if (orderContentTypes.Contains(OrderContentType.DetailTeamName))
+                                        {
+                                            <td>@detail.DetailTeamName</td>
+                                        }
+                                        @if (orderContentTypes.Contains(OrderContentType.DetailFileUpload))
+                                        {
+                                            <td>
+
+                                                @if (!string.IsNullOrEmpty(detail.FilePath))
+                                                {
+                                                    <a href="@RouteHelper.SetUrlPath(detail.FilePath)" target="_blank">查看檔案</a>
+                                                }
+                                            </td>
+                                        }
+
+                                        <td>@detail.Quantity</td>
+                                        <td>@detail.SalePrice.ToString("0")</td>
+                                        @* 折扣 *@
+                                        @{
+                                            var discList = Model.OrderDiscounts.Where(x => x.OrderDetailID == detail.ID);
+                                        }
+                                        @if (orderContentTypes.Contains(OrderContentType.Discount))
+                                        {
+                                            <td>
+                                                @foreach (var disc in discList)
+                                                {
+                                                    <div>@disc.cms_Item.cms_ItemLanguage.FirstOrDefault().Subject: @disc.DiscountPrice.ToString("0")</div>
+                                                }
+                                            </td>
+                                        }
+                                        @if (orderContentTypes.Contains(OrderContentType.UnitInOrderDetail))
+                                        {
+                                            //每個項目只有一單位
+                                            var unit = Model.Units.FirstOrDefault(x => x.OrderDetailID == detail.ID);
+                                            var members = Model.TeamMembers.Where(x => x.erp_OrderDetail.Any(y => y.ID == detail.ID));
+
+                                            <td>
+                                                @if (unit != null)
+                                                {
+                                                    <span>團隊: @unit.Unit</span> <span>領隊：@unit.Leader</span> <span>教練：@unit.Coach</span> <span>管理：@unit.Manager</span>
+                                                }
+                                            </td>
+                                            <td>@string.Join("、", members.Select(x => x.NickName))</td>
+                                        }
+                                        @if (orderContentTypes.Contains(OrderContentType.Detail))
+                                        {
+                                            <td>
+                                                @mHelper.OrderStatus(detail.OrderStatus, detail.OrderStatus.GetDisplayName<OrderStatus>())
+
+                                            </td>
+                                            <td>
+                                                @if (orderContentTypes.Contains(OrderContentType.Detail))
+                                                {
+                                                    var allowDetailStep = OrderTool.AllowSteps((OrderStatus)detail.OrderStatus, AccountType.Admin, orderStatus);
+                                                    if (allowDetailStep.Any())
+                                                    {
+                                                        @Html.DropDownList("OrderDetails[" + i + "].OrderStatus", _Enum.EnumtoSelect(allowDetailStep), "(請選擇)", new { @class = "form-control selectpicker" })
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.Hidden("OrderDetails[" + i + "].OrderStatus", detail.OrderStatus);
+                                                    }
+                                                    @Html.Hidden("OrderDetails[" + i + "].ID", detail.ID)
+                                                }
+                                            </td>
+                                        }
+
+                                        <td>
+                                            @if (detail.CombineOriOrderID != null)
+                                            {
+                                                @:原訂單 @detail.erp_OrderCombineOri.OrderNumber
+                                if (Model.Order.OrderStatus == (int)OrderStatus.Processing)
+                                                {
+                                                    <a href="javascript:" class="RevertBtn btn btn-warning" title="復原合併"><i class="fa fa-reply"></i> 復原合併</a>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                                i++;
+                                            }
+                            </table>
+                        </div>
+                    </div>
+
+                                            if (orderContentTypes.Contains(OrderContentType.Detail))
+                                            {
+                                                @Html.HiddenFor(model => model.Order.ID)
+
+                                                <div class="form-group">
+                                                    <div class="col-md-offset-12">
+                                                        <input id="SaveBtn" type="button" value="儲存" class="btn btn-info" />
+                                                    </div>
+                                                </div>
+                                                }
+                                            }
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Order.DetailPrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Model.Order.DetailPrice.ToString("0")
+                    </div>
+                </div>
+
+                @if (Model.Order.ShippingFee != 0)
+                {
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Order.ShippingFee, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Model.Order.ShippingFee.ToString("0")
+                        </div>
+                    </div>
+                }
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Order.TotalPrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Model.Order.TotalPrice.ToString("0")
+                    </div>
+                </div>
+
+                <!--備註-->
+                @* todo 狀態變更紀錄 *@
+
+                @if (orderContentTypes.Contains(OrderContentType.FileUpload))
+                {
+                    <div class="form-group">
+                        <label class="control-label col-md-2">上傳檔案</label>
+                        <div class="col-md-10">
+                            <a href="@RouteHelper.SetUrlPath(Model.Order.FilePath)" target="_blank">
+                                <img src="@RouteHelper.SetUrlPath(Model.Order.FilePath)" width="200" />
+                            </a>
+                        </div>
+                    </div>
+                }
+                @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = (isEdit && !orderContentTypes.Contains(OrderContentType.Detail) ? "edit-form" : "") }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    if (contentTypes.Contains(ContentType.OrderAutoRole_Not))
+                    {
+                        <div class="form-group">
+                            <label class="control-label col-md-2">
+                                申請身分
+                            </label>
+                            <div class="col-md-10">
+                                <div id="switch-role" class="collapse @(true ? "in" : "")">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th width="12%">身分 @mHelper.HelpButton("狀態\"完成\"時會自動新增身分")</th>
+                                            <th width="13%">編號</th>
+                                            <th width="30%">選擇期限</th>
+                                        </tr>
+                                        <tr>
+                                            <td>
+
+                                                @Html.HiddenFor(model => model.NewRoleRelation.ID)
+                                                @if (isEdit)
+                                                {
+                                                    @Html.DropDownList("NewRoleRelation.RoleID", (List<SelectListItem>)ViewBag.RoleSelectList, "未選擇", new { @class = "form-control selectpicker" })
+                                                }
+                                                else
+                                                {
+                                                    @(Model.NewRoleRelation?.mgt_Role?.Name)
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (isEdit)
+                                                {
+                                                    <input type="text" class="form-control" name="NewRoleRelation.RoleNumber" value="@(Model.NewRoleRelation?.RoleNumber)" />
+                                                }
+                                                else
+                                                {
+                                                    @(Model.NewRoleRelation?.RoleNumber)
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (isEdit)
+                                                {
+                                                    var isChecked = Model.NewRoleRelation?.IsTimeLimited ?? false;
+                                                    @mHelper.Switch("", "NewRoleRelation.IsTimeLimited", isChecked, addAttr: "data-toggle=collapse data-target=#switch-panel")
+                                                    <div id="switch-panel" class="collapse @(isChecked ? "in" : "")">
+                                                        <div class="input-group input-daterange">
+                                                            <input type="text" class="form-control" name="NewRoleRelation.StartTime" value="@(Model.NewRoleRelation?.StartTime.ToDateString())" />
+                                                            <div class="input-group-addon">to</div>
+                                                            <input type="text" class="form-control" name="NewRoleRelation.EndTime" value="@(Model.NewRoleRelation?.EndTime.ToDateString())" />
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (Model.NewRoleRelation != null)
+                                                {
+                                                    @(Model.NewRoleRelation.IsTimeLimited ? Model.NewRoleRelation.StartTime.ToDateString() + "~" + Model.NewRoleRelation.EndTime.ToDateString() : "")
+                                                }
+
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    if (orderContentTypes.Contains(OrderContentType.PublicNote))
+                    {
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Order.PublicNote, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @if (isEdit)
+                                {
+                                    @Html.EditorFor(model => model.Order.PublicNote, new { htmlAttributes = new { @class = "form-control" } })
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(model => model.Order.PublicNote, new { htmlAttributes = new { @class = "form-control" } })
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    if (orderContentTypes.Contains(OrderContentType.PrivateNote))
+                    {
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Order.PrivateNote, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @if (isEdit)
+                                {
+                                    @Html.EditorFor(model => model.Order.PrivateNote, new { htmlAttributes = new { @class = "form-control" } })
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(model => model.Order.PrivateNote, new { htmlAttributes = new { @class = "form-control" } })
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @* 變更訂單狀態 *@
+                if (isEdit && !orderContentTypes.Contains(OrderContentType.Detail))
+                {
+                    @Html.HiddenFor(model => model.Order.ID)
+                    @Html.HiddenFor(model => model.Order.StructureID)
+                    @Html.HiddenFor(model => model.Order.CreateUser)
+
+                    <div class="form-group">
+                        <label class="control-label col-md-2" for="OrderStatus">變更狀態</label>
+                        <div class="col-md-10">
+                            @Html.DropDownList("Order.OrderStatus", _Enum.EnumtoSelect(allowStep), "(請選擇)", new { @class = "form-control selectpicker" })
+                            @Html.ValidationMessageFor(model => model.Order.OrderStatus, "", new { @class = "text-danger" })
+
+                            @* 可併入的訂單 *@
+                            <div id="CombinOrderBlock" style="display:none">
+                                <h5>選擇併入訂單:</h5>
+                                @Html.DropDownList("Order.CombineOrderID", Model.CombinOrderSelectList, new { @class = "form-control selectpicker" })
+                            </div>
+
+                            @if (Model.Order.PayType == (int)PayType.ATMVirtual)
+                            {
+                                @mHelper.HelpButton("狀態為\"待付款\"時，會產生虛擬帳號，繳費期限為7天")
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="button" value="回前頁" class="CancelBtn btn btn-default" />
+
+                        @if (isEdit && !orderContentTypes.Contains(OrderContentType.Detail))
+                        {
+                            <input id="SaveBtn" type="button" value="儲存" class="btn btn-info" />
+                        }
+                    </div>
+                </div>
+                }
+            </div>

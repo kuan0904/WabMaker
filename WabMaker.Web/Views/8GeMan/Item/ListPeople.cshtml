@@ -1,0 +1,183 @@
+﻿@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemListModel
+@* 人物文章列表 *@
+@{
+    ViewBag.Title = Model.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    //不分頁
+    Model.ItemPageModel.IsPaged = false;
+    var mainImage = Model.ItemViewModel.ItemFiles.Count == 0 ? new WabMaker.Web.WebViewModels.ItemWebFile() :
+                                                  Model.ItemViewModel.ItemFiles.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+}
+
+@section scripts{
+    <script>
+        $(function () {
+
+            $("#filter-box input[type=checkbox]").change(function () {
+                filterPeople();
+            });
+
+            function filterPeople() {
+
+                if ($("#filter-box input[type=checkbox]:checked").length == 0) {
+                    $(".people-item").show();
+
+                } else {
+                    $(".people-item").hide();
+
+                    $(".people-item").each(function () {
+                        var me = $(this);
+                        var andShow = true;
+                        var orShow = false;
+
+                        //gender
+                        orShow = $("#filter-box input[type=checkbox][name=chk_gender]:checked").length == 0;
+                        $("#filter-box input[type=checkbox][name=chk_gender]:checked").each(function () {
+                            if ($(this).val() == me.data("gender")) {
+                                orShow = true;
+                            }
+                        });
+                        andShow = andShow && orShow;
+
+                        //age
+                        orShow = $("#filter-box input[name=chk_age]:checked").length == 0;
+                        $("#filter-box input[name=chk_age]:checked").each(function () {
+                            var min = $(this).data("min");
+                            var max = $(this).data("max");
+
+                            var value = me.data("age");
+                            if (min <= value && value <= max) {
+                                orShow = true;
+                            }
+                        });
+                        andShow = andShow && orShow;
+
+                        //height
+                        orShow = $("#filter-box input[name=chk_height]:checked").length == 0;
+                        $("#filter-box input[name=chk_height]:checked").each(function () {
+                            var min = $(this).data("min");
+                            var max = $(this).data("max");
+
+                            var value = me.data("height");
+                            if (min <= value && value <= max) {
+                                orShow = true;
+                            }
+                        });
+                        andShow = andShow && orShow;
+
+                        //language
+                        orShow = $("#filter-box input[name=chk_language]:checked").length == 0;
+                        $("#filter-box input[name=chk_language]:checked").each(function () {
+                            var str = $(this).val();
+
+                            var value = me.data("language");
+                            if (value.indexOf(str) != -1) {
+                                orShow = true;
+                            }
+                        });
+                        andShow = andShow && orShow;
+
+
+                        if (andShow) {
+                            me.show();
+                        }
+                    });
+                                        
+                }
+            }
+
+        });
+    </script>
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)) 0/cover no-repeat;">
+        <div class="auto-container">
+            @Html.Raw(Model.ItemViewModel.ItemLanguage.TemplateText)
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">首頁</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@Model.ItemViewModel.ItemLanguage.Subject</a></li>
+            </ol>
+        </div>
+        @* 篩選人物 *@
+        <div id="filter-box" class="products-filter-box products-filter-box2 mb-20">
+            <input type="hidden" name="tabs" value="1">
+            <div class="row p-10 mr-15 ml-15 border-b">
+                <label class="col-sm-2 col-xs-3  form-label text-right">性別 ：</label>
+                <div class="col-md-10 col-xs-9">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_gender" value="@((int)GenderType.Male)"><span>男</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_gender" value="@((int)GenderType.Female)"><span>女</span>
+                    </label>
+                </div>
+            </div>
+            <div class="clearfix p-10 mr-15 ml-15 border-b">
+                <label class="col-sm-2 col-xs-3 form-label text-right">年齡 ：</label>
+                <div class="col-md-10 col-xs-9">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_age" value="1" data-min="0" data-max="18"><span>18以下</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_age" value="2" data-min="18" data-max="25"><span>18-25</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_age" value="3" data-min="25" data-max="30"><span>25-30</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_age" value="4" data-min="30" data-max="100"><span>30以上</span>
+                    </label>
+                </div>
+            </div>
+            <div class="clearfix p-10 mr-15 ml-15 border-b">
+                <label class="col-sm-2 col-xs-3 form-label text-right">身高 ：</label>
+                <div class="col-md-10 col-xs-9">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_height" value="1" data-min="0" data-max="160"><span>160以下</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_height" value="2" data-min="160" data-max="170"><span>160-170</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_height" value="3" data-min="170" data-max="180"><span>170-180</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_height" value="4" data-min="180" data-max="300"><span>180以上</span>
+                    </label>
+                </div>
+            </div>
+            <div class="clearfix p-10 mr-15 ml-15 border-b">
+                <label class="col-md-2 col-xs-3 form-label text-right">語言 ：</label>
+                <div class="col-md-10 col-xs-9">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_language" value="國語"><span>國語</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_language" value="台語"><span>台語</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_language" value="英文"><span>英文</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_language" value="日文"><span>日文</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div id="ListContent" class="row">
+            @Html.Action("Partial", new { model = Model.ItemPageModel })
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,93 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using WebMaker.BLL.Helpers
+@model  WabMaker.Web.WebViewModels.ItemPageResult
+@{
+    bool isLogin = SessionManager.UserID != Guid.Empty && SessionManager.AccountType == MyTool.Enums.AccountType.Member;
+}
+<div class="news-wrap news-list">
+
+    @foreach (var item in Model.DataResult.Data)
+    {
+        var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+
+        <div class="col-md-12">
+
+            <div class="thumbnail">
+                <div class="pic effect col-xs-4">
+                    <img src="@RouteHelper.SetImagePath(mainImage?.FilePath, mainImage?.ThumbnailPath,"/html/RollerSport/images/default.jpg")" alt="" title="@item.ItemLanguage.Subject" />
+                    <a class="view-more" href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" title="了解更多"><span>more</span></a>
+                </div>
+
+                <div class="caption col-xs-8">
+                    <h3 class="title"><a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" title="@item.ItemLanguage.Subject">@item.ItemLanguage.Subject</a></h3>
+                    <div class=meta-info>
+                        @if (item.ParentItems != null)
+                        {
+                            foreach (var category in item.ParentItems)
+                            {
+                                <a href="@Url.Action("Get", "Item", new { routeName = category.RouteName })" class="post-category">@category.Subject</a>
+                            }
+                        }
+                        <div class=post-author>
+                            <span>By</span>
+                            <a href="#">@(item.ItemLanguage.Author)</a>
+                            <span> - </span>
+                        </div>
+                        <span class=post-date><time>@item.Item.Date.ToDateString()</time></span>
+                        <div class=post-views>
+                            <i class="fa fa-eye"></i>@item.Item.ViewCount
+                        </div>
+                        <div class=post-comments>
+                            <a href="#respond"><i class="fa fa-comments"></i>0</a>
+                        </div>
+                        <div class="post-keywords">
+                            <i class="fa fa-tags"></i>
+                            @*<a href="#">搜尋引擎</a>
+                                <a href="#">網站維護</a>
+                                <a href="#">SEO</a>
+                                <a href="#">CMS</a>*@
+                        </div>
+                    </div><!-- meta-info END -->
+                    <p class="description">
+                        @_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Content), 120)
+                    </p>
+                    @* 比賽文章報名鈕 *@
+                    @if (item.Item.StructureID == new Guid("d83dc304-8f3a-48bc-b85f-23695ba0e9d6"))
+                    {
+                        <a class="btn-course @(isLogin?"":"btnNotLogin")" data-url="@(Url.Action("NewCompetition", "Order", new { id = item.Item.ID  }))"
+                           href="@(isLogin?Url.Action("NewCompetition", "Order", new { id = item.Item.ID }):"javascript:")">報名去</a>
+                    }
+                    <a class="btn-read-more" href="detail.html">繼續閱讀</a>
+                </div>
+            </div>
+        </div><!-- col-md-12 END -->
+    }
+
+</div><!-- news-list END -->
+
+@{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number_PreNext;
+    buttonModel.PreviousText = string.Format("<span aria-hidden='true'>«</span><span class='sr-only'>Previous</span>");
+    buttonModel.NextText = string.Format("<span aria-hidden='true'>»</span><span class='sr-only'>Next</span>");
+
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+
+@*<div class="page-info">第@(Model.DataResult.CurrentPage)頁 / 共@(Model.DataResult.PageCount)頁</div>*@
+
+<ul class="pagination">
+    @foreach (var item in buttons)
+    {
+        Model.ItemPageModel.CurrentPage = item.Page;
+
+        <li class="page-item @(item.IsCurrent?"active":"")">
+            @Ajax.RawActionLink(item.Name, "GetPageList", "Item", Model.ItemPageModel,
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" },
+           new { @class = "page-link" })
+        </li>
+    }
+</ul>

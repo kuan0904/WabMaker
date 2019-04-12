@@ -1,0 +1,98 @@
+﻿@using WebMaker.BLL.Helpers
+@using MyTool.Enums
+@model WebMaker.Entity.ViewModels.OrderListModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = Model.Structure.OrderName;
+    //每頁顯示筆數
+    //Model.OrderPageModel.PageSize = 3;
+}
+
+<div class="main-content">
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+                <li><a href="@Url.Action("Index","Member")">會員中心</a></li>
+                <li class="active">@ViewBag.Title</li>
+            </ol>
+        </div>
+    </div>
+    <!-- breadArea END -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+            </div>
+            <div class="col-md-10">
+                <div class="account">
+                    <h2>@ViewBag.Title</h2>
+                </div>
+
+                @* 套版start *@
+                <div id="ListContent">
+                    @Html.Action("OrderPartial", new { model = Model.OrderPageModel })
+                </div>
+                @* 套版end *@
+
+            </div>
+            <!-- col-sm-12 -main-content END -->
+            <!-- col-md-8 td-main-content END -->
+        </div>
+        <!-- row END -->
+    </div>
+    <!-- container END -->
+</div>
+
+@section css{
+    <style>
+        .label {
+            background-color: #abbac3;
+            font-weight: normal;
+            font-size: 11px;   
+            padding: .2em .5em .3em;      
+            border-radius: 0;
+        }
+
+        .label-grey, .badge-grey {
+            background-color: #a0a0a0 !important;
+        }
+
+        .label-info, .badge-info {
+            background-color: #4ca3ce !important;
+        }
+
+        .label-primary, .badge-primary {
+            background-color: #428bca !important;
+        }
+
+        .label-success, .badge-success {
+            background-color: #82af6f !important;
+        }
+
+        .label-danger, .badge-danger {
+            background-color: #d15b47 !important;
+        }
+
+        .label-important, .badge-important {
+            background-color: #d15b47 !important;
+        }
+
+        .label-inverse, .badge-inverse {
+            background-color: #333 !important;
+        }
+
+        .label-warning, .badge-warning {
+            background-color: #f89406 !important;
+        }
+
+        .label-pink, .badge-pink {
+            background-color: #d6487e !important;
+        }
+
+        .label-purple, .badge-purple {
+            background-color: #9585bf !important;
+        }
+    </style>
+}

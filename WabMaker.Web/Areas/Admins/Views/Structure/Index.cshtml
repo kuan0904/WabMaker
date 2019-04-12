@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "文章內容組成";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action()" />
+<h2>@ViewBag.Title</h2>
+<br>
+
+<!--Tree-->
+<ul id="treeView" class="itemTree mTree loadData vertical-checks">
+
+</ul>
+
+@*<div id="masterView">
+        <p><button id="CreateBtn" class="btn btn-sm btn-primary">新增</button></p>
+
+        <div id="mainTable" class="container-fluid"></div>
+    </div>
+
+    <div id="editView" style="display:none;"></div>
+*@
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+        //site.showMaster();
+    </script>
+}
+@section css{
+    <style>
+        /*tree block*/
+        .itemTree .timeline-label {
+            min-width: 130px;
+        }
+
+        .itemTree .CreateNode .timeline-label, .itemTree .CreateSmNode .timeline-label {
+            width: 70px;
+        }
+
+        .itemTree .EditNode > .timeline-label {
+            width: 850px;
+        }
+    </style>
+}
+
+

@@ -1,0 +1,37 @@
+﻿@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "會員中心";
+}
+
+<div class="main-content">
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+                <li class="active">會員中心</li>           
+            </ol>
+        </div>
+    </div>
+    <!-- breadArea END -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+            </div>
+            <div class="col-md-10">
+
+
+
+            </div>
+            <!-- col-sm-12 -main-content END -->
+            <!-- col-md-8 td-main-content END -->
+        </div>
+        <!-- row END -->
+    </div>
+    <!-- container END -->
+</div>
+

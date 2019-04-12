@@ -1,0 +1,14 @@
+﻿@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services;
+
+@* 橫幅Banner *@
+@Html.Action("Partial", "Item", new ItemPageModel
+{
+    CacheName = "Index_Banner",
+    ViewName = "Index_Banner",
+    IsPaged = false,
+    SortColumn = SortColumn.Sort,
+    StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("ac78d95b-2a49-4586-8cc3-92fddc73ee91") })//Index_Banner
+})

@@ -1,0 +1,266 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.Models.cms_Structure
+
+@{
+    bool isNew = Model.ID == Guid.Empty;
+    ViewBag.Title = (isNew ? "新增" : "編輯") + "文章內容";
+}
+
+@*<div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>*@
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.Hidden("isNew", isNew ? 1 : 0)
+        @Html.HiddenFor(model => model.ID)
+        @Html.Hidden("ParentID", Guid.Empty)
+
+        @if (isNew)
+        {
+            //使用已存Structure
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="SeqNo">已存在的結構</label>
+                <div class="col-sm-10">
+                    <input class="form-control text-box single-line" type="text" id="SeqNo" name="SeqNo" value="@Model.SeqNo" placeholder="SeqNo">
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @*@Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })*@
+                <input type="text" class="form-control text-box single-line input-validation-error" data-val-length="不得大於50個字元" data-val-length-max="50" id="Name" name="Name" value="@Model.Name">
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">語系</label>
+            <!--包含語系-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("LanguageTypes"),
+               "LanguageTypes", Model.LanguageTypes, _Enum.ToContainCheck<LanguageType>(Model.LanguageTypes))
+            </div>
+            <!--主要語系-->
+            <div class="col-sm-2">
+                @mHelper.RadioList(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("DefaultLanguage"),
+               "DefaultLanguage", Model.DefaultLanguage, _Enum.ToRadioList<LanguageType>(Model.DefaultLanguage))
+            </div>
+        </div>
+
+        <!--關聯類型-->
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">關聯類型</label>
+            <div class="col-sm-2">
+                @mHelper.RadioList(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("ParentRelationType"),
+               "ParentRelationType", Model.ParentRelationType, _Enum.ToRadioList<ItemRelationType>(Model.ParentRelationType))
+            </div>
+            <div class="col-sm-2">
+                @mHelper.RadioList(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("ChildRelationType"),
+               "ChildRelationType", Model.ChildRelationType, _Enum.ToRadioList<ItemRelationType>(Model.ChildRelationType))
+            </div>
+        </div>
+
+        <!--包含功能-->
+        <div class="form-group form-group-border">
+            @Html.LabelFor(model => model.ToolTypes, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("ToolTypes"),
+                                        "ToolTypes", Model.ToolTypes, _Enum.ToContainCheck<ToolType>(Model.ToolTypes))
+            </div>
+        </div>
+
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">文章內容</label>
+            <!--包含類型-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("ContentTypes"),
+                                        "ContentTypes", Model.ContentTypes, _Enum.ToContainCheck<ContentType>(Model.ContentTypes))
+            </div>
+            <!--篩選包含欄位 todo delete-->
+            @*<div class="col-sm-2">
+                    @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("FilterTypes"),
+                                            "FilterTypes", Model.FilterTypes, _Enum.ToContainCheck<ContentType>(Model.FilterTypes))
+                </div>*@
+            <!--列表包含類型-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("ListTypes"),
+                                        "ListTypes", Model.ListTypes, _Enum.ToContainCheck<ContentType>(Model.ListTypes))
+            </div>
+            <!--必填類型-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("RequiredTypes"),
+                                        "RequiredTypes", Model.RequiredTypes, _Enum.ToContainCheck<ContentRequiredType>(Model.RequiredTypes))
+            </div>
+            <!--語系獨立欄位 todo delete-->
+            @*<div class="col-sm-2">
+                    @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("ContentLanguageTypes"),
+                                            "ContentLanguageTypes", Model.ContentLanguageTypes, _Enum.ToContainCheck<ContentLanguageType>(Model.ContentLanguageTypes))
+                </div>*@
+        </div>
+
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">檔案</label>
+            <!--檔案組成類型-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("FileTypes"),
+                                        "FileTypes", Model.FileTypes, _Enum.ToContainCheck<FileType>(Model.FileTypes))
+            </div>
+            <!--檔案包含功能-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("FileToolTypes"),
+                                        "FileToolTypes", Model.FileToolTypes, _Enum.ToContainCheck<FileToolType>(Model.FileToolTypes))
+            </div>
+        </div>
+
+        <!--圖片尺寸-->
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">圖片尺寸</label>
+            <div class="col-sm-2">
+                <span>寬</span>
+                @Html.EditorFor(model => model.ImageWidth, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            <div class="col-sm-2">
+                <span>高</span>
+                @Html.EditorFor(model => model.ImageHeight, new { htmlAttributes = new { @class = "form-control" } })
+
+            </div>
+        </div>
+
+        <!--樣板編輯-->
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">樣板編輯(html)</label>
+            <div class="col-sm-10">
+                <textarea cols="20" data-name="Template" rows="5" class="form-control htmlencode">@Model.Template</textarea>
+            </div>
+        </div>
+
+        <!--自訂格式-->
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">自訂格式</label>
+            <div class="col-sm-10">
+                <textarea cols="20" name="CustomFormat" rows="5" class="form-control">@Model.CustomFormat</textarea>
+            </div>
+        </div>
+
+        <!--訂單-->
+        <div class="form-group">
+            @Html.LabelFor(model => model.OrderName, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @Html.EditorFor(model => model.OrderName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.OrderName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">訂單</label>
+            <!--包含付費方式-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("PayTypes"),
+                                        "PayTypes", Model.PayTypes, _Enum.ToContainCheck<PayType>(Model.PayTypes))
+            </div>
+            <!--包含出貨方式-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("DeliveryTypes"),
+                                        "DeliveryTypes", Model.DeliveryTypes, _Enum.ToContainCheck<DeliveryType>(Model.DeliveryTypes))
+            </div>
+            <!--包含計價方式-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("PriceTypes"),
+                                        "PriceTypes", Model.PriceTypes, _Enum.ToContainCheck<PriceType>(Model.PriceTypes))
+            </div>
+            <!--包含折扣類型-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("DiscountTypes"),
+                                        "DiscountTypes", Model.DiscountTypes, _Enum.ToContainCheck<DiscountType>(Model.DiscountTypes))
+            </div>
+        </div>
+
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2">訂單</label>
+            <!--包含訂單流程-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("OrderStatuses"),
+                                        "OrderStatuses", Model.OrderStatuses, _Enum.ToContainCheck<OrderStatus>(Model.OrderStatuses))
+            </div>
+            <!--包含訂單欄位-->
+            <div class="col-sm-2">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.cms_Structure>("OrderContentTypes"),
+                                        "OrderContentTypes", Model.OrderContentTypes, _Enum.ToContainCheck<OrderContentType>(Model.OrderContentTypes))
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OrderErrorReturnPage, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @Html.DropDownList("OrderErrorReturnPage",
+                     _Enum.EnumtoSelectAndName<OrderErrorReturnPage>(Model.OrderErrorReturnPage), new { @class = "selectpicker" })
+                @Html.ValidationMessageFor(model => model.OrderErrorReturnPage, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <!--功能類型-->
+        <div class="form-group form-group-border">
+            @Html.LabelFor(model => model.ItemTypes, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @mHelper.CheckboxContain("", "ItemTypes", Model.ItemTypes, _Enum.ToContainCheck<ItemType>(Model.ItemTypes))
+            </div>
+        </div>
+
+        <div class="form-group form-group-border">
+            @Html.LabelFor(model => model.ViewName, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @Html.EditorFor(model => model.ViewName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ViewName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*@Html.HiddenFor(model => model.Sort)*@
+        <div class="form-group">
+            @Html.LabelFor(model => model.Sort, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                @Html.EditorFor(model => model.Sort, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Sort, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsEnabled, htmlAttributes: new { @class = "control-label col-sm-2" })
+            <div class="col-sm-10">
+                <div class="switch-block">
+                    <label>
+                        <input name="IsEnabled" class="ace ace-switch ace-switch-6" type="checkbox" checked="@Model.IsEnabled" value="true">
+                        <span class="lbl"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" style="padding-top: 10px;">
+            <div class="col-md-12 text-center">
+                @if (!isNew)
+                {
+                    <input type="button" value="刪除" class="btn btn-danger btn-sm DeleteTree" />
+                }
+                <input id="SaveBtn" type="button" value="儲存" class="btn btn-sm btn-info" />
+                <input type="button" value="取消" class="btn btn-sm btn-default CancelTree" />
+            </div>
+        </div>
+    </div>
+}

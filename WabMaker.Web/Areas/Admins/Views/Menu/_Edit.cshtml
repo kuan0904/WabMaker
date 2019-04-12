@@ -1,0 +1,101 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.Models.mgt_Menu
+
+@{
+    bool isNew = Model.ID == Guid.Empty;
+    ViewBag.Title = (isNew ? "新增" : "編輯");
+}
+
+@using (Html.BeginForm((isNew ? "Create" : "UPdate"), null))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.Hidden("isNew", isNew ? 1 : 0)
+        @Html.HiddenFor(model => model.ID)
+        @Html.HiddenFor(model => model.Type)
+        @Html.HiddenFor(model => model.ParentID)    
+
+        <div class="form-group ffl-wrapper">
+            <div class="col-md-12">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "ffl-label" })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group ffl-wrapper-height">
+            <div class="col-md-12 select-mapping">
+                @*@Html.HiddenFor(model => model.Controller, new { @class = "select-mapping-hidden" })*@
+                @Html.DropDownList("Controller",
+                     _Enum.EnumtoSelectAndName<ControllerType>(Model.Controller),
+                     "Controller", new { @class = "selectpicker select.select-mapping-target" })
+            </div>
+        </div>
+
+        <div class="form-group ffl-wrapper-height">
+            <div class="col-md-12 select-mapping">
+                @*@Html.HiddenFor(model => model.Action)*@
+                @Html.DropDownList("Action",
+                    _Enum.EnumtoSelectAndName<ActionType>(Model.Action),
+                    "Action", new { @class = "selectpicker" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.mgt_Menu>("MenuActions"), "MenuActions", Model.MenuActions,
+                                        _Enum.ToContainCheck<ActionType>(Model.MenuActions))
+            </div>
+        </div>
+
+        <div class="form-group ffl-wrapper">
+            <div class="col-md-12">
+                @Html.EditorFor(model => model.Url, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.LabelFor(model => model.Url, htmlAttributes: new { @class = "ffl-label" })
+                @Html.ValidationMessageFor(model => model.Url, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*<div class="form-group">
+            <div class="col-md-12">
+                @mHelper.Switch(_Model.GetDisplayName<WebMaker.Entity.Models.mgt_Menu>("IsLink"), "IsLink", Model.IsLink)
+            </div>
+        </div>*@
+
+        <div class="form-group">
+            <div class="col-md-12">
+                @mHelper.Switch(_Model.GetDisplayName<WebMaker.Entity.Models.mgt_Menu>("IsMenu"), "IsMenu", Model.IsMenu)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                @mHelper.Switch(_Model.GetDisplayName<WebMaker.Entity.Models.mgt_Menu>("IsEnabled"), "IsEnabled", Model.IsEnabled)
+            </div>
+        </div>
+
+        <div class="form-group ffl-wrapper">
+            <div class="col-md-12">
+                @Html.EditorFor(model => model.Sort, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.LabelFor(model => model.Sort, htmlAttributes: new { @class = "ffl-label" })
+                @Html.ValidationMessageFor(model => model.Sort, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12 text-center">
+                @if (!isNew)
+                {
+                    <input type="button" value="刪除" class="btn btn-danger btn-sm DeleteTree" />
+                }
+                <input id="SaveBtn" type="button" value="儲存" class="btn btn-info btn-sm" />
+                <input type="button" value="取消" class="btn btn-default btn-sm CancelTree" />
+            </div>
+        </div>
+    </div>
+}
+

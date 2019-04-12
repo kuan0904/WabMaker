@@ -1,0 +1,32 @@
+﻿@model WabMaker.Web.WebViewModels.ItemPageResult
+
+<div class="hotnews-title">
+    <span class="hotnews-title-inner"><span>News</span> 最新消息</span>
+</div>
+
+<div class="news-inner mb-20">
+    @foreach (var item in Model.DataResult.Data)
+    {
+        <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="border-b">
+            <div class="news-mark mark-blue">
+                @if (item.Item.StructureID == new Guid("acfa272c-a682-444a-b513-d7e1006a09fe"))
+                {
+                    @:課程資訊
+                }
+                else if (item.BreadCrumbs.Any())
+                {
+                    @item.BreadCrumbs.Last().Subject
+                }
+            </div>
+            @*<div class="news-date">
+                   @item.Item.UpdateTime
+                </div>*@
+            <div class="news-list">
+                @item.ItemLanguage.Subject
+            </div>
+        </a>
+    }
+</div>
+@*<div class="news-more text-right">
+        <a href="#">More</a>
+    </div>*@

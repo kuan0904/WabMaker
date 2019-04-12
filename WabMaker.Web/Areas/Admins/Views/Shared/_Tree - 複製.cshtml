@@ -1,0 +1,50 @@
+﻿@* 共用樹結構 *@
+@model List<MyTool.ViewModels.TreeViewModel>
+
+<ul>
+    @GenerateTree(Model)
+
+    @* new data *@
+    <li class="CreateNode" data-jstree='{"disabled":false}'>
+        <div class="hidden"></div>
+        <div class="timeline-label">
+            @Html.Partial("_TreeNode", new MyTool.ViewModels.TreeViewModel { Name = "新增" })
+        </div>
+    </li>
+</ul>
+
+@helper GenerateTree(List<MyTool.ViewModels.TreeViewModel> nodes, int level = 1)
+{
+
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+        bool isMultiLanguage = item.TreeLangs != null;
+
+            <li class="type-@(item.Type.ToString()) ViewNode" data-id="@item.ID" data-jstree='{"disabled":false}'>
+                <div class="hidden"></div>
+                <div class="timeline-label @(item.IsEnabled?"":"notEnabled") @(isMultiLanguage?"no-edit":"")">
+                    @Html.Partial("_TreeNode", item)
+                </div>
+
+                <ul>
+                    @if (item.Nodes != null && item.Nodes.Any())
+                    {
+                        @GenerateTree(item.Nodes, level + 1)
+                    }
+
+                    @* new data *@
+                    <li class="CreateNode" data-jstree='{"disabled":false}'>
+                        <div class="hidden"></div>
+                        <div class="timeline-label">
+                            @Html.Partial("_TreeNode", new MyTool.ViewModels.TreeViewModel { Name = "新增" })
+                        </div>
+                    </li>
+                </ul>
+
+            </li>
+    }
+}
+
+}

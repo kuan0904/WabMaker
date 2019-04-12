@@ -1,0 +1,44 @@
+﻿@using MyTool.ViewModels
+@using WabMaker.Web.Helpers
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    SiteInfoViewModel SiteInfo = ApplicationHelper.SiteInfo;
+}
+
+
+@section meta
+{
+    @if (SiteInfo != null)
+    {
+        if (!string.IsNullOrEmpty(SiteInfo.SiteName))
+        {
+            <meta property="og:title" content="@SiteInfo.SiteName" />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content="@RouteHelper.Url(true)" />
+        }
+
+        if (!string.IsNullOrEmpty(SiteInfo.MetaTagDescription))
+        {
+            <meta property="og:description" content="@SiteInfo.MetaTagDescription">
+        }
+
+        if (!string.IsNullOrEmpty(SiteInfo.MetaTagOgImage))
+        {
+            <meta property="og:image" content="@RouteHelper.SetUrlPath(SiteInfo.MetaTagOgImage, isAbsolute:true)" />
+        }
+    }
+}
+
+
+@*    @Html.Action("Partial", "Item", new ItemPageModel
+    {
+        ViewName = "Banner_1",
+        IsPaged = false,
+        SortColumn = SortColumn.Sort,
+        StructureJson = _Json.ModelToJson(new List<Guid> {
+                           new Guid("5e4337f2-25d9-4251-b47e-34983c3c07b1") })//Banner1
+    })*@
+
+<br><br>
+@* 訂閱電子報 *@
+@Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_SubEpaper"), new WebMaker.Entity.ViewModels.SendEmailViewModel())      

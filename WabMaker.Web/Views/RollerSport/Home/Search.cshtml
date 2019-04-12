@@ -1,0 +1,105 @@
+﻿@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services
+@model string
+@* 搜尋結果 *@
+@{
+    ViewBag.Title = Model + "搜尋結果";
+    Layout = "../Shared/_Layout.cshtml";
+}
+
+<div class="main-content">
+
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+                <li class="active">@Model</li>
+            </ol>
+        </div>
+    </div><!-- breadArea END -->
+
+    <div class="container">
+        <h1 class="site-title"></h1>
+
+        <div class="titlePic">
+            <div class="jumbotron">
+                <div class="container">
+                    <h2>搜尋結果</h2>
+                </div>
+            </div>
+        </div><!-- titlePic END -->
+
+        <div class="row">
+
+            <div class="col-md-8 col-sm-8 main-content">
+                <div class="main-content-inner">
+
+                    <div class="page-header">
+                        <h2 class="search-title">
+                            <span class="search-query">@Model</span> - <span> 搜尋結果</span>
+                        </h2>
+                        <div class="search-wrap">
+                            <form method="get" action="@Url.Action("Search", "Home")">
+
+                                <div class="form-group">
+                                    <input class="form-control" type="text" value="@Model" name="q">
+                                    <input class="btn btn-search" type="submit" value="Search">
+                                </div>
+                            </form>
+                            <p>若沒有找到您需要的文章或資訊，麻煩您再下一次關鍵字重新搜尋</p>
+                        </div><!-- search-wrap END -->
+
+                    </div><!-- page-header END -->
+
+                
+                    <div id="ListContent">
+                        @Html.Action("Partial", "Item", new ItemPageModel
+                    {
+                        ViewName = "Search_Page",
+                        PageSize = 10,
+                        SortColumn = SortColumn.Date,
+                        StructureJson = _Json.ModelToJson(new List<Guid> {
+                        new Guid("955c3e73-2328-48c5-af9a-b021dd25a8f3"),//一般文章
+                        new Guid("d83dc304-8f3a-48bc-b85f-23695ba0e9d6") //比賽文章
+                         }),
+                        SearchString = Model
+                    })
+                    </div>
+
+
+                    <div class="clearfix"></div>
+                </div><!-- main-content-inner END -->
+            </div><!-- col-md-8 td-main-content END -->
+
+            <div class="col-md-4 col-sm-4 main-sidebar">
+                <!-- <div class=main-sidebar-inner> -->
+
+                <div class="block-wrap" id="ad_banner">
+                    <ul class="banner-group"></ul>
+                </div>
+
+                <div class="block-wrap">
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Hot"))
+                </div>
+
+                <div class="block-wrap">
+                    <iframe src="https://www.facebook.com/plugins/page.php?href=https://www.facebook.com/tpersf/&tabs=timeline&width=300&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=1355515061131043" width="300" height="500" scrolling="no" frameborder="0" allowTransparency="true" style="display: block; width: 300px; margin: auto;"></iframe>
+                </div>
+
+                <!-- </div> --><!-- main-sidebar-inner END -->
+            </div><!-- col-md-4 END -->
+
+        </div><!-- row END -->
+
+    </div><!-- container END -->
+</div>
+
+
+
+
+
+
+

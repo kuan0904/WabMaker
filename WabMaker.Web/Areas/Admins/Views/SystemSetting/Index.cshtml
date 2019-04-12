@@ -1,0 +1,43 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@{
+    ViewBag.Title = "系統設定";
+
+    //系統設定
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+}
+
+<h2>@ViewBag.Title</h2>
+
+<table class="table table-striped table-bordered bootstrap-datatable">
+    <tr>
+        <th width="15%"><!--setting--></th>
+        <th>
+
+        </th>
+    </tr>
+
+    <tr>
+        <td><a href="@Url.Action("ClientInfo","SystemSetting")" class="EditBtn btn btn-sm btn-info" title="Edit"><i class="fa fa-pencil"></i></a></td>
+        <td>公司基本資料</td>
+    </tr>
+    <tr>
+        <td><a href="@Url.Action("SiteInfo","SystemSetting")" class="EditBtn btn btn-sm btn-info" title="Edit"><i class="fa fa-pencil"></i></a></td>
+        <td>網站基本資料</td>
+    </tr>
+    <tr>
+        <td><a href="@Url.Action("ApiKey","SystemSetting")" class="EditBtn btn btn-sm btn-info" title="Edit"><i class="fa fa-pencil"></i></a></td>
+        <td>API key設定</td>
+    </tr>
+    <tr>
+        <td><a href="@Url.Action("SmtpServer","SystemSetting")" class="EditBtn btn btn-sm btn-info" title="Edit"><i class="fa fa-pencil"></i></a></td>
+        <td>寄件服務設定</td>
+    </tr>
+    @if (clientSettings.Contains(ClientSetting.SMS))
+    {
+        <tr>
+            <td><a href="@Url.Action("SmsService","SystemSetting")" class="EditBtn btn btn-sm btn-info" title="Edit"><i class="fa fa-pencil"></i></a></td>
+            <td>簡訊服務設定</td>
+        </tr>
+    }
+</table>

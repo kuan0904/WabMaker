@@ -1,0 +1,76 @@
+﻿@using MyTool.Enums
+@using WebMaker.Entity.ViewModels
+@model WebMaker.Entity.ViewModels.SendEmailViewModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    //ViewBag.Title; //忘記密碼、重寄驗證信
+}
+
+<div class="breadArea">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+            <li class="active">註冊會員</li>
+            <li class="active">@ViewBag.Title</li>
+        </ol>
+    </div>
+</div>
+
+@using (Html.BeginForm("SendValidCode", "Member", FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action("Login", "Member", new  { })" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.SystemMailType)
+    @Html.HiddenFor(model => model.ValidType)
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="account center">
+                    <h2>@ViewBag.Title</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="account g-form">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-12"></div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                            <label for="id-number" class="label-helper">* E-mail</label>
+                            <input type="text" class="form-control account-num" name="Email" placeholder="請輸入E-mail" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-12"></div>
+                        <div class="col-lg-4 col-md-4 col-sm-12 mt-3">
+                            <label for="id-number" class="label-helper">*驗證碼 </label>
+                            @Html.TextBoxFor(model => model.Captcha, "", new { @class = "form-control account-num", placeholder = "驗證碼", autocomplete = "off" })
+                            @Html.ValidationMessageFor(model => model.Captcha, "", new { @class = "text-danger" })                      
+                         </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 mt-3">
+                            <div class="code-b">
+                                <img class="imgverifycode code-img" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+                                <a class="btnnewcode" href="javascript:"><img class="code-btn" src="~/html/RollerSport/images/code-btn-b.svg" alt=""></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-lg-12 mt-5 mb-5" style="padding-bottom: 150px;">
+                <div class="btn-width-sm"><input id="SaveBtn" type="button" class="DoneBtn btn-sm" value="確認送出" /></div>
+            </div>
+        </div>
+    </div>
+
+}
+

@@ -1,0 +1,78 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@* 比賽報名-項目與組別 *@
+@model WebMaker.Entity.ViewModels.EditOrderViewModel
+@{
+    var structure = Model.OrderViewModel.ItemViewModel.Item.cms_Structure;
+    var orderDetail = Model.OrderViewModel.OrderDetails.FirstOrDefault(x => x.ID == Model.OrderDetailID);
+    var updateTargetId = "Member_" + Model.OrderDetailID;
+    var orderStatus = orderDetail.OrderStatus;
+}
+
+@* Editing *@
+@if (Model.IsEditing)
+{
+    @Html.HiddenFor(model => model.Block)
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ItemID)
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ID)
+    @Html.Hidden("OrderViewModel.OrderDetails[0].ID", Model.OrderDetailID)
+
+
+    if (((orderStatus == (int)OrderStatus.TeamEdit ||
+        orderStatus == (int)OrderStatus.TeamEditConfirm ||
+        orderStatus == (int)OrderStatus.TeamEditDone)
+        && Model.IsCheckSuccess))// || Model.IsAdmin
+    {
+        <div class="col-md-12">
+            <button id="SaveBtn" class="btn btn-style-sixteen" title="Save">儲存</button>
+            @Ajax.RawActionLink("取消", "GetCompetition", "Order", new { id = Model.OrderViewModel.Order.ID, block = OrderEditBlock.DetailMember, isEditing = false, OrderDetailID = Model.OrderDetailID },
+                 new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = updateTargetId }, new { @class = "btn btn-style-eighteen orderCancelBtn" })
+        </div>
+    }
+
+    <div class="col-xs-12 member-event-step3-arena">
+        @foreach (var member in Model.TeamMemberAssigns)
+        {
+            var isCheck = orderDetail.DetailMembers.Any(x => x.FromSourceID == member.ID);
+
+            <label>
+                <span class="badge badge-pill badge-nametags-@(isCheck?"pick":"nopick")">
+                    @(member.NickName) @*(@member.Birthday.ToDateString())*@
+                    <i class="fas fa-check"></i>
+                </span>
+                <input type="checkbox" style="display:none" name="OrderViewModel.OrderDetails[0].DetailMemberID" value="@member.ID" @(isCheck ? "checked" : "") />
+            </label>
+        }
+        @if (!Model.TeamMemberAssigns.Any())
+        {
+            <span>(無可參賽的選手...)</span>
+        }
+    </div>
+}
+
+    @* View *@
+else
+{
+    if (((orderStatus == (int)OrderStatus.TeamEdit ||
+      orderStatus == (int)OrderStatus.TeamEditConfirm ||
+      orderStatus == (int)OrderStatus.TeamEditDone)
+   && Model.IsCheckSuccess))// || Model.IsAdmin
+    {
+        <div class="col-md-12">
+            @Ajax.RawActionLink("編輯選手", "GetCompetition", "Order", new { id = Model.OrderViewModel.Order.ID, block = OrderEditBlock.DetailMember, isEditing = true, OrderDetailID = Model.OrderDetailID },
+                new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = updateTargetId }, new { @class = "btn btn-style-sixteen orderEditBtn" })
+        </div>
+    }
+
+    <div class="col-xs-12 member-event-step3-arena">
+        @foreach (var member in orderDetail.DetailMembers)
+        {
+            <span class="badge badge-pill badge-nametags-pick">
+                @(member.NickName) @*(@member.Birthday.ToDateString())*@
+            </span>
+        }
+    </div>
+}

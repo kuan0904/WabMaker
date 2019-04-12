@@ -1,0 +1,75 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WebMaker.Entity.ViewModels
+@model  WebMaker.Entity.ViewModels.FileViewModel
+@{
+    //包含副檔名
+    //var extList = _Enum.ToBinaryList<FileType>(Model.Structure.FileTypes);
+    var extstring = string.Join(",", Model.FileTypes.Select(x => x.GetDescription()));
+    var extNames = string.Join(",", Model.FileTypes.Select(x => x.GetDisplayName()));
+}
+
+<div id="@Model.IdName" class="fileuploader" data-multiple="@(Model.IsMultiple ? 1 : 0)" data-checkext="@extstring">
+    <input class="hidden mainFile" type="file" @(Model.IsMultiple ? "multiple" : "")>
+
+    <div class="tabbable">
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="active">
+                <a data-toggle="tab" href="#tab-fileupload">FileUpload</a>
+            </li>
+
+            @if (Model.FileTypes.Contains(FileType.YouTube))
+            {
+                <li>
+                    <a data-toggle="tab" href="#tab-youtube">YouTube</a>
+                </li>
+            }
+        </ul>
+
+        <div class="tab-content">
+
+            <div id="tab-fileupload" class="tab-pane in active">
+                <div id="fileuploader-input" class="fileuploader-input">
+                    <div class="fileText"><span class="chooseText">請選擇上傳檔案 或拖曳至此</span></div>
+                    <div class="fileBtn"><span>選擇檔案</span></div>
+                </div>
+            </div>
+
+            <div id="tab-youtube" class="tab-pane">
+                <div class="youtube-input">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-youtube-play"></i></span>
+                        <input type="text" class="form-control youtubeText" placeholder="請輸入YouTube網址" />
+                    </div>
+                    <input type="button" class="youtubeBtn" value="確認" />
+                </div>
+            </div>
+            @{
+                string sizeMessage = "";
+                sizeMessage = Model.ImageWidth != 0 ? "寬=" + Model.ImageWidth : "";
+                sizeMessage += Model.ImageHeight != 0 ? ", 高=" + Model.ImageHeight : "";
+            }
+            <div class="fileDes_L">@(!string.IsNullOrEmpty(sizeMessage)? "[縮圖Size] " + sizeMessage:"")</div>
+            <div class="fileDes_R">[類型] <span>@extNames</span> [限制] <span class="maxsize"></span></div>
+        </div>
+    </div>
+
+
+
+    <div class="fileuploader-items">
+        <div class="template hidden">
+            @Html.Partial("_File", new FileDetailModel { name = Model.IdName, file = new WebMaker.Entity.Models.cms_ItemFile(), FileToolTypes=Model.FileToolTypes })
+        </div>
+        <ul class="fileuploader-items-list">
+            <!--fileuploader-item-->
+            @if (Model.FileList != null && Model.FileList.Any())
+            {
+                foreach (var file in Model.FileList)
+                {
+                    @Html.Partial("_File", new FileDetailModel { name = Model.IdName, file = file, FileToolTypes = Model.FileToolTypes })
+                }
+            }
+        </ul>
+    </div>
+
+</div>

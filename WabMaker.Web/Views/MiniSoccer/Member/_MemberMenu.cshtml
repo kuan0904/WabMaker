@@ -1,0 +1,69 @@
+﻿@using WabMaker.Web.Helpers
+@{
+    List<MyTool.ViewModels.TreeViewModel> tree = WebMaker.BLL.Helpers.SessionManager.MenuTree;
+    var urlNow = RouteHelper.Url();
+}
+<div class="hotnews-title">
+    <span class="hotnews-title-inner mb-20">會員專區</span>
+    @*<span class="badge badge-pill member-identity-tags-green">教練</span>
+        <span class="badge badge-pill member-identity-tags-blue">家長</span>
+        <span class="badge badge-pill member-identity-tags-gray">選手</span>*@
+</div>
+<div class="mb-sm-30">
+    <div class="single-sidebar">
+        <ul class="theme_menu mb-15">
+            <li>
+                @{
+                    var url_1 = "/Member/Profile";
+                    var isActive_1 = urlNow == url_1 ? "active" : "";
+                    <a class="@isActive_1" href="@url_1">基本資料</a>
+                }
+            </li>
+            <li>
+                @{
+                    var url_2 = "/Member/Password";
+                    var isActive_2 = urlNow == url_2 ? "active" : "";
+                    <a class="@isActive_2" href="@url_2">更改密碼</a>
+                }
+            </li>
+            <li class="second_menu">
+                家長
+                <ul>
+                    <li>
+                        @{
+                            var url_5 = "/Member/MyChildren";
+                            var isActive_5 = urlNow == url_5 ? "active" : "";
+                            <a class="@isActive_5" href="@url_5">我的寶貝</a>
+                        }                        
+                    </li>
+                    <li>
+                        @{
+                            var url_6 = "/Member/MyChildrenRecord";
+                            var isActive_6 = urlNow == url_6 ? "active" : "";
+                            <a class="@isActive_6" href="@url_6">寶貝報名記錄</a>
+                        }                         
+                    </li>
+                </ul>
+            </li>
+            <li class="second_menu">
+                教練
+                <ul>
+                    <li>
+                        @{
+                            var url_9 = "/Member/MyTeamMember";
+                            var isActive_9 = urlNow == url_9 ? "active" : "";
+                            <a class="@isActive_9" href="@url_9">我的選手</a>
+                        }
+                    </li>
+                    <li>
+                        @{
+                            var url_10 = "/Member/Order?type=19895d5b-95e0-48aa-9a87-a06ce4dca71a";
+                            var isActive_10 = urlNow == url_10 ? "active" : "";
+                            <a class="@isActive_10" href="@url_10">選手報名記錄</a>
+                        }                      
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+﻿@{
+    ViewBag.Title = "角色管理";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action()" />
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    <p>@mHelper.CreateButton()</p>
+
+    <div id="mainTable" class="container-fluid"></div>
+</div>
+
+<div id="editView" style="display:none;"></div>
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+        site.showMaster();
+
+    </script>
+}
+@section css{
+    <style>
+        .checkTree .timeline-label.no-edit {
+            padding: 7px 20px;
+            background: #7aae71;
+            border-radius: 5px;
+            margin-bottom: 1px;
+        }
+    </style>
+}

@@ -1,0 +1,367 @@
+﻿/*-----共用jstree css-----*/
+
+.tree {
+    margin: auto;
+    padding: 15px 0 0 15px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+}
+
+    .tree:before {
+        display: inline-block;
+        content: "";
+        position: absolute;
+        top: -20px;
+        bottom: 16px;
+        left: 4px;
+        /*z-index: 1;*/
+        border: 1px dotted #8a9398 /*#67B2DD*/;
+        border-width: 0 0 0 1px;
+    }
+
+    .tree .tree {
+        padding: 0;
+        overflow: visible;
+    }
+
+        .tree .tree:before {
+            display: none;
+        }
+
+    .tree .icon-caret {
+        vertical-align: baseline !important;
+    }
+
+    .tree .tree-branch .tree-branch-header {
+        position: relative;
+    }
+
+        .tree .tree-branch .tree-branch-header:hover {
+            /*background-color: rgba(98,168,209,.1);*/
+        }
+
+    .tree .tree-branch .icon-caret ~ .tree-branch-header {
+        display: inline-block;
+        width: 80%;
+        width: calc(100% - 36px);
+    }
+
+    .tree .tree-branch.tree-selected > .tree-branch-header {
+        /*background-color: rgba(98,168,209,.18);*/
+    }
+
+    .tree .tree-branch:last-child:after {
+        display: inline-block;
+        content: "";
+        position: absolute;
+        /*z-index: 1;*/
+        top: 15px;
+        bottom: 0;
+        left: -10px;
+        border-left: 2px solid #FFF;
+    }
+
+    .tree .tree-branch .tree-branch-children, .tree .tree-branch .tree-branch-children.tree {
+        margin: 0 0 0 23px;
+        padding: 0;
+        position: relative;
+    }
+
+        .tree .tree-branch .tree-branch-children.tree:before, .tree .tree-branch .tree-branch-children:before {
+            display: inline-block;
+            content: "";
+            position: absolute;
+            /*z-index: 0;*/
+            top: -17px;
+            bottom: 12px;
+            left: -11px;
+            border: 1px dotted #8a9398 /*#67B2DD*/;
+            border-width: 0 0 0 1px;
+        }
+
+    .tree .tree-item:hover {
+        /*background-color: rgba(98,168,209,.1);*/
+    }
+
+    .tree .tree-item.tree-selected, .tree .tree-item.tree-selected:hover {
+        /*background-color: rgba(98,168,209,.16);*/
+    }
+
+    .tree .tree-branch, .tree .tree-item {
+        position: relative;
+        list-style: none;
+        border-left: 1px solid #FFF;
+        margin-top: -1px;
+    }
+
+        .tree .tree-branch:before, .tree .tree-item:before {
+            display: inline-block;
+            content: "";
+            position: absolute;
+            top: 16px;
+            left: -13px;
+            width: 25px;
+            height: 0;
+            border-top: 1px dotted #8a9398 /*#67B2DD*/;
+            /*z-index: 1;*/
+        }
+
+    .tree .tree-selected {
+        color: #6398B0;
+    }
+
+    .tree .tree-branch .tree-branch-header {
+        border-radius: 0;
+    }
+
+    .tree .tree-branch .tree-branch-header, .tree .tree-item {
+        padding-left: 5px;
+        margin: 2px;
+        color: #4D6878;
+        -webkit-box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+        display: flex;
+    }
+
+
+    .tree .ace-icon[class*="-download"] {
+        transform: none;
+    }
+
+    .tree .tree-branch > i {
+        color: #8a9398;
+        font-size: 15px;
+        left: -13px;
+        top: 9px;
+        display: inline-block;
+        position: absolute;
+        width: 15px;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+        .tree .tree-branch > i.fa-caret-down {
+            left: -16px;
+        }
+
+/*-------------------------------------------------*/
+/*block*/
+.mTree .node-div {
+    display: inline-block;
+}
+
+.mTree.jstree-default .jstree-anchor {
+    line-height: inherit;
+    height: auto;
+}
+
+.mTree.jstree-default .jstree-hovered,
+.mTree.jstree-default .jstree-clicked {
+    background: none;
+    box-shadow: none;
+}
+
+.mTree .timeline-label {
+    /*margin: -5px 0 4px 0;*/
+    /*margin-left: -15px;*/
+    position: relative;
+    background: #f5f5f5;
+    display: inline-block;
+    min-width: 150px; /*width: custom*/
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    position: relative;
+    cursor: pointer;
+    z-index: 1;
+}
+
+    /*hover*/
+    .mTree .timeline-label:not(.no-edit):hover,
+    .mTree .EditNode > .timeline-label {
+        background: #eeeeee; /*dark gray*/
+        z-index: 2;
+    }
+
+    .mTree .timeline-label.no-edit {
+        cursor: default;
+    }
+
+.mTree .CreateNode .timeline-label:hover,
+.mTree .CreateSmNode .timeline-label:hover {
+    background: none;
+    cursor: pointer;
+}
+
+    .mTree .CreateNode .timeline-label:hover p,
+    .mTree .CreateSmNode .timeline-label:hover p {
+        color: #69b1ef;
+    }
+
+/*not Enabled*/
+.mTree .timeline-label.notEnabled {
+    border: none;
+    margin-top: 1px;
+}
+
+/*button(語系按鈕用)*/
+.mTree .timeline-btn {
+    position: absolute;
+    display: flex;
+    /*left: 100%;*/
+    right: 2px;
+    top: 1px;
+}
+
+    .mTree .timeline-btn .btn {
+        /*display: block;*/
+        padding: 4px 6px;
+        font-size: 12px;
+        border: none;
+        /*border-bottom-right-radius: 3px;
+        border-top-right-radius: 3px;*/
+        border-radius: 2px;
+        margin-left: 1px;
+    }
+
+        .mTree .timeline-btn .btn.multiLang {
+            /*min-width: 47px;
+            text-align: left;*/
+            min-width: 28px;
+            /*margin-bottom: 1px;*/
+        }
+
+            .mTree .timeline-btn .btn.multiLang i {
+                padding-right: 2px;
+            }
+
+
+/*text*/
+.mTree .timeline-text {
+    padding: 6px 12px;
+    width: 100%;
+}
+
+.mTree .timeline-label .subject {
+    font-size: 14px;
+    color: #555555;
+    margin: 0;
+}
+
+.mTree .timeline-label .description {
+    font-size: 12px;
+    color: #7f7f7f;
+    margin: 4px 0 0 0;
+}
+
+/*create btn*/
+.mTree .CreateNode .timeline-label,
+.mTree .CreateSmNode .timeline-label {
+    width: 80px;
+    padding: 7px 5px 5px 0;
+    /*margin: -4px 0 4px 0;*/
+    border: none;
+    background: none;
+}
+
+    .mTree .CreateNode .timeline-label p,
+    .mTree .CreateSmNode .timeline-label p {
+        color: #428bca;
+        font-size: 12px;
+        margin: 0;
+        background: #fff;
+    }
+
+        .mTree .CreateNode .timeline-label p i,
+        .mTree .CreateSmNode .timeline-label p i {
+            margin-right: 3px;
+            width: 11px;
+            background: #fff;
+        }
+
+/*edit*/
+.mTree .EditNode > .timeline-label {
+    width: 300px; /*width: custom*/
+    padding: 10px;
+}
+
+    .mTree .EditNode > .timeline-label form {
+        width: 100%;
+    }
+
+    .mTree .EditNode > .timeline-label .col-md-12 {
+        width: 100%;
+    }
+
+    .mTree .EditNode > .timeline-label .form-group {
+        margin-bottom: 8px;
+        display: flex;
+    }
+
+
+/*--------------------------------*/
+
+
+.checkTree .type-Action .timeline-label, .checkTree .type-Action .timeline-label:hover {
+    background: none;
+}
+
+.checkTree .timeline-label {
+    width: auto;
+    border: none;
+    background: #f2f2f2;
+    margin: 1px 0;
+}
+
+    .checkTree .timeline-label h6 {
+        color: #fff;
+        padding: 0;
+        margin: 0;
+    }
+
+.checkTree .timeline-text {
+    padding: 1px 6px;
+}
+
+.checkTree .checkbox-block {
+    padding: 0;
+    display: flex;
+}
+
+    .checkTree .checkbox-block .checkbox {
+        padding-bottom: 3px;
+    }
+
+/*.checkTree input[type=checkbox].ace:hover + .lbl, .checkTree input[type=radio].ace:hover + .lbl, .checkTree input[type=checkbox].ace + .lbl:hover, .checkTree input[type=radio].ace + .lbl:hover {
+    color: inherit;
+}*/
+
+/*green*/
+.checkTree .type-Menu > .timeline-label input[type=checkbox].ace:checked + .lbl::before,
+.checkTree .type-Menu > .timeline-label input[type=radio].ace:checked + .lbl::before {
+    background-color: #7aae71;
+    border-color: #7aae71;
+}
+
+
+/*--------------------------------*/
+
+#treeSort.tree .tree-branch:before, #treeSort.tree .tree-item:before {
+    left: 0;
+}
+
+#treeSort.tree:before {
+    top: 10px;
+    bottom: 5px;
+}
+
+#treeSort.tree .tree-branch .tree-branch-children.tree:before, #treeSort.tree .tree-branch .tree-branch-children:before {
+    top: 0px;
+    bottom: 5px;
+}

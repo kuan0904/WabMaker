@@ -1,0 +1,48 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@{
+    ViewBag.Title = "選手管理";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action()" />
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    @*<p>@mHelper.CreateButton()</p>*@
+
+    <div class="toolbar">
+        <div style="width:25%">
+            <input type="text" name="SearchString" class="form-control" placeholder="搜尋姓名、身分證" />
+        </div>       
+
+    </div>
+
+    <div id="mainTable" class="container-fluid"></div>
+</div>
+
+<div id="editView" style="display:none;"></div>
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+
+        var goToId = '@Request["goToId"]';
+        if (site.isNullOrEmpty(goToId))
+        {
+            site.showMaster();
+        }
+        else
+        {
+            var action = "View/" + goToId;
+            site.showEdit(action);
+        }
+
+        //go to RoleList
+        $(site.masterView).on("click", ".RoleListBtn", function (e) {
+            var action = "RoleList?userID=" + $(this).closest('tr').data("id");
+            site.showEdit(action);          
+        });
+
+   
+    </script>
+}

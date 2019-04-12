@@ -1,0 +1,64 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.Models.cms_EmailTemplate>
+@{
+    //系統設定
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+}
+
+<table class="table table-striped table-bordered bootstrap-datatable">
+    <tr>
+        <th width="15%"><!--setting--></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].SystemMailType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].Subject)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].IsEnabled)
+        </th>
+
+        @if (WebMaker.BLL.Helpers.SessionManager.IsSuperManager)
+        {
+            <th class="info">
+                @Html.DisplayNameFor(model => model.Data[0].SMSContent)
+            </th>
+            <th class="info">
+                @Html.DisplayNameFor(model => model.Data[0].SMSIsEnabled)
+            </th>
+        }
+    </tr>
+
+    @foreach (var item in Model.Data)
+    {
+        <tr data-id="@item.ID">
+            <td>
+                @mHelper.ListButton()
+            </td>
+            <td>
+                @(item.SystemMailType.GetDisplayName<SystemMailType>())
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Subject)
+            </td>
+            <td>
+                @mHelper.IsEnabled(item.IsEnabled)
+            </td>
+
+            @if (WebMaker.BLL.Helpers.SessionManager.IsSuperManager)
+            {
+                <th>
+                    @Html.DisplayFor(modelItem => item.SMSContent)                  
+                </th>
+                <th>
+                    @mHelper.IsEnabled(item.SMSIsEnabled)                 
+                </th>
+            }
+        </tr>
+    }
+
+</table>
+
+@Html.Partial("_Pagination", Model)
+

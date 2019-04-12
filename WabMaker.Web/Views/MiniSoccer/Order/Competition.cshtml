@@ -1,0 +1,65 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@using WabMaker.Web.WebViewModels
+@* 比賽報名 *@
+@model WebMaker.Entity.ViewModels.EditOrderViewModel
+@{
+    ViewBag.Title = (Model.IsAdmin ? "[管理員編輯] " : "") + Model.OrderViewModel.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    bool isNew = Model.OrderViewModel.Order.ID == Guid.Empty;
+}
+
+@if (isNew)
+{
+    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "Competition_New"), Model)
+}
+else
+{
+    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "Competition_Edit"), Model)
+}
+
+@section scripts{
+    <script src="~/Scripts/bootstrap-select.min.js"></script>
+    <script>
+        $(function () {
+
+            $(".OrderConfirmBtn").click(function (e) {
+                e.preventDefault();
+                //web.ConfirmCaptcha.showFn();            
+                web.showConfirm('', "確定完成，將發送通知信給家長?<br>", goToLink, $(this));
+            });
+
+            $(".OrderAbandonBtn").click(function (e) {
+                e.preventDefault();
+                //web.ConfirmCaptcha.showFn();            
+                web.showConfirm('', "確定放棄，將移除已指派的選手?<br>", goToLink, $(this));
+            });
+
+            function goToLink($item) {
+                window.location = $item.data('url') + "&captcha=" + $("#confirm_box input").val();
+            }
+
+            $(document).on("click", ".orderEditBtn", function (e) {
+                $(".orderEditBtn, .OrderButtonBlock [type=button]").attr("disabled", true);
+            });
+
+            $(document).on("click", ".orderCancelBtn", function (e) {
+                $(".orderEditBtn, .OrderButtonBlock [type=button]").attr("disabled", false);
+            });
+
+            $(document).on("change", ".member-event-step3-arena input:checkbox", function (e) {
+
+                if ($(this).is(":checked")) {
+                    $(this).siblings(".badge").addClass("badge-nametags-pick").removeClass("badge-nametags-nopick");
+                } else {
+                    $(this).siblings(".badge").addClass("badge-nametags-nopick").removeClass("badge-nametags-pick");
+                }
+            });
+
+        });
+
+    </script>
+}

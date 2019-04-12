@@ -1,0 +1,180 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@using WabMaker.Web.WebViewModels
+@* 比賽報名 *@
+@model WebMaker.Entity.ViewModels.EditOrderViewModel
+@{
+    ViewBag.Title = (Model.IsAdmin ? "[管理員編輯] " : "") + Model.OrderViewModel.ItemViewModel.ItemLanguage.Subject;
+    Layout = null;
+    var structure = Model.OrderViewModel.ItemViewModel.Item.cms_Structure;
+    var orderStatus = Model.OrderViewModel.Order.OrderStatus;
+    bool isNew = Model.OrderViewModel.Order.ID == Guid.Empty;
+
+    var parentItem = Model.OrderViewModel.ParentItemViewModel;
+
+    //封面圖
+    //var mainImage = parentItem.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    //var imgUrl = mainImage == null ? "" :
+    //    (mainImage.FileType == (int)FileType.YouTube) ?
+    //    _YouTube.SetThumbnail(mainImage.FilePath) ://YouTube縮圖
+    //    mainImage.FilePath;//封面
+
+    //內頁圖
+    var subImage = parentItem.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemSubImage);
+    var subImageUrl = subImage == null ? "" : RouteHelper.SetUrlPath(subImage.FilePath, isAbsolute: true);
+
+    //var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemViewModel.ItemLanguage.Content), 200);
+    //檔案下載
+    //var filedownloads = Model.ItemViewModel.ItemFiles.Where(x => x.SourceType == (int)SourceType.ItemFile && x.StructureID == new Guid("c3a94bc2-a6be-4f0f-8a99-489abdc153f0")).ToList();
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@subImageUrl) 0/cover no-repeat;">
+        <div class="auto-container">
+            <h2>@parentItem.ItemLanguage.Subject</h2>
+        </div>
+    </div>
+</section>
+
+@using (Html.BeginForm("EditCompetition", "Order", new { id = "" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    //防止重複post
+    @*@Html.GenerateVerficationToken()*@
+
+    <input type="hidden" id="returnUrl" value="@(isNew ? Url.Action("ToEditCompetition") : Url.Action())" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ItemID)
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ID)
+
+    <section class="hotnews-section mt-md-250">
+        <div class="auto-container">
+            <div class="text-right">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">HOME</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Get", "Item", new { RouteName = parentItem.Item.RouteName })">@parentItem.ItemLanguage.Subject</a></li>
+                    <li class="breadcrumb-item active">@ViewBag.Title</li>
+                </ol>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 col-xs-12 mb-30">
+
+                    <div class="hotnews-detail p-20">
+                        <h3 class="text-orange">@Model.OrderViewModel.ItemViewModel.ItemLanguage.Subject</h3>
+                        <div class="mt-20 mb-20">
+                            <!----content-->
+                            @Html.Raw(Model.OrderViewModel.ItemViewModel.ItemLanguage.Content)
+                            <!--conetnt end-->
+                        </div>
+
+                        <hr>
+                        <h3 class="text-orange">選擇分組</h3>
+                        <table class="table table-bordered table-striped member-list-tab mt-20 mb-20">
+                            <thead>
+                                <tr>
+                                    <th width="40%" class="text-center">比賽組別</th>
+                                    <th width="20%" class="text-center">已報隊數/隊數限制</th>
+                                    <th width="30%" class="text-center">報名隊數</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ var c = 0;
+                                    bool isEdit = false;
+                                }
+                                @foreach (var item in Model.OrderViewModel.SubItemViewModel)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.Hidden($"OrderViewModel.OrderDetails[{c}].ItemID", item.ID)
+                                            @item.Subject
+                                        </td>
+                                        <td class="text-center">@(item.SaleCount) / @item.StockCount</td>
+                                        <td class="text-center">
+                                            @if (item.SaleCount >= item.StockCount)
+                                            {
+                                                <span class="text-red">滿額</span>
+                                            }
+                                            else
+                                            {
+                                                isEdit = true;
+                                                var length = Math.Min(item.StockCount - item.SaleCount, item.SaleLimit);
+                                                <select class="form-control" name="OrderViewModel.OrderDetails[@(c)].Quantity">
+                                                    @for (int i = 0; i <= length; i++)
+                                                    {
+                                                        <option value="@i">@i</option>
+                                                    }
+                                                </select>
+                                            }
+                                        </td>
+                                    </tr>
+                                    c++;
+                                }
+                            </tbody>
+                        </table>
+                        @*<div class="text-right mt-20 mb-50">
+                                <h3 class="text-red">訂單總金額：NT$0</h3>
+                            </div>*@
+
+                        @*<div class="form-group row">
+                                <input type="hidden" name="captchaRequired" value="true"/>
+                                <label class="col-sm-2 form-label text-right"></label>
+                                <div class="col-sm-4">
+                                    <input name="captcha" type="text" class="form-control" autocomplete="off" placeholder="請輸入驗證碼" data-val="true" data-val-required="請輸入驗證碼" />
+                                    @Html.ValidationMessage("captcha", "", new { @class = "text-danger" })
+                                 </div>
+                                <div class="col-sm-2">
+                                    <img class="imgverifycode" src="@Url.Action("CaptchaImage", "Member")" alt="驗證碼" />
+                                </div>
+                                <div class="col-sm-3"><a class="btnnewcode" href="javascript:" style="color: #7b7b7b;">重新產生驗證碼</a></div>
+                            </div>*@
+
+                        @if (isEdit)
+                        {
+                            <div class="form-group row">
+                                <input type="hidden" name="verifyType" value="PhoneNumber" />
+                                <label class="col-sm-3 form-label text-right pr-0">驗證碼:</label>
+                                <div class="col-sm-5">
+                                    <input name="verifystr" type="text" class="form-control" autocomplete="off" placeholder="請輸入會員電話號碼" data-val="true" data-val-required="請輸入" />
+                                    @Html.ValidationMessage("verifystr", "", new { @class = "text-danger" })
+                                </div>                             
+                            </div>
+                        }
+
+                        <a id="SaveBtn" class="btn btn-style-fifteen btn-block text-center @(isEdit?"":"disabled")">確認報名與付款</a>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4 col-xs-12 mb-30">
+                    <div class="hotnews-recommend p-20 mb-20">
+                        <div class="hotnews-recommend p-20 mb-20">
+                            <div class="hotnews-title">
+                                <span class="hotnews-title-inner">
+                                    選擇賽事地區
+                                </span>
+                            </div>
+
+                            @Html.Action("Partial", "Item", new ItemPageModel
+                       {
+                           ViewName = "Detail_Competition_area",
+                           IsPaged = false,
+                           SortColumn = SortColumn.Date,
+                           StructureJson = _Json.ModelToJson(new List<Guid> { new Guid("19895d5b-95e0-48aa-9a87-a06ce4dca71a") }),//分區報名
+                           CategoryJson = _Json.ModelToJson(Model.OrderViewModel.ItemViewModel.ParentID.ToListObject()),//自己
+                       })
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+                                    }

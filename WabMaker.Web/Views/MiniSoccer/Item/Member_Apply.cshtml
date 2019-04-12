@@ -1,0 +1,10 @@
+﻿@model WabMaker.Web.WebViewModels.ItemPageResult
+
+<div>
+    @foreach (var item in Model.DataResult.Data)
+    {
+        <a href="@Url.Action("SignUp","Order",new {id=item.Item.ID })">
+            @item.ItemLanguage.Subject
+        </a>
+    }
+</div>

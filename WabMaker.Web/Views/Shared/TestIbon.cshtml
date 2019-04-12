@@ -1,0 +1,41 @@
+﻿
+@{
+    Layout = null;
+
+    var dataGet = "<SENDDATA><BUSINESS>07901</BUSINESS><STOREID>webtest</STOREID><SHOPID>01</SHOPID>"
++ "<DETAILED_NUM>06020171000001</DETAILED_NUM><PRODUCT_CODE>1100121201</PRODUCT_CODE> <STATUS_CODE>0000</STATUS_CODE>"
++ "<STATUS_DESC>成功</STATUS_DESC><KEY1>A123456789</KEY1><KEY2>650101</KEY2><KEY3></KEY3><KEY4></KEY4> <KEY5></KEY5></SENDDATA>";
+
+    var dataPay = "<PAYMONEY><SENDTIME>0</SENDTIME><STOREID>123456</STOREID>"
++ "<SHOPID>01</SHOPID><DETAIL_NUM>06010151000033</DETAIL_NUM><STATUS_CODE>0000</STATUS_CODE><STATUS_DESC>成功</STATUS_DESC>"
++ "<BARCODE1>950101123</BARCODE1><BARCODE2>0601015100003300</BARCODE2><BARCODE3>123456789012345</BARCODE3>"
++ "<AMOUNT>500</AMOUNT><PAYDATE>20060101123030</PAYDATE><USERDATA1>0921100100</USERDATA1>"
++ "<USERDATA2></USERDATA2><USERDATA3></USERDATA3><USERDATA4></USERDATA4><USERDATA5></USERDATA5></PAYMONEY>";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>test</title>
+</head>
+<body>
+    <h4>test get ibon data</h4>
+
+    <form name="form1" action="@Url.Action("GetIbonData","Order")" method="post">
+        <textarea rows="10" cols="50" name="XMLData">@dataGet</textarea>
+        <br>
+        <input type="submit" value="submit" />
+    </form>
+
+    <br>
+    <h4>test pay money</h4>
+
+    <form name="form1" action="@Url.Action("IbonPay","Order")" met method="post">
+        <textarea rows="10" cols="50" name="XMLData">@dataPay</textarea>
+        <br>
+        <input type="submit" value="submit" />
+    </form>
+</body>
+</html>

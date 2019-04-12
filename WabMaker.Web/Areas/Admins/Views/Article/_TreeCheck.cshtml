@@ -1,0 +1,87 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using MyTool.ViewModels
+@model CheckTreeModel
+@GenerateTree(Model.tree)
+
+@functions{
+    int i = 0; // 遞迴共用計數
+}
+
+@helper GenerateTree(List<MyTool.ViewModels.TreeViewModel> nodes, int count = 0)
+{
+string typeName = Model.relationType == ItemRelationType.One ? "radio" : "checkbox";
+
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+        if (item.Nodes.Any())
+        {
+            // 1.有子層繼續loop
+            <li class="type-@(item.Type.ToString())" data-id="@item.ID">
+                <div class="timeline-label no-edit">
+                    <div class="timeline-text">
+                        @if (Model.relationType != ItemRelationType.MultiMany)
+                        {
+                            <p class="subject">@item.Name</p>
+                        }
+                        else
+                        {
+                           //--可選多層
+                            <input name="CategoryTree[@i].ID" type="hidden" value="@item.ID">
+                            <div class="checkbox-block">
+                                <div class="checkbox">
+                                    <label>
+                                        @* typeName= checkbox or radio *@
+                                        <input type="@typeName" class="ace" name="CategoryTree[@i].IsChecked" checked="@(item.IsChecked)" value="@(typeName== "checkbox"?"true":item.ID.ToString())">
+                                        <span class="lbl">@item.Name</span>
+                                    </label>
+                                </div>
+                            </div>
+                            i += 1;
+                        }
+                    </div>
+                </div>
+
+                @* child menu *@
+                @if (item.Nodes != null && item.Nodes.Any())
+                {
+                    <ul>
+                        @GenerateTree(item.Nodes, i)
+                    </ul>
+                }
+
+            </li>
+        }
+        else
+        {
+            //2.最後一層才可選取
+            <li class="type-@(item.Type.ToString()) CheckNode" data-id="@item.ID">
+
+                    <div class="timeline-label">
+                        <div class="timeline-text">
+
+                            <input name="CategoryTree[@i].ID" type="hidden" value="@item.ID">
+                            <div class="checkbox-block">
+                                <div class="checkbox">
+                                    <label>
+                                        @* typeName= checkbox or radio *@
+                                        <input type="@typeName" class="ace" name="CategoryTree[@i].IsChecked" @(item.IsChecked?(typeName== "checkbox"?"checked" : "checked='True'") :"") value="true">
+                                        <span class="lbl">@item.Name</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </li>
+            if (typeName == "checkbox")
+            {
+                i += 1;
+            }
+        }
+    }//end foreach
+}//end if
+
+}

@@ -1,0 +1,182 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@using WabMaker.Web.WebViewModels
+@* 比賽報名 *@
+@model WebMaker.Entity.ViewModels.EditOrderViewModel
+@{
+    Layout = null;
+    var structure = Model.OrderViewModel.ItemViewModel.Item.cms_Structure;
+    var orderStatus = Model.OrderViewModel.Order.OrderStatus;
+    bool isNew = Model.OrderViewModel.Order.ID == Guid.Empty;
+    var parentItem = Model.OrderViewModel.ParentItemViewModel;
+
+    ViewBag.Title = (Model.IsAdmin ? "[管理員編輯] " : "") + parentItem.ItemLanguage.Subject + "-" + Model.OrderViewModel.ItemViewModel.ItemLanguage.Subject;
+
+    ////內頁圖
+    //var subImage = parentItem.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemSubImage);
+    //var subImageUrl = subImage == null ? "" : RouteHelper.SetUrlPath(subImage.FilePath, isAbsolute: true);
+}
+
+<section class="character-section mt-65">
+    <div class="character-back character-back2">
+        <div class="auto-container">
+            <h2></h2>
+        </div>
+    </div>
+</section>
+
+@using (Html.BeginForm("EditCompetition", "Order", new { id = "" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    //防止重複post
+    @*@Html.GenerateVerficationToken()*@
+
+    <input type="hidden" id="returnUrl" value="@(isNew ? Url.Action("ToEditCompetition") : Url.Action())" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ItemID)
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ID)
+
+    <section class="hotnews-section mt-md-250">
+        <div class="auto-container">
+            <div class="text-right">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">HOME</a></li>
+                    <li><a href="@Url.Action("Index", "Member")">會員中心</a></li>
+                    <li><a href="@Url.Action("Order", "Member", new { type = structure.ID })">比賽報名紀錄</a></li>
+                    <li class="active">@ViewBag.Title</li>
+                </ol>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="w-back-g p-20">
+                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="w-back-g p-20">
+                        <div class="hotnews-title">
+                            <span class="hotnews-title-inner mb-20">@ViewBag.Title</span>
+                        </div>
+
+                        <ul class="list-inline">
+                            <li>訂單編號: @(Model.OrderViewModel.Order.OrderNumber)</li>
+                            <li>建立時間: @(Model.OrderViewModel.Order.CreateTime.ToDateString())</li>
+                            @*<li>狀態: @(Model.OrderViewModel.Order.OrderStatus.GetDisplayName<OrderStatus>())</li>*@
+                            <li>總金額: @Model.OrderViewModel.Order.TotalPrice.ToPrice()</li>
+                        </ul>
+
+                        <div>
+                            <label class="form-label text-red mb-15">
+                                @{var sevenDay = Model.OrderViewModel.Order.EditDeadline;
+                                    var endDay = Model.OrderViewModel.ItemViewModel.Item.SaleEndTime;}
+
+                                @*@if (sevenDay !=null && endDay > sevenDay)
+                                    {
+                                        <span>請於@(sevenDay.ToDateString())前完成資料編輯，</span>
+                                        <span>@(endDay.ToDateString())前完成修改，</span>
+                                    }
+                                    else
+                                    {
+                                        <span>請於@(endDay.ToDateString())前完成資料編輯，</span>
+                                    }
+                                    否則將失去參賽資格。*@
+
+                                @if (sevenDay != null && endDay > sevenDay)
+                                {
+                                    endDay = sevenDay;
+                                }@*@(endDay.ToDateString() + " " + "23:59 ")*@
+                                <span>請於取得報名資格後24小時內 完成隊伍資料填寫與編輯選手（7 - 10人），若未完成報名資格將自動取消。</span>
+                            </label>
+                        </div>
+
+                        @foreach (var item in Model.OrderViewModel.OrderDetails)
+                        {
+                            var article = Model.OrderViewModel.SubItemViewModel.FirstOrDefault(x => x.ID == item.ItemID);
+                            <div class="row mt-0 mb-0">
+                                <div class="row mt-0 mb-0 area-box">
+                                    <div class="row col-md-6">
+                                        <h4 class="text-orange OrderButtonBlock">
+                                            @item.ItemSubject
+
+                                            @if (item.OrderStatus == (int)OrderStatus.Done || item.OrderStatus == (int)OrderStatus.TeamEditDone)
+                                            {
+                                                //green
+                                                <span class="badge badge-pill member-identity-tags-green ml-10">@(item.OrderStatus.GetDisplayName<OrderStatus>()) </span>
+                                            }
+                                            else if (item.OrderStatus == (int)OrderStatus.TeamEditConfirm && Model.IsCheckSuccess)
+                                            {
+                                                //點我確認完成
+                                                <button type="button" class="OrderConfirmBtn btn btn-style-fifteen" style="font-size: 14px;padding: 5px 30px;" data-url="@Url.Action("ChangeDetailStatus", new { detailid = item.ID, status = OrderStatus.TeamEditDone })">點我確認完成</button>
+                                            }
+                                            else
+                                            {
+                                                //gray
+                                                <span class="badge badge-pill member-identity-tags-gray ml-10">@(item.OrderStatus.GetDisplayName<OrderStatus>()) </span>
+
+                                                //放棄名額
+                                                if (item.OrderStatus == (int)OrderStatus.TeamEdit)
+                                                {
+                                                    <button type="button" class="OrderAbandonBtn btn btn-style-nineteen" style="font-size: 14px;padding: 5px 30px;" data-url="@Url.Action("ChangeDetailStatus", new { detailid = item.ID, status = OrderStatus.Abandon })">點我放棄名額</button>
+                                                }
+                                            }
+
+                                        </h4>
+
+                                    </div>
+                                    <div class="row col-md-3">
+                                        <span>隊員: @(article.PeopleMin)~@(article.PeopleMax)人</span>
+                                    </div>
+                                    <div class="row col-md-3">
+                                        @if (article.DateLimit != null)
+                                        {
+                                            <span>限 @(article.DateLimit.ToDateString()) 以後出生</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="row mt-0 member-event-area">
+                                    @if (item.OrderStatus != (int)OrderStatus.Abandon && item.OrderStatus != (int)OrderStatus.Invalid)
+                                    {
+                                        <div id="Unit_@item.ID" class="row col-md-6">
+                                            @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "_Competition_DetailUnit"),
+                                             new EditOrderViewModel
+                                             {
+                                                 OrderViewModel = Model.OrderViewModel,
+                                                 Block = OrderEditBlock.DetailUnit,
+                                                 IsEditing = false,
+                                                 IsCheckSuccess = Model.IsCheckSuccess,
+                                                 IsAdmin = Model.IsAdmin,
+                                                 OrderDetailID = item.ID
+                                             })
+                                        </div>
+
+                                        <div id="Member_@item.ID" class="row col-md-6">
+                                            @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Order", "_Competition_DetailMember"),
+                                             new EditOrderViewModel
+                                             {
+                                                 OrderViewModel = Model.OrderViewModel,
+                                                 Block = OrderEditBlock.DetailMember,
+                                                 IsEditing = false,
+                                                 IsCheckSuccess = Model.IsCheckSuccess,
+                                                 IsAdmin = Model.IsAdmin,
+                                                 OrderDetailID = item.ID
+                                             })
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+                                    }

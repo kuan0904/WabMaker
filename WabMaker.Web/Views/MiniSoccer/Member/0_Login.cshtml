@@ -1,0 +1,81 @@
+﻿@model WebMaker.Entity.ViewModels.LoginViewModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "會員登入";
+}
+
+<section class="character-section mt-65">
+    <div class="character-back character-back2">
+        <div class="auto-container">
+            <h2></h2>
+        </div>
+    </div>
+</section>
+
+@using (Html.BeginForm("Login", "Member", new { }, FormMethod.Post, new { }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <input type="hidden" name="url" value="@Request.QueryString["url"]" />
+
+    <section class="hotnews-section mt-md-250">
+        <div class="auto-container">
+            <div class="row w-back-g pb-15 pt-15">
+                <div class="col-md-offset-1 col-md-10 col-xs-12">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner mb-20 text-center">@ViewBag.Title</span>
+                    </div>
+                    <div class="singup-inner mb-20">
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">登入帳號/Email</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Account, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Account, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">密碼</label>
+                            <div class="col-sm-5">
+                                @Html.PasswordFor(model => model.Password, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">驗證碼</label>
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(model => model.Captcha, "", new { @class = "form-control enterToSave", autocomplete = "off" })
+                                @Html.ValidationMessageFor(model => model.Captcha, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-sm-2">
+                                <img class="imgverifycode" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+                            </div>
+                            <div class="col-sm-3"><a class="btnnewcode" href="javascript:">重新產生驗證碼</a></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <div class="singup-link mb-20">
+                                <button type="submit" class="btn btn-style-fifteen btn-block">登　入</button>
+
+                                <p><a href="@Url.Action("ForgotPassword","Member")">忘記密碼</a>　｜　<a href="@Url.Action("ReSend","Member")">重寄認證信</a></p>
+                                <h4>還不是會員嗎？<a href="@Url.Action("SignUp","Member")"> 快速註冊</a></h4>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right"></label>
+                            <div class="col-sm-5 facebook-login">
+                                <a href="@Url.Action("FacebookLogin","Member",new {  url = Request["url"]} )" class="w-100 btn btn-style-twenty"><i class="fab fa-facebook-f mr-15"></i>使用facebook登入</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+}
+
+
+

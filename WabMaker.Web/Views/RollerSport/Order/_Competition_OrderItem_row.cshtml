@@ -1,0 +1,44 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@model WebMaker.Entity.ViewModels.EditOrderDetail
+@{
+
+    var randomID = Guid.NewGuid();
+    var memberIDstr = Model.DetailMembers != null ? string.Join(",", Model.DetailMembers.Select(x => x.ID)) : "";
+}
+
+<tr>
+    @*<td></td>*@
+    <td>
+        <select name="ItemID_@randomID" rename="OrderViewModel.OrderDetails[x].ItemID" class="dynamicItem form-control" data-level="1" data-value="@Model.ItemID"></select>
+    </td>  
+    <td>
+        <select name="Option_@randomID" rename="OrderViewModel.OrderDetails[x].Option" class="dynamicItem form-control" data-level="2" data-value="@Model.Option"></select>
+    </td>
+    <td>
+        <select name="DetailMemberID_@randomID" rename="OrderViewModel.OrderDetails[x].DetailMemberID" class="teamMemberSelect form-control selectpicker" data-level="1" multiple data-value="@memberIDstr"></select>
+    </td>
+    <td>
+        <input type="text" name="DetailTeamName_@randomID" rename="OrderViewModel.OrderDetails[x].DetailTeamName" class="form-control" value="@Model.DetailTeamName"
+               data-val="true" data-val-length="不得大於100個字元" data-val-length-max="100" >
+        @Html.ValidationMessage("DetailTeamName_" + randomID, "", new { @class = "text-danger" })    
+    </td>
+    <td> 
+        <input type="hidden" name="FilePath_@randomID" rename="OrderViewModel.OrderDetails[x].FilePath" value="@Model.FilePath" />
+        <input type="file" accept="audio/*" name="FileUpload_@randomID" rename="OrderViewModel.OrderDetails[x].FileUpload" />
+        @if (!string.IsNullOrEmpty(Model.FilePath))
+        {
+            <a class="text-danger deleteHidden" data-target="FilePath_@randomID">移除檔案</a>
+        }
+     </td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>
+        <input type="hidden" name="ID_@randomID" rename="OrderViewModel.OrderDetails[x].ID" value="@Model.ID">
+        <button type="button" class="rowDeleteBtn btn btn-danger btn-sm">x</button>
+    </td>
+</tr>

@@ -1,0 +1,35 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+<div id="Slider" class="swiper-container">
+    <h2 class="main-title"><span>Hot News</span></h2>
+    <div class="swiper-wrapper">
+
+        @foreach (var item in Model.DataResult.Data)
+        {
+            var mainImage = item.ItemFiles.Where(x => x.SourceType == SourceType.ItemConver).ToList();
+
+            if (mainImage.Any())
+            {
+                var img = mainImage.FirstOrDefault();
+                <div class="swiper-slide item">
+                    <div class="image" style="background-image: url(@RouteHelper.SetImagePath(img.FilePath, img.ThumbnailPath));">
+                        <div class="carousel-caption">
+                            <div class="container">
+                                <h3><a href="@item.ItemLanguage.LinkUrl" target="@(item.ItemLanguage.IsBlankUrl?"_blank":"_self")" title="@item.ItemLanguage.Subject">@item.ItemLanguage.Subject</a></h3>
+                                <p>@item.ItemLanguage.Description</p>
+                            </div>
+                        </div>
+                        <a href="detail.html" class="view-more" title="了解更多">我想了解</a>
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</div><!-- Slider END -->

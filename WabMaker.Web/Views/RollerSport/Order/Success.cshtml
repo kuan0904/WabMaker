@@ -1,0 +1,45 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+
+@model Guid
+@{
+    ViewBag.Title = "報名成功";
+    Layout = "../Shared/_Layout.cshtml";
+}
+
+<div class="breadArea">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+            <li class="active">@ViewBag.Title</li>
+        </ol>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="account center">
+                <img src="~/html/RollerSport/images/success.svg" style="width:80px;margin: 100px auto 20px auto;">
+                <h2>報名成功</h2>
+                <p>感謝您的參加，可至會員中心查看報名紀錄</p>
+                @if (ViewBag.OrderATMInfo != null)
+                {
+                    <p style="width:430px;text-align:left;margin: 0 auto;padding: 0 50px;">
+                        @Html.Raw(ViewBag.OrderATMInfo)
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 mt-2" style="padding-bottom: 100px;">
+            <div class="btn-width-sm">
+                <a href="@Url.Action("Competition","Order", new { id = Model})"><button type="button" class="DoneBtn btn-sm">前往會員中心</button></a>
+            </div>
+        </div>
+    </div>
+</div>

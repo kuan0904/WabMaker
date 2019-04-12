@@ -1,0 +1,262 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.ViewModels.UserViewModel
+
+@* in 會員基本資料、報名活動 *@
+
+@if (Model.UserContentTypes.Contains(UserContentType.Name))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Name);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label for="User_Name" class="label-helper">@(isRequired ? "* " : "")姓名</label>
+
+        <input type="text" id="User_Name" name="User.Name" class="form-control account-num" value="@Model.User.Name"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequired ? "data-val-required='請輸入姓名'" : ""))>
+        @Html.ValidationMessageFor(model => model.User.Name, "", new { @class = "text-danger" })
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Gender))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Gender);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3" >
+        <label class="label-helper">@(isRequired ? "* " : "")性別</label>
+
+        @*@Html.DropDownList("UserProfile.Gender", _Enum.EnumtoSelect<GenderType>(Model.UserProfile.Gender), "請選擇", new { @class = "form-control account-num", data_val_required = "請選擇性別" })*@
+
+        <div class="radio-blue">
+            <label>
+                <input type="radio" name="UserProfile.Gender" value="@((int)GenderType.Male)" @(Model.UserProfile.Gender == (int)GenderType.Male ? "checked" : "")
+                       data-val="true" @Html.Raw((isRequired ? "data-val-required='請輸入性別'" : ""))>男
+            </label>
+            <label style="margin-left: 20px;">
+                <input type="radio" name="UserProfile.Gender" value="@((int)GenderType.Female)" @(Model.UserProfile.Gender == (int)GenderType.Female ? "checked" : "")>女
+            </label>
+        </div>
+
+        @Html.ValidationMessageFor(model => model.UserProfile.Gender, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Marriage))
+{
+    //var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Marriage);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3" >
+        <label class="label-helper">婚姻狀況</label>
+
+        @*@Html.DropDownList("UserProfile.Marriage", _Enum.EnumtoSelect<MarriageType>(Model.UserProfile.Marriage), new { @class = "form-control account-num" })*@
+
+        @*<label class="radio-inline">
+                <input type="radio" name="UserProfile.Marriage" value="@((int)MarriageType.None)" @(Model.UserProfile.Marriage == (int)MarriageType.None ? "checked" : "")>不提供
+            </label>*@
+
+        <div class="radio-blue">
+            <label>
+                <input type="radio" name="UserProfile.Marriage" value="@((int)MarriageType.Single)" @(Model.UserProfile.Marriage == (int)MarriageType.Single ? "checked" : "")>未婚
+            </label>
+            <label style="margin-left: 20px;">
+                <input type="radio" name="UserProfile.Marriage" value="@((int)MarriageType.Married)" @(Model.UserProfile.Marriage == (int)MarriageType.Married ? "checked" : "")>已婚
+            </label>
+        </div>
+
+        @Html.ValidationMessageFor(model => model.UserProfile.Marriage, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Birthday))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Birthday);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">@(isRequired ? "* " : "")出生年月日</label>
+
+        <input type="date" name="UserProfile.Birthday" class="form-control account-num" value="@Model.UserProfile.Birthday.ToDateString("yyyy-MM-dd")"
+               data-val="true" data-val-date @Html.Raw((isRequired ? "data-val-required='請輸入出生年月日'" : "")) placeholder="yyyy-mm-dd">
+        @Html.ValidationMessageFor(model => model.UserProfile.Birthday, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.IdentityCard))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.IdentityCard);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">@(isRequired ? "* " : "")身分證字號</label>
+
+        <input type="text" id="UserProfile_IdentityCard" name="UserProfile.IdentityCard" class="form-control account-num" value="@Model.UserProfile.IdentityCard"
+               data-val="true" @Html.Raw((isRequired ? "data-val-required='請輸入身分證字號'" : ""))>
+        @Html.ValidationMessageFor(model => model.UserProfile.IdentityCard, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Phone))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Phone);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">@(isRequired ? "* " : "")手機</label>
+
+        <input type="text" id="User_Phone" name="User.Phone" class="form-control account-num" value="@Model.User.Phone"
+               data-val="true" data-val-length="不得大於20個字元" data-val-length-max="20" @Html.Raw((isRequired ? "data-val-required='請輸入手機'" : ""))>
+        @Html.ValidationMessageFor(model => model.User.Phone, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.HomePhone))
+{
+    //var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.HomePhone);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">電話</label>
+
+        @Html.EditorFor(model => model.UserProfile.HomePhone, new { htmlAttributes = new { @class = "form-control account-num" } })
+        @Html.ValidationMessageFor(model => model.UserProfile.HomePhone, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@*@if (Model.UserContentTypes.Contains(UserContentType.Address))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Address);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">@(isRequired ? "* " : "")地址</label>
+
+        <input type="text" id="User_Address" name="User.Address" class="form-control account-num" value="@Model.User.Address"
+               data-val="true" data-val-length="不得大於200個字元" data-val-length-max="200" @Html.Raw((isRequired ? "data-val-required='請輸入地址'" : ""))>
+        @Html.ValidationMessageFor(model => model.User.Address, "", new { @class = "text-danger" })
+
+    </div>
+}*@
+
+
+@if (Model.UserContentTypes.Contains(UserContentType.HouseholdAddress))
+{  
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">戶籍地</label>
+
+        @Html.EditorFor(model => model.UserProfile.HouseholdAddress, new { htmlAttributes = new { @class = "form-control account-num" } })
+        @Html.ValidationMessageFor(model => model.UserProfile.HouseholdAddress, "", new { @class = "text-danger" })
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Unit))
+{
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">服務單位/學校</label>
+
+        @Html.EditorFor(model => model.UserProfile.Unit, new { htmlAttributes = new { @class = "form-control account-num" } })
+        @Html.ValidationMessageFor(model => model.UserProfile.Unit, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.UnitAddress))
+{
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">服務單位地址</label>
+
+        @Html.EditorFor(model => model.UserProfile.UnitAddress, new { htmlAttributes = new { @class = "form-control account-num" } })
+        @Html.ValidationMessageFor(model => model.UserProfile.UnitAddress, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Occupation))
+{
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">職業</label>
+
+        @Html.EditorFor(model => model.UserProfile.Occupation, new { htmlAttributes = new { @class = "form-control account-num" } })
+        @Html.ValidationMessageFor(model => model.UserProfile.Occupation, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Education))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Education);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">@(isRequired ? "* " : "")學歷</label>
+
+        <input type="text" id="UserProfile_Education" name="UserProfile.Education" class="form-control account-num" value="@Model.UserProfile.Education"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequired ? "data-val-required='請輸入學歷'" : ""))>
+        @Html.ValidationMessageFor(model => model.UserProfile.Education, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.EmergencyContact))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.EmergencyContact);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">@(isRequired ? "* " : "")緊急聯絡人</label>
+
+        <input type="text" id="UserProfile_EmergencyContact" name="UserProfile.EmergencyContact" class="form-control account-num" value="@Model.UserProfile.EmergencyContact"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequired ? "data-val-required='請輸入緊急聯絡人'" : ""))>
+        @Html.ValidationMessageFor(model => model.UserProfile.EmergencyContact, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.EmergencyPhone))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.EmergencyPhone);
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+        <label class="label-helper">@(isRequired ? "* " : "")緊急聯絡電話</label>
+
+        <input type="text" id="UserProfile_EmergencyPhone" name="UserProfile.EmergencyPhone" class="form-control account-num" value="@Model.UserProfile.EmergencyPhone"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequired ? "data-val-required='請輸入緊急聯絡電話'" : ""))>
+        @Html.ValidationMessageFor(model => model.UserProfile.EmergencyPhone, "", new { @class = "text-danger" })
+
+    </div>
+}
+
+    @*@if (Model.UserContentTypes.Contains(UserContentType.Skill))
+        {
+            <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                <label class="label-helper">專長</label>
+
+                @Html.EditorFor(model => model.UserProfile.Skill, new { htmlAttributes = new { @class = "form-control account-num" } })
+                @Html.ValidationMessageFor(model => model.UserProfile.Skill, "", new { @class = "text-danger" })
+
+            </div>
+        }*@
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Sports))
+    { 
+        var sportList = new List<string> { "競速溜冰", "花式溜冰", "自由式輪滑", "曲棍球", "滑輪板" };
+
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3 containGroup" >
+            <label class="label-helper">項目</label>
+            <div class="">
+                @foreach (var str in sportList)
+                {                  
+                    <label class="checkbox-inline"><input type="checkbox" class="containChk" value="@str" @(!string.IsNullOrEmpty(Model.UserProfile.Sports) && Model.UserProfile.Sports.Contains(str) ? "checked" : "")>@str</label>
+                }
+            </div>
+
+            @Html.HiddenFor(model => model.UserProfile.Sports, new { @class = "containSum" })
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Language))
+    {
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <label class="label-helper">語言</label>
+
+            @Html.EditorFor(model => model.UserProfile.Language, new { htmlAttributes = new { @class = "form-control account-num" } })
+            @Html.ValidationMessageFor(model => model.UserProfile.Language, "", new { @class = "text-danger" })
+        </div>
+    }
+
+    @*@if (Model.UserContentTypes.Contains(UserContentType.Referrer))
+        {
+            <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                <label class="label-helper">推薦人</label>
+
+                @Html.EditorFor(model => model.UserProfile.Referrer, new { htmlAttributes = new { @class = "form-control account-num" } })
+                @Html.ValidationMessageFor(model => model.UserProfile.Referrer, "", new { @class = "text-danger" })
+
+            </div>
+        }*@

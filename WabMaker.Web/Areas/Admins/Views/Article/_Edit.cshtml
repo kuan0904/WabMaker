@@ -1,0 +1,524 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using MyTool.ViewModels
+@using WebMaker.Entity.ViewModels
+@model WebMaker.Entity.ViewModels.EditItemViewModel
+
+@{
+    WebMaker.Entity.Models.cms_Structure structure = Model.Item.cms_Structure;
+    List<WebMaker.Entity.Models.cms_ItemFile> coverImage = Model.ItemFiles?.Where(x => x.SourceType == (int)SourceType.ItemConver).ToList();
+    List<WebMaker.Entity.Models.cms_ItemFile> subImage = Model.ItemFiles?.Where(x => x.SourceType == (int)SourceType.ItemSubImage).ToList();
+    var frontLanguageTypes = WebMaker.BLL.Helpers.SessionManager.Client.FrontLanguageTypes;
+    bool isNew = Model.Item.ID == Guid.Empty;
+    ViewBag.Title = (isNew ? "新增" : "編輯") + structure.Name;
+    //包含功能
+    List<ToolType> ToolTypes = structure.ToolTypes.ToContainList<ToolType>();
+    //包含類型
+    List<ItemType> ItemTypes = structure.ItemTypes.ToContainList<ItemType>();
+    //包含欄位
+    List<ContentType> ContentTypes = structure.ContentTypes.ToContainList<ContentType>();
+    //必填欄位
+    List<ContentType> RequiredTypes = structure.RequiredTypes.ToContainList<ContentType>();
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.Hidden("Item.ID", Model.Item.ID, new { id = "ID" })
+        @Html.HiddenFor(model => model.Item.StructureID)
+        @Html.HiddenFor(model => model.Item.MenuPositions)
+
+        @if (ContentTypes.Contains(ContentType.Department))
+        {
+            <div id="DepartmentBlock" class="form-group">
+                <label class="control-label col-md-2">屬於單位<span class="mark-required">＊</span></label>
+                <div class="col-md-10">
+                    @Html.DropDownList("Item.DepartmentID", Model.DepartmentSelectList, "(選擇)", new { @class = "form-control selectpicker", data_val = "true", data_val_required = "請選擇單位" })
+                    <span class="field-validation-valid text-danger" data-valmsg-for="Item.DepartmentID" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        }
+
+        <!--分類-->
+        @if (structure.ParentRelationType != (int)ItemRelationType.None && !ItemTypes.Contains(ItemType.Category))
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2" for="Item_IsTop">分類</label>
+                <div class="col-md-10 select-mapping">
+
+                    @* 群組 *@
+                    @if (structure.ParentRelationType == (int)ItemRelationType.Group)
+                    {
+                        @Html.DropDownList("ParentID", Model.SelectList, "選擇分類", new { @class = "form-control selectpicker", data_live_search = "true" })
+                        @*<input name="ParentID" type="hidden" class="select-mapping-hidden" value="@Model.ParentID" />*@
+                    }
+                    else
+                    {
+
+                        @*麵包屑用-main parent*@
+                        @*<div class="@(structure.ParentRelationType == (int)ItemRelationType.Many||
+                                     structure.ParentRelationType == (int)ItemRelationType.MultiMany?"":"hidden")">
+                                <select class="selectpicker select-mapping-target"></select>
+                                <input name="ParentID" type="hidden" class="select-mapping-hidden" value="@Model.ParentID" />
+                            </div>*@
+                    }
+
+
+                    @* 多 *@
+                    @if (structure.ParentRelationType == (int)ItemRelationType.Many ||
+                         structure.ParentRelationType == (int)ItemRelationType.MultiMany ||
+                         structure.ParentRelationType == (int)ItemRelationType.Group)
+                    {
+                        <ul id="categoryTree" class="mTree checkTree select-mapping-source">
+                            @Html.Partial("_TreeCheck", new CheckTreeModel { tree = Model.CategoryTree, relationType = (ItemRelationType)structure.ParentRelationType })
+                        </ul>
+                    }
+                    @* 1 *@
+                    else if (structure.ParentRelationType == (int)ItemRelationType.One)
+                    {
+                        <ul id="categoryTree" class="mTree checkTree select-mapping-source">
+                            @Html.Partial("_TreeCheck", new CheckTreeModel { tree = Model.CategoryTree, relationType = (ItemRelationType)structure.ParentRelationType })
+                        </ul>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            @Html.HiddenFor(model => model.ParentID)
+        }
+
+        @if (ContentTypes.Contains(ContentType.RouteName))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.RouteName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @if (isNew)
+                    {
+                        @mHelper.Switch("", "IsAutoRouteName", true, addAttr: "data-toggle=collapse data-target=#switch-panel", bottomLabel: "從標題自動產生")
+
+                        <div id="switch-panel" class="collapse @(true ? "" : "in")">
+                            @Html.EditorFor(model => model.Item.RouteName, new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
+                        </div>
+                    }
+                    else
+                    {
+                        @Html.EditorFor(model => model.Item.RouteName, new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
+                        @Html.ValidationMessageFor(model => model.Item.RouteName, "", new { @class = "text-danger" })
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            @Html.HiddenFor(model => model.Item.RouteName)
+        }
+
+        @if (ContentTypes.Contains(ContentType.IsTop))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.IsTop, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @mHelper.Switch("", "Item.IsTop", Model.Item.IsTop)
+                </div>
+            </div>
+        }
+
+        @Html.HiddenFor(model => model.Item.Sort)
+        @*@if (ContentTypes.Contains(ContentType.Sort))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Item.Sort, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Item.Sort, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Item.Sort, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            }*@
+
+        @if (ContentTypes.Contains(ContentType.Date))
+        {
+            var isRequired = RequiredTypes.Contains(ContentType.Date);
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.Date, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <input type="text" class="form-control date-picker" id="Item_Date" name="Item.Date" value="@Model.Item.Date.ToDateString()" data-val="true" data-val-required="@(isRequired ? "日期 欄位是必要項。" : "")">
+                        <span class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Item.Date, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.DateRange))
+        {
+            var isRequired = RequiredTypes.Contains(ContentType.DateRange);
+
+            <div class="form-group">
+                <label class="control-label col-md-2">日期</label>
+                <div class="col-md-10">
+                    <div class="input-group input-daterange">
+                        <input type="text" class="form-control" id="Item_StartTime" name="Item.StartTime" value="@Model.Item.StartTime.ToDateString()" data-val="true" data-val-required="@(isRequired ? "開始日期 欄位是必要項。" : "" )">
+                        <div class="input-group-addon">to</div>
+                        <input type="text" class="form-control" id="Item_EndTime" name="Item.EndTime" value="@Model.Item.EndTime.ToDateString()" data-val="true" data-val-required="@(isRequired ? "結束日期 欄位是必要項。" : "" )">
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Item.StartTime, "", new { @class = "text-danger" })
+                    @Html.ValidationMessageFor(model => model.Item.EndTime, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.Cover))
+        {
+            var FileTypes = _Enum.ToContainList<FileType>(structure.FileTypes);
+            var FileToolTypes = _Enum.ToContainList<FileToolType>(structure.FileToolTypes);
+
+            <div class="form-group">
+                <label class="control-label col-md-2">@ContentType.Cover.GetDisplayName()</label>
+                <div class="col-md-10">
+                    @Html.Partial("_FileList", new FileViewModel
+               {
+                   IdName = "CoverModel",
+                   FileTypes = FileTypes,
+                   FileToolTypes = FileToolTypes,
+                   FileList = coverImage,
+                   IsMultiple = false,
+                   ImageWidth = structure.ImageWidth,
+                   ImageHeight = structure.ImageHeight
+               })
+                </div>
+            </div>
+            @Html.Hidden("ImageWidth", structure.ImageWidth)
+            @Html.Hidden("ImageHeight", structure.ImageHeight)
+        }
+
+        @if (ContentTypes.Contains(ContentType.SubImage))
+        {
+            var FileTypes = new List<FileType> { FileType.Images };
+
+            <div class="form-group">
+                <label class="control-label col-md-2">@ContentType.SubImage.GetDisplayName()</label>
+                <div class="col-md-10">
+                    @Html.Partial("_FileList", new FileViewModel
+               {
+                   IdName = "SubImageModel",
+                   FileTypes = FileTypes,
+                   FileToolTypes = null,
+                   FileList = subImage,
+                   IsMultiple = false,
+                   //ImageWidth = structure.ImageWidth,
+                   //ImageHeight = structure.ImageHeight
+               })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.ViewCount))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.ViewCount, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Item.ViewCount, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Item.ViewCount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+        else
+        {
+            @Html.HiddenFor(model => model.Item.ViewCount)
+        }
+
+        @* -----商品----- *@
+        @if (ItemTypes.Contains(ItemType.Order))
+        {
+            <div class="language-subject col-md-offset-2">
+                <span>商品/活動</span>
+            </div>
+        }
+        @if (ContentTypes.Contains(ContentType.OriginalPrice))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.OriginalPrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Item.OriginalPrice, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Item.OriginalPrice, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.SalePrice))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.SalePrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <input class="form-control text-box single-line" data-val="true" data-val-number="欄位 售價 必須是數字。" data-val-required="售價 欄位是必要項。"
+                           id="Item_SalePrice" name="Item.SalePrice" type="text" value="@Model.Item.SalePrice.ToString("0")">
+                    @Html.ValidationMessageFor(model => model.Item.SalePrice, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.StockCount))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Item.StockCount, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Item.StockCount, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Item.StockCount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.DiscountText))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.DiscountText, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ItemLanguage.DiscountText, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.DiscountText, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.SaleDateHourRange))
+        {
+            var isRequired = RequiredTypes.Contains(ContentType.SaleDateHourRange);
+
+            <div class="form-group">
+                <label class="control-label col-md-2">販售/報名時間</label>
+                <div class="col-md-10">
+                    <div class="input-group input-group-l">
+                        <input type="text" class="form-control datetimepicker" id="Item_SaleStartTime" name="Item.SaleStartTime" value="@(Model.Item.SaleStartTime.ToDateString("yyyy-MM-dd HH:mm"))" data-val="true" data-val-required="@(isRequired ? "開始日期 欄位是必要項。" : "" )">
+                        <div class="input-group-addon">to</div>
+                        <input type="text" class="form-control datetimepicker" id="Item_SaleEndTime" name="Item.SaleEndTime" value="@Model.Item.SaleEndTime.ToDateString("yyyy-MM-dd HH:mm")" data-val="true" data-val-required="@(isRequired ? "結束日期 欄位是必要項。" : "" )">
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Item.SaleStartTime, "", new { @class = "text-danger" })
+                    @Html.ValidationMessageFor(model => model.Item.SaleEndTime, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+        else if (ContentTypes.Contains(ContentType.SaleDateRange))
+        {
+            var isRequired = RequiredTypes.Contains(ContentType.SaleDateRange);
+
+            <div class="form-group">
+                <label class="control-label col-md-2">販售/報名時間</label>
+                <div class="col-md-10">
+                    <div class="input-group input-daterange">
+                        <input type="text" class="form-control" id="Item_SaleStartTime" name="Item.SaleStartTime" value="@Model.Item.SaleStartTime.ToDateString()" data-val="true" data-val-required="@(isRequired ? "開始日期 欄位是必要項。" : "" )">
+                        <div class="input-group-addon">to</div>
+                        <input type="text" class="form-control" id="Item_SaleEndTime" name="Item.SaleEndTime" value="@Model.Item.SaleEndTime.ToDateString()" data-val="true" data-val-required="@(isRequired ? "結束日期 欄位是必要項。" : "" )">
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Item.SaleStartTime, "", new { @class = "text-danger" })
+                    @Html.ValidationMessageFor(model => model.Item.SaleEndTime, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+       
+        @if (ContentTypes.Contains(ContentType.OrderAllowRole))
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2">允許參與身分</label>
+                <div class="col-md-10">
+                    @mHelper.CheckboxList("AllowRoleCheckList", Model.AllowRoleCheckList)
+                </div>
+            </div>
+        }
+        @if (ContentTypes.Contains(ContentType.OrderCreateRole))
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2">完成後新增身分</label>
+                <div class="col-sm-10">
+                    @*@mHelper.CheckboxList("CreateRoleSelectList", Model.CreateRoleSelectList)*@
+                </div>
+            </div>
+        }
+        @*@if (ContentTypes.Contains(ContentType.RoleTimeLimitYear))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Item.RoleTimeLimitYear, htmlAttributes: new { @class = "control-label col-sm-2" })
+                    <div class="col-sm-10">
+                        @Html.EditorFor(model => model.Item.RoleTimeLimitYear, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Item.RoleTimeLimitYear, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            }*@
+
+        @* -----語系----- *@
+        @if (string.IsNullOrEmpty(frontLanguageTypes))
+        {
+            <div class="language-subject col-md-offset-2">
+                <span>@(Model.ItemLanguage.LanguageType.GetDisplayName<LanguageType>())</span>
+            </div>
+        }
+        @Html.HiddenFor(model => model.ItemLanguage.ItemID)
+        @Html.HiddenFor(model => model.ItemLanguage.LanguageType)
+
+        @if (ContentTypes.Contains(ContentType.Subject))
+        {
+            var isRequired = RequiredTypes.Contains(ContentType.Subject);
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.Subject, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ItemLanguage.Subject, new { htmlAttributes = new { @class = "form-control", autocomplete = "off", data_val = "true", data_val_required = isRequired ? "標題 欄位是必要項。" : "" } })
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.Subject, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+        else
+        {
+            @Html.HiddenFor(model => model.ItemLanguage.Subject)
+        }
+
+        @if (ContentTypes.Contains(ContentType.Description))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <textarea cols="20" id="ItemLanguage_Description" name="ItemLanguage.Description" rows="5" class="form-control">@Model.ItemLanguage.Description</textarea>
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.Description, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.Content))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.Content, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <input type="hidden" id="ContentImagesJson" name="ContentImagesJson" />
+                    @Html.TextAreaFor(model => model.ItemLanguage.Content, new { id = "ContentText", @class = "ckeditor" })
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.Content, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.Template))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.TemplateText, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <button id="resetTemplate" class="btn btn-sm btn-default">清除內容</button>
+                    <div class="template-default hidden">@Html.Raw(structure.Template)</div>
+                    <div class="template-block htmlencode" data-name="ItemLanguage.TemplateText">
+                        @if (string.IsNullOrWhiteSpace(Model.ItemLanguage.TemplateText))
+                        {
+                            @Html.Raw(structure.Template)
+                        }
+                        else
+                        {
+                            @Html.Raw(Model.ItemLanguage.TemplateText)
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.CustomFormat))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.CustomFormatText, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <textarea cols="20" id="ItemLanguage_CustomFormatText" name="ItemLanguage.CustomFormatText" rows="5" class="form-control" placeholder="@structure.CustomFormat">@Model.ItemLanguage.CustomFormatText</textarea>
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.LinkUrl))
+        {
+            var isRequired = RequiredTypes.Contains(ContentType.LinkUrl);
+
+            <div class="form-group help-button-parent">
+                @Html.LabelFor(model => model.ItemLanguage.LinkUrl, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ItemLanguage.LinkUrl, new { htmlAttributes = new { @class = "form-control", placeholder = "http://website.com", data_val_required = isRequired ? "網址連結 欄位是必要項。" : "" } })
+                    @mHelper.HelpButton("外部連結: http://website.com <br> 內部連結: ~/路由名稱")
+                    @mHelper.Switch("新開視窗", "ItemLanguage.IsBlankUrl", Model.ItemLanguage.IsBlankUrl)
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.LinkUrl, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.Keywords))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.Keywords, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ItemLanguage.Keywords, new { htmlAttributes = new { @class = "form-control tagsinput" } })
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.Keywords, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.Author))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.Author, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ItemLanguage.Author, new { htmlAttributes = new { @class = "form-control tagsinput" } })
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.Author, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.Phone))
+        {       <div class="form-group">
+            @Html.LabelFor(model => model.ItemLanguage.Phone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ItemLanguage.Phone, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ItemLanguage.Phone, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.Address))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ItemLanguage.Address, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        @if (ContentTypes.Contains(ContentType.AddressInfo))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemLanguage.AddressInfo, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ItemLanguage.AddressInfo, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ItemLanguage.AddressInfo, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        <!--IsEnabled必存在-->
+        <div class="form-group">
+            @Html.LabelFor(model => model.ItemLanguage.IsEnabled, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @mHelper.Switch("", "ItemLanguage.IsEnabled", Model.ItemLanguage.IsEnabled)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="SaveBtn" type="button" value="儲存" class="btn btn-info" />
+                <input id="CancelBtn" type="button" value="取消" class="btn btn-default" />
+                <input id="PreviewBtn" type="button" value="預覽" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}

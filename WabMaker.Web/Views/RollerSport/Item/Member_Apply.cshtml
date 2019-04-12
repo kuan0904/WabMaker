@@ -1,0 +1,31 @@
+﻿@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+<div class="bg-acc">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="account">
+                    <h2 style="color: #FFF;">付費會員註冊 / 選手 / 教練 / 裁判</h2>
+                </div>
+            </div>
+            @foreach (var item in Model.DataResult.Data)
+            {
+                <div class="col-lg-3 col-md-3 col-sm-12 mb-5 mt-4">
+                    <div class="card account">
+                        <div class="card-body">
+                            <h4 class="center">@item.ItemLanguage.Subject</h4>
+                            <ul class="card-text center">
+                                <li class="">
+                                    @Html.Raw(_Html.BreakLine(item.ItemLanguage.Description))
+                                </li>
+                            </ul>
+                            <a href="@Url.Action("SignUp","Order",new {id=item.Item.ID })"><button class="DoneBtn">前往填寫</button></a>
+                        </div>
+                    </div>
+                </div>              
+            }
+
+        </div>
+    </div>
+</div>

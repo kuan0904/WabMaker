@@ -1,0 +1,139 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.ViewModels.UserViewModel
+
+@* in 會員基本資料、報名活動 *@
+
+@if (Model.UserContentTypes.Contains(UserContentType.Name))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Name);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">姓名@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <input type="text" id="User_Name" name="User.Name" class="form-control" value="@Model.User.Name"
+                   data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @(isRequired ? "data-val-required='請輸入姓名'" : "")>
+            @Html.ValidationMessageFor(model => model.User.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Gender))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Gender);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">性別@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <label class="radio-inline">
+                <input type="radio" name="UserProfile.Gender" value="@((int)GenderType.Male)" @(Model.UserProfile.Gender == (int)GenderType.Male ? "checked" : "")
+                       data-val="true" @Html.Raw((isRequired ? "data-val-required='請輸入性別'" : ""))>男
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="UserProfile.Gender" value="@((int)GenderType.Female)" @(Model.UserProfile.Gender == (int)GenderType.Female ? "checked" : "")>女
+            </label>
+            @Html.ValidationMessageFor(model => model.UserProfile.Gender, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Birthday))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Birthday);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">出生年月日@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <input type="date" name="UserProfile.Birthday" class="form-control" value="@Model.UserProfile.Birthday.ToDateString("yyyy-MM-dd")"
+                   data-val="true" data-val-date @Html.Raw((isRequired ? "data-val-required='請輸入出生年月日'" : ""))>
+            @Html.ValidationMessageFor(model => model.UserProfile.Birthday, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.IdentityCard))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.IdentityCard);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">身分證字號@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <input type="text" id="UserProfile_IdentityCard" name="UserProfile.IdentityCard" class="form-control" value="@Model.UserProfile.IdentityCard"
+                   data-val="true" @Html.Raw((isRequired ? "data-val-required='請輸入身分證字號'" : ""))>
+            @Html.ValidationMessageFor(model => model.UserProfile.IdentityCard, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Phone))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Phone);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">手機@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <input type="text" id="User_Phone" name="User.Phone" class="form-control" value="@Model.User.Phone"
+                   data-val="true" data-val-length="不得大於20個字元" data-val-length-max="20" @Html.Raw((isRequired ? "data-val-required='請輸入手機'" : ""))>
+            @Html.ValidationMessageFor(model => model.User.Phone, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.HomePhone))
+{
+    //var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.HomePhone);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">電話</label>
+        <div class="col-sm-9">
+            @Html.EditorFor(model => model.UserProfile.HomePhone, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.UserProfile.HomePhone, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Address))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Address);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">地址@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <input type="text" id="User_Address" name="User.Address" class="form-control" value="@Model.User.Address"
+                   data-val="true" data-val-length="不得大於200個字元" data-val-length-max="200" @Html.Raw((isRequired ? "data-val-required='請輸入地址'" : ""))>
+            @Html.ValidationMessageFor(model => model.User.Address, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.Occupation))
+{
+    //var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Occupation);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">職業</label>
+        <div class="col-sm-9">
+            @Html.EditorFor(model => model.UserProfile.Occupation, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.UserProfile.Occupation, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.EmergencyContact))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.EmergencyContact);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">緊急聯絡人@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <input type="text" id="UserProfile_EmergencyContact" name="UserProfile.EmergencyContact" class="form-control" value="@Model.UserProfile.EmergencyContact"
+                   data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequired ? "data-val-required='請輸入緊急聯絡人'" : ""))>
+            @Html.ValidationMessageFor(model => model.UserProfile.EmergencyContact, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+
+@if (Model.UserContentTypes.Contains(UserContentType.EmergencyPhone))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.EmergencyPhone);
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">緊急聯絡電話@(isRequired ? "(*)" : "")</label>
+        <div class="col-sm-9">
+            <input type="text" id="UserProfile_EmergencyPhone" name="UserProfile.EmergencyPhone" class="form-control" value="@Model.UserProfile.EmergencyPhone"
+                   data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequired ? "data-val-required='請輸入緊急聯絡電話'" : ""))>
+            @Html.ValidationMessageFor(model => model.UserProfile.EmergencyPhone, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+

@@ -1,0 +1,23 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@using WabMaker.Web.Controllers
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+
+@* 會員共用背景 *@
+@{
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemConver);
+    var imgUrl = mainImage?.FilePath;
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@imgUrl) 0/cover no-repeat;">
+        <div class="auto-container">
+            <h2>@*@Model.ItemLanguage.Subject*@</h2>
+            <p>@*@Model.ItemLanguage.Description*@</p>
+        </div>
+    </div>
+</section>
+
+

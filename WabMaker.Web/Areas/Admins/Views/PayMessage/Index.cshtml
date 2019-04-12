@@ -1,0 +1,44 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+
+@{
+    ViewBag.Title = "入帳明細";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action(null, null, new { })" />
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    @* 預設30天 *@
+    <div class="toolbar row">
+        <div class="col-lg-3 col-xs-12">
+            <div class="input-group input-daterange">
+                <input type="text" class="form-control" name="StartTime" placeholder="日期開始範圍" value="@DateTime.Now.AddDays(-30).ToDateString()" />
+                <div class="input-group-addon">to</div>
+                <input type="text" class="form-control" name="EndTime" placeholder="日期結束範圍" value="@DateTime.Now.ToDateString()" />
+            </div>
+        </div>
+        <div>
+            @mHelper.Switch("篩選排程查詢", "IsByQuery", false)
+            @mHelper.Switch("篩選異常", "IsWrong", false)
+        </div>
+        @*<div class="col-lg-6 col-xs-12">
+              快速查詢
+                <button class="btn btn-default">近30天</button>
+                <button class="btn btn-default">@DateTime.Now.ToDateString("yyyy/MM")</button>
+                <button class="btn btn-default">@DateTime.Now.AddMonths(-1).ToDateString("yyyy/MM")</button>
+                <button class="btn btn-default">@DateTime.Now.AddMonths(-2).ToDateString("yyyy/MM")</button>
+            </div>*@
+    </div>
+
+    <div id="mainTable" class="container-fluid"></div>
+</div>
+
+@*<div id="editView" style="display:none;"></div>*@
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+        site.showMaster();
+    </script>
+}

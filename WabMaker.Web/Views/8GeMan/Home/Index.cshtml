@@ -1,0 +1,103 @@
+﻿@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services
+@{
+    ViewBag.Title = "";
+    Layout = "../Shared/_Layout.cshtml";
+}
+
+@section MainSlider{
+    @*------Banner1------ *@
+    @*@Html.Action("Get", "Item", new { routeName = "Index_Banner_1" })*@
+    @Html.Action("Partial", "Item", new ItemPageModel
+{
+    CacheName = "Banner_1",
+    ViewName = "Banner_1",
+    IsPaged = false,
+    SortColumn = SortColumn.Sort,
+    StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("5e4337f2-25d9-4251-b47e-34983c3c07b1") })//Banner1
+})
+}
+
+@*------Banner2------ *@
+@*@Html.Action("Get", "Item", new { routeName = "Index_Banner_2" })*@
+@Html.Action("Partial", "Item", new ItemPageModel
+{
+    CacheName = "Banner_2",
+    ViewName = "Banner_2",
+    IsPaged = false,
+    SortColumn = SortColumn.Sort,
+    StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("21dc3879-0521-448b-8879-70b61a7e4fa1") })//Banner2
+})
+@*------內容------ *@
+<section class="hotnews-section">
+    <div class="auto-container">
+        <div class="row">
+            <div class="col-md-8 col-xs-12 mb-30">
+                <div class="hotnews-recommend">
+                    @* 最新消息 *@
+                    @Html.Action("Partial", "Item", new ItemPageModel
+               {
+                   CacheName = "Index_New",
+                   ViewName = "Index_New",
+                   PageSize = 8,
+                   SortColumn = SortColumn.UpdateTime,
+                   StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("a8345d10-8002-4e1b-8795-9fa076a162e7"),//一般文章
+                       new Guid("f0e9749c-0111-4d60-b257-a9eca9bf6e35"),//人物文章
+                       new Guid("acfa272c-a682-444a-b513-d7e1006a09fe")})//課程文章
+               })
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-12 mb-30">
+                <div class="hotnews-recommend p-10">
+                    @* 熱門推薦 *@
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Hot"))
+
+                </div>
+            </div>
+        </div>
+
+        @* YouTube *@
+        @Html.Action("Partial", "Item", new ItemPageModel
+   {
+       CacheName = "Index_YouTube",
+       ViewName = "Index_YouTube",
+       PageSize = 3,
+       SortColumn = SortColumn.CreateTime,
+       CoverType = MyTool.Enums.CoverType.YouTube,
+       StructureJson = _Json.ModelToJson(new List<Guid> {
+           new Guid("a8345d10-8002-4e1b-8795-9fa076a162e7") })//一般文章
+   })
+
+        @* 課程 *@
+        @Html.Action("Partial", "Item", new ItemPageModel
+   {
+       CacheName = "Index_Course",
+       ViewName = "Index_Course",
+       PageSize = 3,
+       SortColumn = SortColumn.CreateTime,
+       StructureJson = _Json.ModelToJson(new List<Guid> {
+                       //new Guid("a8345d10-8002-4e1b-8795-9fa076a162e7"),//一般文章
+                       new Guid("acfa272c-a682-444a-b513-d7e1006a09fe")//課程文章
+       }),
+   })
+
+        @* SoptLight *@
+        @Html.Action("Partial", "Item", new ItemPageModel
+   {
+       CacheName = "Index_SoptLight",
+       ViewName = "Index_SoptLight",
+       PageSize = 8,
+       SortColumn = SortColumn.CreateTime,
+       StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("a8345d10-8002-4e1b-8795-9fa076a162e7") }),//一般文章
+       CategoryJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("52fce89b-42cb-4ba7-8cae-56f803661695")})//SoptLight
+   })
+
+
+    </div>
+</section>

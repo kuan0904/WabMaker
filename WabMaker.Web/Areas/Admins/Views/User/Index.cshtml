@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "帳號管理";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action()" />
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    <p>@mHelper.CreateButton()</p>
+
+    <div id="mainTable" class="container-fluid"></div>    
+</div>
+
+<div id="editView" style="display:none;"></div>
+
+@section Scripts {
+   <script>
+       site.bindEvent();
+       site.showMaster();
+   </script>
+}

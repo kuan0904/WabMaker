@@ -1,0 +1,66 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@{
+    ViewBag.Title = "會員管理";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action()" />
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    @*<p>@mHelper.CreateButton()</p>*@
+
+    <div class="toolbar">
+        <div style="width:25%">
+            <input type="text" name="SearchString" class="form-control" placeholder="搜尋姓名、Email" />
+        </div>
+
+        <div style="width:15%;float: right;">
+            @Html.DropDownList("SelectUserStatus", _Enum.EnumtoSelect<SelectUserStatus>(), new { @class = "form-control selectpicker", multiple = "multiple", title = "篩選狀態" })
+        </div>
+
+        <div style="width:15%;float: right;">
+            @Html.DropDownList("SelectRoleID", (List<SelectListItem>)ViewBag.RoleSelectList, new { @class = "form-control selectpicker", multiple = "multiple", title = "篩選身分" })
+        </div>
+        
+        <div style="width:15%;float: right;">
+            @Html.DropDownList("SelectLoginType", _Enum.EnumtoSelect<MemberLoginType>(), new { @class = "form-control selectpicker", multiple = "multiple", title = "篩選登入方式" })
+        </div>
+
+    </div>
+
+    <div id="mainTable" class="container-fluid"></div>
+</div>
+
+<div id="editView" style="display:none;"></div>
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+
+        var goToId = '@Request["goToId"]';
+        if (site.isNullOrEmpty(goToId))
+        {
+            site.showMaster();
+        }
+        else
+        {
+            var action = "View/" + goToId;
+            site.showEdit(action);
+        }
+
+        //go to RoleList
+        $(site.masterView).on("click", ".RoleListBtn", function (e) {
+            var action = "RoleList?userID=" + $(this).closest('tr').data("id");
+            site.showEdit(action);          
+        });
+
+        //go to userProflie
+        $(site.masterView).on("click", ".SendConfirmMail", function (e) {
+            e.preventDefault();
+            var id = $(this).closest('tr').data("id");       
+            site.showConfirm("確認要重寄驗證信給會員?", site.doingFn, id, "SendConfirmMail");
+        });
+
+    </script>
+}

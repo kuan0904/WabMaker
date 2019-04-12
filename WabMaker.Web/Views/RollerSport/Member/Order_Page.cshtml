@@ -1,0 +1,143 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using WabMaker.Web.Helpers
+@model WebMaker.Entity.ViewModels.OrderPageResult
+@{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number_PreNext;
+    //buttonModel.PreviousText = string.Format("<i class='fa fa-angle-left'></i>Back");
+    //buttonModel.NextText = string.Format("Next<i class='fa fa-angle-right'></i>");
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+
+    WebMaker.Entity.Models.cms_Structure structure = ViewBag.structure;
+    //包含類型
+    var orderContentTypes = structure.OrderContentTypes.ToContainList<OrderContentType>();
+}
+
+<ul class="pagination">
+    @foreach (var item in buttons)
+    {
+        Model.OrderPageModel.CurrentPage = item.Page;
+
+        <li class="@(item.IsCurrent?"active":"")">
+            @Ajax.RawActionLink(item.Name, "GetOrderPageList", "Member", Model.OrderPageModel,
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" }, null)
+        </li>
+    }
+</ul>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>          
+            <th></th>            
+            <th>訂單編號</th>
+            <th>名稱</th>
+            <th>建立日期</th>
+            <th>狀態</th>
+            <th>付款方式</th>
+            <th>金額</th>
+            @if (orderContentTypes.Contains(OrderContentType.PublicNote))
+            {
+                <th>管理員訊息</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.DataResult.Data)
+            {
+            <tr>
+                
+                @if (Model.OrderPageModel.StructureID == new Guid("d83dc304-8f3a-48bc-b85f-23695ba0e9d6"))
+                {
+                    //比賽報名紀錄
+                    <td>
+                        <a class="btn btn-@(item.Order.OrderStatus == (int)OrderStatus.Editing ? "success" : "info") btn-sm" href="@Url.Action("Competition", "Order", new { id = item.Order.ID })">
+                            @(item.Order.OrderStatus == (int)OrderStatus.Editing ? "編輯" : "瀏覽")
+                        </a>
+                    </td>
+                }
+                else
+                {
+                    //會員資格申請紀錄
+                    <td>
+                        <a class="btn btn-@(item.Order.OrderStatus == (int)OrderStatus.Refuse ? "success" : "info") btn-sm" href="@Url.Action("SignUpInfo", "Order", new { id = item.Order.ID })">
+                            @(item.Order.OrderStatus == (int)OrderStatus.Refuse ? "編輯" : "瀏覽")
+                        </a>
+                    </td>
+                }
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Order.OrderNumber)
+                </td>
+                <td>
+                    @{
+                        //只有單一內容且等於文章標題
+                        bool isOnlyItem = item.ItemViewModel != null && item.OrderDetails.Count == 1 && item.OrderDetails.FirstOrDefault().ItemSubject == item.ItemViewModel.ItemLanguage.Subject;
+                    }
+
+
+                    @if (item.Order.ToCombineOrder != null)
+                    {
+                        <span>併入訂單 @item.Order.ToCombineOrder.OrderNumber</span>
+                    }
+                    @*--訂單文章標題--*@
+                    else if (item.ItemViewModel != null)
+                    {
+                        if (!string.IsNullOrEmpty(item.ItemViewModel.Item.cms_Structure.ViewName))
+                        {
+
+                            //link文章 (比賽報名紀錄)
+                            <a href="@Url.Action("Get","Item", new { routeName = item.ItemViewModel.Item.RouteName })" target="_blank">
+                                @item.ItemViewModel.ItemLanguage.Subject
+                            </a>
+                        }
+                        else if (isOnlyItem)
+                        {
+
+                            @item.ItemViewModel.ItemLanguage.Subject
+                        }
+                        else
+                        {
+                            //(會員資格申請紀錄)
+                            @:【@item.ItemViewModel.ItemLanguage.Subject】
+                        }
+                    }
+
+
+                    @*--明細--*@
+                    @*@if (!isOnlyItem)
+                    {
+                        if (item.OrderDetails.Count == 1)
+                        {
+                            @item.OrderDetails.FirstOrDefault().ItemSubject
+                        }
+                        else
+                        {
+                            //所有商品
+                            foreach (var detail in item.OrderDetails)
+                            {
+                                <div>@detail.ItemSubject</div>
+                            }
+                        }
+                    }*@
+                </td>
+                <td>@item.Order.CreateTime.ToString("yyyy/MM/dd")</td>
+                <td>@(mHelper.OrderStatus(item.Order.OrderStatus, item.Order.OrderStatus.GetDisplayName<OrderStatus>()))</td>
+                <td>
+                    @*@(item.Order.PayType.GetDisplayName<PayType>())*@
+                    @if (item.Order.PayType == (int)PayType.ATMVirtual && item.Order.VirtualAccount != null)
+                    {
+                        <div><b>銀行: </b>國泰世華(013) 建國分行</div>
+                        <div><b>虛擬帳號: </b>@item.Order.VirtualAccount</div>
+                        <div><b>繳費期限: </b>@item.Order.PayDeadline.ToDateString()</div>                     
+                    }
+                </td>
+                <td>@item.Order.TotalPrice.ToPrice()</td>
+                @if (orderContentTypes.Contains(OrderContentType.PublicNote))
+                {
+                    <td>@item.Order.PublicNote</td>
+                }
+            </tr>
+                        }
+    </tbody>
+</table>

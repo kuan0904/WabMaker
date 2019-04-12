@@ -1,0 +1,39 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using System.Dynamic
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* 人物文章列表-分頁 *@
+@foreach (var item in Model.DataResult.Data)
+{
+    var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+    <div class="people-item col-md-3 col-xs-6 mb-30"
+         data-gender="@(item.UserProfile?.Gender)"
+         data-age="@(_Date.Age(item.UserProfile?.Birthday))"
+         data-height="@(item.UserProfile?.Height)"
+         data-language="@(item.UserProfile?.Language)">
+        @*@(item.UserProfile?.Gender) @(_Date.Age(item.UserProfile?.Birthday)) @(item.UserProfile?.Height) @(item.UserProfile?.Language)*@
+        <div class="director-inner">
+            <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="director-title">
+                @if (mainImage != null)
+                {
+                    if (mainImage.FileType == FileType.YouTube)
+                    {
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+                        </div>
+                    }
+                    else
+                    {
+                        <img src="@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)" alt="" />
+                    }
+                }
+                <h3 class="mb-10 mt-30">@item.ItemLanguage.Subject</h3>
+                <p> @_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Description), 45)</p>
+                <span class="fr">More</span>
+            </a>
+        </div>
+    </div>
+}

@@ -1,0 +1,54 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+
+@{
+    ViewBag.Title = "選單";
+    MenuType DefaultMenu = MenuType.Admin;
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action()" />
+<h2>@ViewBag.Title</h2>
+<p>所有client共用, Role要設定選單權限才會出現</p>
+<br>
+
+<!--選單分類-->
+<div id="treeTypeBtns" class="btn-group">
+    <button type="button" class="btn btn-primary active" value="@((int)DefaultMenu)">@_Enum.GetDisplayName(DefaultMenu)</button>
+    @foreach (MenuType i in Enum.GetValues(typeof(MenuType)))
+    {
+        if (i != DefaultMenu)
+        {
+            <button type="button" class="btn btn-default" value="@((int)i)">@_Enum.GetDisplayName(i)</button>
+        }
+    }
+</div>
+<br><br>
+
+<!--Tree-->
+<ul id="treeView" class="menuTree mTree loadData">
+
+</ul>
+
+
+@section scripts{
+    <script>
+        $(function () {
+            site.bindEvent();
+
+        });
+
+    </script>
+}
+@section css{  
+    <style>
+        /*tree block*/
+        .menuTree .timeline-label {
+            width: 100px;
+        }
+
+        .menuTree .CreateNode .timeline-label, .deptTree .CreateSmNode .timeline-label {
+            width: 70px;
+        }
+
+    </style>
+}

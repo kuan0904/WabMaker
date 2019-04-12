@@ -1,0 +1,19 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@foreach (var item in Model.DataResult.Data)
+{
+    var mainImage = item.ItemFiles.Where(x => x.SourceType == SourceType.ItemConver).ToList();
+
+    <a href="@item.ItemLanguage.LinkUrl" target="@(item.ItemLanguage.IsBlankUrl?"_blank":"_self")">
+
+        @if (mainImage.Any())
+        {
+            var img = mainImage.FirstOrDefault();
+            <img src="@RouteHelper.SetImagePath(img.FilePath, img.ThumbnailPath)" width="100" />
+        }
+    </a>
+
+}

@@ -1,0 +1,154 @@
+﻿@using WabMaker.Web.WebViewModels
+@using WabMaker.Web.Helpers
+@using MyTool.ViewModels
+@using MyTool.Services
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    SiteInfoViewModel SiteInfo = ApplicationHelper.SiteInfo;
+}
+
+@section meta
+{
+    @if (SiteInfo != null)
+    {
+        if (!string.IsNullOrEmpty(SiteInfo.SiteName))
+        {
+            <meta property="og:title" content="@SiteInfo.SiteName" />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content="@RouteHelper.Url(true)" />
+        }
+        
+        if (!string.IsNullOrEmpty(SiteInfo.MetaTagDescription))
+        {
+            <meta property="og:description" content="@SiteInfo.MetaTagDescription">
+        }
+
+        if (!string.IsNullOrEmpty(SiteInfo.MetaTagOgImage))
+        {
+            <meta property="og:image" content="@RouteHelper.SetUrlPath(SiteInfo.MetaTagOgImage, isAbsolute:true)" />
+        }
+    }
+}
+
+
+<div class="main-content" style="background:#f1faff;">
+
+
+<div class="container">
+            <div class="competition list-bg1">
+                <div class="header-list">
+                    <a href="https://www.rollersports.org.tw/catalog8">
+                        競速溜冰</br>Speed</a>
+                </div>
+            </div>
+            <div class="competition list-bg2">
+                <div class="header-list">
+                    <a href="https://www.rollersports.org.tw/catalog9">花式溜冰</br>Artistic</a>
+                </div>
+            </div>
+            <div class="competition list-bg3">
+                <div class="header-list">
+                    <a href="https://www.rollersports.org.tw/catalog10">自由式輪滑</br>Freestyle</a>
+                </div>
+            </div>
+            <div class="competition list-bg4">
+                <div class="header-list">
+                    <a href="https://www.rollersports.org.tw/catalog11">曲棍球</br>Hockey</a>
+                </div>
+            </div>
+            <div class="competition list-bg5">
+                <div class="header-list">
+                    <a href="https://www.rollersports.org.tw/catalog12">滑輪板</br>Skateboarding</a>
+                </div>
+            </div>
+            <div class="competition list-bg6">
+                <div class="header-list">
+                    <a href="https://www.rollersports.org.tw/Member/SignUp">註冊</br>Sign up</a>
+                </div>
+            </div>
+        </div>
+
+    <div class="main-content">
+        <div class="main-content-inner">
+            @* 橫幅Banner 
+            @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Banner"))
+*@
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="container">
+                <div class="titlePic">
+                    <div class="jumbotron">
+                        <div class="container">
+                            <h2>最新消息</h2>
+                        </div>
+                    </div>
+                </div><!-- titlePic END -->
+
+                <div class="row">
+
+                    <div class="main-content">
+                        <div class=main-content-inner>
+                            <div class="news-wrap news-list">
+                                <h2 class="main-title">最新消息</h2>
+                                @* 最新消息 *@
+                                @Html.Action("Partial", "Item", new ItemPageModel
+                           {
+                               CacheName = "Index_New",
+                               ViewName = "Index_New",
+                               PageSize = 3,
+                               SortColumn = SortColumn.CreateTime,
+                               StructureJson = _Json.ModelToJson(new List<Guid> {
+                                 new Guid("955c3e73-2328-48c5-af9a-b021dd25a8f3"),//一般文章
+                                 new Guid("d83dc304-8f3a-48bc-b85f-23695ba0e9d6")//比賽文章
+                                })
+                           })
+                            </div><!-- news-list END -->
+                            <div class="learnMore">
+                                <a href="@Url.Action("Get", "Item", new { routeName = "news" })"><button>觀看更多</button></a>
+                            </div>
+                        </div><!-- main-content-inner END -->
+                    </div><!-- col-md-8 td-main-content END -->
+
+                </div><!-- row END -->
+
+            </div><!-- container END -->
+        </div><!-- row END -->
+
+    </div><!-- container END -->
+</div><!-- main-content END -->
+<!--===========熱門賽事===========-->
+<div class="container">
+    <div class="main-content">
+        <div class="container">
+
+            <div class="main-content-inner">
+                <div class="news-wrap news-list">
+                    <h2 class="main-title">熱門文章</h2>
+
+                    @* 熱門文章 *@
+                    @Html.Action("Partial", "Item", new ItemPageModel
+               {
+                   CacheName = "Index_Hot",
+                   ViewName = "Index_New",
+                   PageSize = 3,
+                   SortColumn = SortColumn.ViewCount,
+                   StructureJson = _Json.ModelToJson(new List<Guid> {
+                                new Guid("955c3e73-2328-48c5-af9a-b021dd25a8f3"),//一般文章
+                                new Guid("d83dc304-8f3a-48bc-b85f-23695ba0e9d6")//比賽文章
+                   })
+               })
+
+                </div><!-- news-list END -->
+                <div class="learnMore">
+                    <a href="@Url.Action("Get", "Item", new { routeName = "news" })"><button>觀看更多</button></a>
+                </div>
+            </div><!-- main-content-inner END -->
+
+        </div><!-- container END -->
+    </div><!-- main-content END -->
+</div>
+
+

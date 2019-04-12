@@ -1,0 +1,99 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.ViewModels.UserViewModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "基本資料";
+}
+
+@* 會員背景 *@
+@Html.Action("Get", "Item", new
+{
+    routeName = "PrivacyPolicy",
+    specViewName = "_MemberBackgroud"
+})
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">首頁</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@ViewBag.Title</a></li>
+            </ol>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+            </div>
+
+            @using (Html.BeginForm(null, null, FormMethod.Post))
+            {
+                <input type="hidden" id="returnUrl" value="@Url.Action()" />
+                <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="col-md-9">
+                    <div class="w-back-g p-20">
+                        <div class="hotnews-title">
+                            <span class="hotnews-title-inner mb-20">@ViewBag.Title</span>
+                        </div>
+
+                        <div class="singup-inner mb-50 p-lg-rl-50">
+                            <h3 class="text-orange">帳號資料設定</h3>
+                            <hr>
+                            <div class="form-group row">
+                                <label class="col-sm-2 form-label text-right">登入帳號/Email(*)</label>
+                                <div class="col-sm-9">
+                                    @Html.EditorFor(model => model.User.Email, new { htmlAttributes = new { @class = "form-control", data_val_required = "請輸入Email" } })
+                                    @if (Model.User.EmailIsVerify)
+                                    {
+                                        <span class="label label-success">已驗證</span>
+                                    }
+                                    else
+                                    {
+                                        <a class="sendConfirmBtn LinkAjax" data-url="@Url.Action("SendValidCodeSelf")" data-title="重寄驗證信">重寄驗證信</a>
+                                    }
+                                    @Html.ValidationMessageFor(model => model.User.Email, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-2 form-label text-right">Facebook</label>
+                                <div class="col-sm-9">
+                                    @(Model.User.LoginTypes.HasValue((int)LoginType.Facebook) ? "綁定完成" : "未綁定")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="singup-inner mb-50 p-lg-rl-50">
+                            <h3 class="text-orange">會員資料設定</h3>
+                            <hr>
+
+                            @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_Profile"), Model)
+
+                            <div class="row">
+                                <div class="col-xs-12 text-center">
+                                    @*<button type="button" class="btn btn-default border-n n-back-g text-gray text28">Cancel</button>*@
+                                    <button id="SaveBtn" type="button" class="btn btn-default border-n n-back-g text-black text28">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+@section scripts{
+    <script>
+        $(function () {
+            $("#User_Email").change(function () {
+                $(".sendConfirmBtn").addClass("disabled");
+            });
+        });
+    </script>
+}

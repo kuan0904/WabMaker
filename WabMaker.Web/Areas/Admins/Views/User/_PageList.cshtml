@@ -1,0 +1,65 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@{
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+}
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.ViewModels.UserViewModel>
+
+<table class="table table-striped table-bordered bootstrap-datatable">
+    <tr>
+        <th width="15%"><!--setting--></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.Name)
+        </th>
+        @if (clientSettings.Contains(ClientSetting.Department))
+        {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].User.DepartmentID)
+            </th>
+        }
+        <th>
+            權限角色
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.LastLoginTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.LastLoginIP)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.Note)
+        </th>
+    </tr>
+    @foreach (var item in Model.Data)
+    {
+        <tr data-id="@item.User.ID">
+            <td>
+                @mHelper.ListButton()
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Name)
+            </td>
+            @if (clientSettings.Contains(ClientSetting.Department))
+            {
+                <td>
+                    @(item.User.mgt_Department?.Name)                   
+                </td>
+            }
+            <td>
+                @string.Join(", ", item.RoleRelations.Select(x => x.mgt_Role.Name))
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.LastLoginTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.LastLoginIP)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Note)
+            </td>
+        </tr>
+    }
+</table>
+
+@Html.Partial("_Pagination", Model)
+

@@ -1,0 +1,38 @@
+﻿@model MyTool.ViewModels.IbonShowData
+@{
+    Layout = null;
+}
+
+<?xml version="1.0" encoding="Big5" ?>
+<SHOWDATA>
+    <BUSINESS>@Model.BUSINESS</BUSINESS>
+    <STOREID>@Model.STOREID</STOREID>
+    <SHOPID>@Model.SHOPID</SHOPID>
+    <DETAILED_NUM>@Model.DETAILED_NUM</DETAILED_NUM>
+    <PRODUCT_CODE>@Model.PRODUCT_CODE</PRODUCT_CODE>
+    <STATUS_CODE>@Model.STATUS_CODE</STATUS_CODE>
+    <STATUS_DESC>@Model.STATUS_DESC</STATUS_DESC>
+    <KEY1>@Model.KEY1</KEY1>
+    <KEY2>@Model.KEY2</KEY2>
+    <KEY3>@Model.KEY3</KEY3>
+    <KEY4>@Model.KEY4</KEY4>
+    <KEY5>@Model.KEY5</KEY5>
+    <TOTALAMOUNT>@Model.TOTALAMOUNT</TOTALAMOUNT>
+    <TOTALCOUNT>@Model.TOTALCOUNT</TOTALCOUNT>
+    @foreach (var detail in Model.LISTDATAs)
+    {
+        <LISTDATA>
+            <SERIALNO>@detail.SERIALNO</SERIALNO>
+            <PRINT>@detail.PRINT</PRINT>
+            <CP_ORDER>@detail.CP_ORDER</CP_ORDER>
+            <DATA_1>@detail.DATA_1</DATA_1>
+            <DATA_2>@detail.DATA_2</DATA_2>
+            <DATA_3>@detail.DATA_3</DATA_3>
+            <DATA_4>@detail.DATA_4</DATA_4>
+            <DATA_5>@detail.DATA_5</DATA_5>
+            <DATA_6>@detail.DATA_6</DATA_6>
+            <DATA_7>@detail.DATA_7</DATA_7>
+            <DATA_8>@detail.DATA_8</DATA_8>
+        </LISTDATA>
+    }
+</SHOWDATA>

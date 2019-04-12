@@ -1,0 +1,116 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemConver);
+    //封面圖
+    var imgUrl = mainImage?.FilePath;
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+    //預設圖
+    var defalutImage = "~/html/8GeMan/images/8geman-banner.jpg";
+    //內頁圖
+    var subImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemSubImage);
+    var subImageUrl = subImage?.FilePath;
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemLanguage.Subject" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@imgUrl" />
+    <meta property="og:description" content="@description" />
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@subImageUrl) 0/cover no-repeat;">
+        <div class="auto-container">
+            <h2>@Model.ItemLanguage.Subject</h2>
+            <p>@Model.ItemLanguage.Description</p>
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">首頁</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@Model.ItemLanguage.Subject</a></li>
+            </ol>
+        </div>
+        <div class="row">
+            <div class="col-md-8 col-xs-12 mb-30">
+                <div class="hotnews-detail p-20">
+                    <h2 class="border-b-g">@Model.ItemLanguage.Author</h2>
+                    <div class="row">
+                        <div class="col-xs-6 pt-10 mb-10">
+                            <div class="date">
+
+                            </div>
+                        </div>
+                        <div class="col-xs-6 pt-10 mb-10 text-right">
+                            <div class="fb">
+                                <a href="#">
+                                    <img src="images/fb.jpg" alt="">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="banner">
+                        @if (mainImage != null)
+                        {
+                            if (mainImage.FileType == FileType.YouTube)
+                            {
+                                <iframe src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+                            }
+                            else
+                            {
+                                <img src="@imgUrl" alt="" />
+                            }
+                        }
+                    </div>
+                    <p class="pt-10 mb-10">
+                        @Html.Raw(Model.ItemLanguage.Content) <br>
+                    </p>
+                </div>
+                @* todo 相關連結 *@
+                @*<div class="hotnews-recommend">
+                        <div class="hotnews-title">
+                            <span class="hotnews-title-inner">相關連結</span>
+                        </div>
+
+                    </div>*@
+                <div class="hotnews-recommend">
+                    <div class="hotnews-title"><span class="hotnews-title-inner">延伸閱讀</span></div>
+                </div>
+                @* 延伸閱讀 *@
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Related"), Model)
+
+            </div>
+            <div class="col-md-4 col-xs-12 mb-30">
+                <div class="hotnews-recommend p-10 mb-20">
+                    @* 熱門推薦 *@
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Hot"))
+
+                </div>
+                @* 廣告 *@
+                @*@Html.Action("Get", "Item", new { routeName = "Banner_Detail" })*@
+                @Html.Action("Partial", "Item", new WabMaker.Web.WebViewModels.ItemPageModel
+           {
+               CacheName = "Banner_Detail",
+               ViewName = "Banner_Detail",
+               IsPaged = false,
+               SortColumn = SortColumn.Sort,
+               StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("3c753782-d06c-4bd0-9a7a-a80de85e9983") })//內頁 Banner
+           })
+            </div>
+        </div>
+
+    </div>
+</section>

@@ -1,0 +1,15 @@
+﻿@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services;
+
+@* 熱門推薦(Index、Detail) *@
+@Html.Action("Partial", "Item", new ItemPageModel
+{
+    ViewName = "Partial_Hot",
+    PageSize = 3,
+    SortColumn = SortColumn.ViewCount,
+    StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("a8345d10-8002-4e1b-8795-9fa076a162e7"),//一般文章
+                       new Guid("f0e9749c-0111-4d60-b257-a9eca9bf6e35"),//人物文章
+                       new Guid("acfa272c-a682-444a-b513-d7e1006a09fe")})//課程文章
+})

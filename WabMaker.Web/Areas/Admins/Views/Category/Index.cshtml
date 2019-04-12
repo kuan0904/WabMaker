@@ -1,0 +1,38 @@
+﻿@using MyTool.Enums
+@{
+    ViewBag.Title = "分類管理";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action(null)" />
+<input type="hidden" id="itemType" value="@ItemType.Category" />
+<h2>@ViewBag.Title</h2>
+<br>
+
+<!--Tree-->
+<ul id="treeView" class="itemTree mTree loadData"></ul>
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+    </script>
+}
+@section css{
+    <style>
+        /*tree block*/
+        .itemTree .timeline-label {
+            width: 185px;
+        }
+
+        .itemTree .CreateNode .timeline-label, .deptTree .CreateSmNode .timeline-label {
+            width: 80px;
+        }
+
+        /*not menu*/
+        /*.itemTree .type-Item:not(.EditNode) > .timeline-label {
+            background: #fff;
+            border-style: dashed;
+        }*/
+    </style>
+}
+
+

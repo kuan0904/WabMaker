@@ -1,0 +1,103 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model  WebMaker.Entity.ViewModels.ItemViewModel
+
+@{
+    ViewBag.Title = "分組名單-" + Model.ItemLanguage.Subject;
+
+    //包含流程
+    var orderStatus = Model.Item.cms_Structure.OrderStatuses.ToContainList<OrderStatus>();
+    orderStatus.Remove(OrderStatus.Delete);
+    orderStatus.Remove(OrderStatus.AdminEdit);
+    //是會員名單or訂單列表
+    //WebMaker.Entity.ViewModels.ItemViewModel item = ViewBag.Item;
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action(null, null, new { StructureID = Model.Item.StructureID, ArticleID = Request["articleID"], subject = Model.ItemLanguage.Subject})" />
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    <button id="CreateNumberBtn" class="btn btn-warning btn-sm">產生選手和單位編號</button>
+    <br>
+    <div class="toolbar">
+        <table style="width:100%">
+            <tr>
+                <td style="width:25%;">
+                    <div style="display: inline-block; width: 80%;">
+                        @Html.DropDownList("Type", _Enum.EnumtoSelect<OrderTeamSelect>(), new { @class = "form-control selectpicker" })
+                    </div>
+                    @mHelper.HelpButton("單位、項目、選手清單: 只顯示狀態\"完成\"的訂單")
+                </td>
+                <td class="selectDiv2 hidden" style="width:10%;">
+                    @Html.DropDownList("ReportStyle", _Enum.EnumtoSelect<ReportStyle>(), new { @class = "form-control selectpicker" })
+                </td>              
+                <td class="selectDiv2 hidden" style="width:10%;padding:0 10px;">
+                    <button id="ExportBtn" class="btn btn-success">匯出Excel</button>
+                </td>
+                <td></td>
+                <td style="width:15%;">
+                    <div class="selectDiv">
+                        @Html.DropDownList("OrderTeamSort", _Enum.EnumtoSelect<OrderTeamSort>(), new { @class = "form-control selectpicker" })
+                    </div>
+                </td>
+                <td style="width:15%;">
+                    <div class="selectDiv">
+                        
+                        <select class="form-control selectpicker" id="SelectOrderStatus" multiple="multiple" name="SelectOrderStatus" title="篩選狀態" tabindex="-98">
+                           @foreach (var item in (List<WebMaker.Entity.ViewModels.StatusModel>)ViewBag.StatusModels)
+                           {
+                            <option value="@item.OrderStatus">@(item.OrderStatus.GetDisplayName()) (@item.TotalCount)</option>
+                           }                           
+                        </select>
+                       @* @Html.DropDownList("SelectOrderStatus", _Enum.EnumtoSelect(orderStatus), new { @class = "form-control selectpicker", multiple = "multiple", title = "篩選狀態" })*@
+                        <h5 class="hidden text-center text-danger" style="font-weight: 700;">狀態: 完成</h5>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <div id="mainTable" class="container-fluid"></div>
+</div>
+
+@*<div id="editView" style="display:none;"></div>*@
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+        site.showMaster();
+
+
+        //分組名單 才能篩選狀態
+        $(document).on('change', "#Type", function (event) {
+            if ($(this).val() == '@((int)OrderTeamSelect.OrderTeam)') {
+                $(".selectDiv .dropdown").removeClass("hidden");
+                $(".selectDiv2").addClass("hidden");
+                $(".selectDiv h5").addClass("hidden");
+            } else {
+                $(".selectDiv .dropdown").addClass("hidden");
+                $(".selectDiv2").removeClass("hidden");
+                $(".selectDiv h5").removeClass("hidden");
+            }
+        });
+
+        //create number
+        $(site.masterView).on("click", "#CreateNumberBtn", function (e) {
+            e.preventDefault();
+            site.showConfirm("確認要建立編號? (編號將會重新產生)", site.doingFn, "", "CreateNumber");
+        });
+
+        //export            
+        $(site.masterView).on("click", "#ExportBtn", function (e) {
+            e.preventDefault();
+            var addurl = site.createSearchUrl() + "&IsExport=true";
+            var url = site.makeUrl("GetPageList", addurl);
+            if (url) {
+                site.loadingMask.start();
+                window.location = url;
+                site.loadingMask.stop();
+            }
+        });
+    </script>
+}

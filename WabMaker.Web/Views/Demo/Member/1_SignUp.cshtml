@@ -1,0 +1,74 @@
+﻿@model WebMaker.Entity.ViewModels.SignUpViewModel
+
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "註冊";
+}
+
+<h2>SignUp</h2>
+
+@if (Model.ExternalType == null)
+{
+    <p>免費加入，立即參加一般民眾課程</p>
+}
+else
+{
+    <p>使用 Facebook 登入，請填入以下資訊以完成註冊程序</p>
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action("Login", "Member", new  { })" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.ExternalType)
+
+    <div class="form-group">
+        帳號
+        @{ string emailMessage = Model.ExternalType == null ? "E-mail將作為登入帳號，請完成驗證" : "請完成E-mail驗證"; }
+        @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = emailMessage })
+        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        姓名
+        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", autocomplete = "off" })
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </div>
+
+    @if (Model.ExternalType == null)
+    {
+        <div class="form-group">
+            密碼
+            @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "請輸入 6-12 個英數字", autocomplete = "off" })
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            確認密碼
+            @Html.PasswordFor(model => model.PasswordConfirm, new { @class = "form-control", placeholder = "請再次輸入密碼", autocomplete = "off" })
+            @Html.ValidationMessageFor(model => model.PasswordConfirm, "", new { @class = "text-danger" })
+        </div>
+
+
+        <div class="form-group">
+            @Html.TextBoxFor(model => model.Captcha, "", new { @class = "form-control", placeholder = "驗證碼", autocomplete = "off" })
+            @Html.ValidationMessageFor(model => model.Captcha, "", new { @class = "text-danger" })
+            <img class="imgverifycode" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+            <a class="btnnewcode" href="javascript:">重新產生驗證碼</a>
+        </div>
+    }
+            <div class="form-group">
+                <label>
+                    <input id="IsArgee" name="IsArgee" type="checkbox" data-val="true" data-rule-required="true" data-msg-required="請勾選同意">
+                    我已詳細閱讀並同意<a href="">授權同意書</a>
+                </label>
+                <span class="text-danger field-validation-valid" data-valmsg-for="IsArgee" data-valmsg-replace="true"></span>
+
+                <input id="SaveBtn" type="button" value="Save" class="btn btn-default" />
+            </div>
+            }
+<a href="@Url.Action("Login","Member")">立即登入</a>

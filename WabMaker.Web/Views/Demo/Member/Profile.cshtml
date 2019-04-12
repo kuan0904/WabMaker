@@ -1,0 +1,102 @@
+﻿@using MyTool.Services
+@model WebMaker.Entity.ViewModels.UserViewModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "基本資料";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+@using (Html.BeginForm(null, null, FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action()" />
+    <input type="hidden" id="successMessage" data-title="修改基本資料" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right"></label>
+        <div class="col-sm-9">
+            <table class="table">
+                <tr>
+                    <th>建立時間</th>
+                    <th>身分</th>
+                    <th>証號</th>
+                    <th>期限</th>
+                </tr>
+                @foreach (var item in Model.RoleRelations)
+                {
+                    <tr>
+                        <td>@item.CreateTime.ToDateString()</td>
+                        <td>@item.mgt_Role.Name</td>
+                        <td>@item.RoleNumber</td>
+                        <td>@(item.IsTimeLimited ? item.StartTime.ToDateString() + "~" + item.EndTime.ToDateString() : "")</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">登入帳號/Email</label>
+        <div class="col-sm-9">
+            <div>
+                @Model.User.Email
+
+                @if (Model.User.EmailIsVerify)
+                {
+                    <h4 style="display: inline;"><span class="label label-success">已驗證</span></h4>
+                }
+                else
+                {
+                    <a class="btn btn-warning sendConfirmBtn LinkAjax" data-url="@Url.Action("SendValidCodeSelf")" data-title="重寄驗證信">重寄驗證信</a>
+                }
+
+                <a href="@Url.Action("UpdateEmail")">變更</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">Facebook 帳號</label>
+        <div class="col-sm-9">
+            @(Model.User.LoginTypes.HasValue((int)MyTool.Enums.LoginType.Facebook) ? "綁定完成" : "未綁定")
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">手機號碼</label>
+        <div class="col-sm-9">
+            <div>
+                @Model.User.Phone
+
+                @if (Model.User.PhoneIsVerify)
+                {
+                    <h4 style="display: inline;"><span class="label label-success">已驗證</span></h4>
+                }
+                else if(!string.IsNullOrEmpty(Model.User.Phone))
+                {
+                    <a class="btn btn-warning sendConfirmBtn LinkAjax" data-url="@Url.Action("SendSmsValidCodeSelf")" data-gotourl="@Url.Action("UpdatePhoneCorfirm")" data-title="重寄驗證碼">重寄驗證碼</a>
+                }
+
+                <a href="@Url.Action("UpdatePhone")">變更</a>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_Profile"), Model)
+
+    <input id="SaveBtn" type="button" value="Save" class="btn btn-default" />
+}
+
+@section scripts{
+    <script>
+        $(function () {
+            $("#User_Email").change(function () {
+                $(".sendConfirmBtn").addClass("disabled");
+            });
+        });
+    </script>
+}

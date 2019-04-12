@@ -1,0 +1,68 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* 一般文章列表-分頁 *@
+@foreach (var item in Model.DataResult.Data)
+{
+    var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemConver);
+
+    <div class="col-md-4 col-xs-12 mb-30">
+        <div class="list-inner pb-10">
+            @if (mainImage != null)
+            {
+                if (mainImage.FileType == FileType.YouTube)
+                {
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+                    </div>
+                }
+                else
+                {
+                    <img src="@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)" alt="" />
+                }
+            }
+            <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="hot-title">
+                <h3 class="mb-10">@item.ItemLanguage.Subject</h3>
+                <p>@_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Content), 100)</p>
+                <span>@item.Item.Date.ToDateString("yyyy.MM.dd")</span>
+                <span class="fr">More</span>
+            </a>
+        </div>
+    </div>
+
+}
+
+@{    
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Next;
+    buttonModel.NextText = string.Format("<div class='icon-outer'><i class='fa fa-chevron-down'></i></div>");
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+
+@* Pagination *@
+<div class="row clearfix">
+    <div class="faq-column col-sm-12 col-xs-12">
+        <div class="accordion-block">
+            <div class="accordion-box style-two">
+                <div class="accordion block">
+                    <div class="acc-content">
+                        <div class="content">
+                            @* Ori Content *@
+                        </div>
+                    </div>
+                    <div class="acc-btn">
+                        @foreach (var item in buttons)
+                        {
+                            Model.ItemPageModel.CurrentPage = item.Page;
+
+                            @Ajax.RawActionLink(item.Name, "GetPageList", "Item", Model.ItemPageModel,
+                                new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.InsertAfter, UpdateTargetId = "ListContent" }, null)
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

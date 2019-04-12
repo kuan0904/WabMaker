@@ -1,0 +1,192 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model List<WebMaker.Entity.Models.mgt_UserProfile>
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "我的寶貝";
+}
+
+<section class="character-section mt-65">
+    <div class="character-back character-back2">
+        <div class="auto-container">
+            <h2></h2>
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="UserAssignModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+
+</div>
+
+@using (Html.BeginForm("UpdateMyChild", null, FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action()" />
+    <input type="hidden" id="successMessage" data-title="我的寶貝" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <section class="hotnews-section mt-md-250">
+        <div class="auto-container">
+            <div class="text-right">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")">首頁</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Profile","Member")">會員中心</a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        <a href="@Url.Action()">@ViewBag.Title</a>
+                    </li>
+                </ol>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="w-back-g p-20">
+                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="w-back-g p-20">
+                        <div class="hotnews-title">
+                            <span class="hotnews-title-inner mb-10">@ViewBag.Title</span>
+                        </div>
+
+                        <div class="singup-inner mb-20">
+                            @*<div>
+                                    <label class="text-red">必須為法定監護人才能建立資料，最多限五人。</label>
+                                </div>*@
+                            <div>
+                                <label class="text-red">選手資料不能修改，若要修改請聯絡管理員。</label>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped member-list-tab">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="text-center" width="17%">選手姓名</th>
+                                        <th scope="col" class="text-center" width="23%">生日</th>
+                                        <th scope="col" class="text-center" width="15%">姓別</th>
+                                        <th scope="col" class="text-center" width="25%">身分證字號/護照號</th>
+                                        <th scope="col" class="text-center" width="17%">教練名單</th>
+                                        <th scope="col" class="text-center" width="3%"></th>
+                                        <th scope="col" class="text-center" width="3%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null)
+                                    {
+                                        foreach (var member in Model)
+                                        {
+                                            <tr id="row_@member.ID">
+                                                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "MyChildren_View"), member)
+                                            </tr>
+                                        }
+                                    }
+                                    @*@if (Model.Count < 5)
+                                        {*@
+                                    <!--新增-->
+                                    <tr id="newRow">
+                                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "MyChildren_Edit"), new WebMaker.Entity.Models.mgt_UserProfile())
+                                    </tr>
+                                    @*}*@
+                                </tbody>
+                            </table>
+                            @*<button type="button" class="btn btn-style-seventeen btn-block">
+                                    <i class="fas fa-plus"></i>
+                                </button>*@
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+}
+
+@section scripts{
+    <script>
+        $(document).on("click", "#MyChildSaveBtn", function (e) {
+            e.preventDefault();
+            web.showConfirm('新增選手', "請確認資料無誤。", web.saveFn, $(this));
+        });
+
+        $(document).on("click", ".MyChildUpdateBtn", function (e) {
+            e.preventDefault();
+            web.saveFn($(this));
+        });
+
+        $(".MemberDeleteBtn").click(function (e) {
+            e.preventDefault();
+            web.ConfirmCaptcha.showFn();
+            web.showConfirm('確定要刪除選手嗎?', "", goToLink, $(this));
+        });
+
+        $(document).on("click", ".MyChildEditBtn", function (e) {
+            $(this).closest("tr").addClass("warning");
+            $("#MyChildSaveBtn, .MyChildEditBtn").attr("disabled", true);
+            $("#newRow").empty();
+        });
+
+        $(document).on("click", ".MyChildCancelBtn", function (e) {
+            $(this).closest("tr").removeClass("warning");
+            $("#MyChildSaveBtn, .MyChildEditBtn").attr("disabled", false);
+            $("#newRow").load("/Member/GetMyChildEmpty");
+        });
+
+        function goToLink($item) {
+            window.location = $item.data('url') + "&captcha=" + $("#confirm_box input").val();
+        }
+
+        function onModalAjax() {
+            $("#UserAssignModal").modal('show');
+        }
+
+        //--------------------
+
+        //save
+        $(document).on("click", "#AssignSaveBtn", function (e) {
+            e.preventDefault();
+            web.saveFn($(this), AssignSuccess);
+        });
+
+        //enter save
+        $(document).on("keypress", "#AssignPhoneNumber", function (e) {
+            if (e.which == 13) {
+                $("#AssignSaveBtn").click();
+                return false;
+            }
+        });
+
+        //delete
+        $(document).on("click", ".AssignDeleteBtn", function (e) {
+            e.preventDefault();
+            web.showConfirm('確定要刪除教練嗎?', "", web.linkFn, $(this));
+            AssignSuccess();
+        });
+
+        var assignRefresh = false;
+
+        //success
+        function AssignSuccess() {
+            assignRefresh = true;
+            var id = $("#AssignChildID").val();
+            $("#AssignBtn" + id).click();
+        }
+
+        //refresh
+        $('#UserAssignModal').on('hidden.bs.modal', function () {
+            if (assignRefresh) {
+                location.reload();
+            }
+        });
+
+    </script>
+}

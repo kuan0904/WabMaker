@@ -1,0 +1,60 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using System.Dynamic;
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.ViewModels.ItemViewModel>
+@{
+    WebMaker.Entity.Models.cms_Structure structure = ViewBag.Structure;
+}
+
+<div class="page-header">
+    <h1>排序</h1>
+</div>
+
+@using (Html.BeginForm(null, null, FormMethod.Post))
+{
+    <div class="sort-container">
+        <ul class="sort-list">
+            @foreach (var item in Model.Data)
+            {
+                List<WebMaker.Entity.Models.cms_ItemFile> mainImage = item.ItemFiles.Where(x => x.SourceType == (int)SourceType.ItemConver).ToList();
+
+                <li>
+                    <input type="hidden" name="IDs" value="@item.Item.ID" />
+
+                    @if (structure.ListTypes.HasValue((int)ContentType.Cover))
+                    {
+                        <div class="sort-image">
+                            @if (mainImage.Any())
+                        {
+                            var file = mainImage.FirstOrDefault();
+                            if (file.FileType == (int)FileType.YouTube)
+                            {
+                                    <iframe width="180" height="100" src="@_YouTube.SetIframe(file.FilePath)" frameborder="0"></iframe>
+                                }
+                                else
+                                {
+                                    <img src="@RouteHelper.SetUrlPath(file.FilePath, file.ThumbnailPath)" height="100" />
+                                }
+                            }
+                        </div>
+                    }
+
+                    @if (structure.ListTypes.HasValue((int)ContentType.Subject))
+                    {
+                        <div class="sort-subject">
+                            @Html.DisplayFor(modelItem => item.ItemLanguage.Subject)
+                        </div>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input id="SaveBtn" type="button" value="儲存" class="btn btn-info" />
+            <input id="CancelBtn" type="button" value="取消" class="btn btn-default" />
+        </div>
+    </div>
+}

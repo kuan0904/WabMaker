@@ -1,0 +1,76 @@
+﻿@model WabMaker.Web.WebViewModels.ItemListModel
+
+@{
+    ViewBag.Title = Model.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    //每頁顯示筆數
+    Model.ItemPageModel.PageSize = 5;
+}
+
+<div class="main-content">
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index","Home")">HOME</a></li>            
+                <li class="active">@Model.ItemViewModel.ItemLanguage.Subject</li>
+            </ol>
+        </div>
+    </div>
+
+    <h1 class="site-title"></h1>
+
+    <div class="main-content">
+        <div class="main-content-inner">
+            @* 橫幅Banner *@
+            @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Banner"))
+
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-8 col-sm-8 main-content">
+                <div class=main-content-inner>
+
+                    <h2 class="main-title">@Model.ItemViewModel.ItemLanguage.Subject</h2>
+                
+                    <div id="ListContent">
+                        @Html.Action("Partial", new { model = Model.ItemPageModel })
+                    </div>
+                
+                    <div class=clearfix></div>
+
+                </div><!-- main-content-inner END -->
+            </div>
+
+            <div class="col-md-4 col-sm-4 main-sidebar">
+                <!-- <div class=main-sidebar-inner> -->
+                @*<div class="block-wrap">
+                        <!-- <div class=block-title>AD</div> -->
+                        <ul class="banner-group">
+                            <li class="col-md-12 col-sm-4 col-xs-4 thumbnail">
+                                <a href="#" title="img-banner-300x200" target="_blank">
+                                    <img src="images/img-banner-300x200.jpg" alt="" title="">
+                                </a>
+                            </li>
+                            <li class="col-md-12 col-sm-4 col-xs-4 thumbnail">
+                                <a href="#" title="img-banner-300x200" target="_blank">
+                                    <img src="images/img-banner-300x200.jpg" alt="" title="">
+                                </a>
+                            </li>
+                        </ul>
+                    </div><!-- block-wrap END -->*@
+
+                @* 熱門排行 *@
+                <div class="block-wrap">
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Shared", "Get_Partial_Hot"))
+                </div>
+
+                <!--</div> main-sidebar-inner END -->
+            </div><!-- col-md-4 END -->
+
+        </div><!-- row END -->
+
+    </div><!-- container END -->
+</div><!-- main-content END -->

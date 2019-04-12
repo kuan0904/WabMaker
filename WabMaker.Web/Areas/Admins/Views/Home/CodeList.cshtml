@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "CodeList";
+}
+
+<h2>CodeList</h2>
+
+<br>
+
+<ul>
+    <li>
+        <h4>系統設定 SystemSetting</h4>
+        <ul>
+            <li><a target="_blank" href="@Url.Action("ClientInfo","SystemSetting")">公司基本資料 ClientInfo</a></li>
+            <li><a target="_blank" href="@Url.Action("SiteInfo","SystemSetting")">網站基本資料 SiteInfo</a></li>
+            <li><a target="_blank" href="@Url.Action("ApiKey","SystemSetting")">API key設定 ApiKey</a></li>
+            <li><a target="_blank" href="@Url.Action("SmtpServer","SystemSetting")">寄件服務設定 SmtpServer</a></li>
+        </ul>
+    </li>  
+    <li>
+        <h4>權限設定</h4>
+        <ul>
+            <li><a target="_blank" href="@Url.Action("Index","Menu")">選單 Menu</a></li>
+            <li><a target="_blank" href="@Url.Action("Index","Role")">角色管理 Role</a></li>
+            <li><a target="_blank" href="@Url.Action("Index","Department")">組織圖 Department</a> <span class="text-danger"></span></li>
+            <li><a target="_blank" href="@Url.Action("Index","User")">帳號管理 User</a></li>
+            <li><a target="_blank" href="@Url.Action("Index","Member")">會員管理 Member</a></li>
+        </ul>
+    </li>
+    <li>
+        <h4>Item</h4>
+        <ul>
+            <li><a target="_blank" href="@Url.Action("Index","Structure")">結構 Structure</a></li>
+            <li><a target="_blank" href="@Url.Action("Index","Category")">分類 Category</a></li>
+            <li>文章 Article</li>        
+        </ul>
+    </li>  
+    <li>
+        <h4>Mail</h4>
+        <ul>
+            <li><a target="_blank" href="@Url.Action("Index","EmailTemplate")">通知信管理 EmailTemplate</a></li>
+            <li><a target="_blank" href="@Url.Action("Index","MailBox")">郵件服務 MailBox</a> <span class="text-danger">(未完成)</span></li>         
+        </ul>
+    </li>
+</ul>
+
+
+
+

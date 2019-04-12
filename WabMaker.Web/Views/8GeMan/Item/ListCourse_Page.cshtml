@@ -1,0 +1,40 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* 課程列表-分頁/最新課程/熱門課程 *@
+@foreach (var item in Model.DataResult.Data)
+{
+    var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    //活動進行的月份
+    <div class="course-item col-md-4 col-xs-12 list-inner pb-10 mb-30"
+         data-categories="@string.Join(",",item.ParentItems?.Select(x => x.ID).ToList())"
+         data-minyear="@item.Item.StartTime.ToDateString("yyyy")"
+         data-maxyear="@item.Item.EndTime.ToDateString("yyyy")"
+         data-mindate="@item.Item.StartTime.ToDateString("yyyyMM")"
+         data-maxdate="@item.Item.EndTime.ToDateString("yyyyMM")">
+        <div class="list-inner pb-10">
+            @if (mainImage != null)
+            {
+                if (mainImage.FileType == FileType.YouTube)
+                {
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+                    </div>
+                }
+                else
+                {
+                    <img src="@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)" alt="" />
+                }
+            }
+            <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="hot-title">
+                <h3 class="mb-10">@item.ItemLanguage.Subject</h3>
+                <p>活動日期: <br>@item.Item.StartTime.ToDateString() ~ @item.Item.EndTime.ToDateString()</p>
+                <p>活動地點: <br>@item.ItemLanguage.Address</p>
+                <span class="fr">Join</span>
+            </a>
+        </div>
+    </div>
+}
+

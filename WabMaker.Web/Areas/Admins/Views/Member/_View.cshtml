@@ -1,0 +1,433 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.ViewModels.UserViewModel
+
+@{
+    bool isNew = Model.User.ID == Guid.Empty;
+    ViewBag.Title = "會員資料";
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+<div class="form-horizontal viewtable">
+    <h4>帳號資料</h4>
+    <div class="form-group">
+        @Html.LabelFor(model => model.User.LoginTypes, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @{var loginTyps = Model.User.LoginTypes.ToContainStrList<LoginType>();  }
+            @string.Join(",", loginTyps)
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-md-2">身分</label>
+        <div class="col-md-10">
+            @foreach (var item in Model.RoleRelations)
+            {
+                <div>@item.mgt_Role.Name @(item.IsTimeLimited ? "(" + item.StartTime.ToDateString() + "~" + item.EndTime.ToDateString() + ")" : "") </div>
+            }
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.User.UserStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @(((UserStatus)Model.User.UserStatus).GetDisplayName())
+        </div>
+    </div>
+
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.User.Account, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.User.Account, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    *@
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.User.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.User.Email, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.User.EmailIsVerify, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @if (Model.User.EmailIsVerify)
+            {
+                <span class="label label-success">已驗證</span>
+            }
+            else
+            {
+                <span class="label">未驗證</span>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.User.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.User.Password, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.User.CreateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.User.CreateTime, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.User.UpdateTime, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.User.UpdateTime, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+
+
+    <h4>個人資料</h4>
+    @* 基本欄位 *@
+    @if (Model.UserContentTypes.Contains(UserContentType.Name))
+    {
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.User.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.User.Name, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Phone))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.User.Phone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.User.Phone, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (clientSettings.Contains(ClientSetting.SMS))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.User.PhoneIsVerify, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @if (Model.User.PhoneIsVerify)
+                {
+                    <span class="label label-success">已驗證</span>
+                }
+                else
+                {
+                    <span class="label">未驗證</span>
+                }
+            </div>
+        </div>
+    }
+
+    @*
+        <div class="form-group">
+            @Html.LabelFor(model => model.User.ZipCodeOption, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.User.ZipCodeOption, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>*@
+    @if (Model.UserContentTypes.Contains(UserContentType.Address))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.User.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.User.Address, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @* ------- UserProfile -------- *@
+    @if (Model.UserContentTypes.Contains(UserContentType.LastName))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.LastName, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.FirstName))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.EngName))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.EngName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.EngName, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.NickName))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.NickName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.NickName, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+    @*<div class="form-group">
+                @Html.LabelFor(model => model.UserProfile.AvatarPath, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DisplayFor(model => model.UserProfile.AvatarPath, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Description, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    *@
+    @if (Model.UserContentTypes.Contains(UserContentType.HouseholdAddress))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.HouseholdAddress, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.HouseholdAddress, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.IdentityCard))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.IdentityCard, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.IdentityCard, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Birthday))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Birthday, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Model.UserProfile.Birthday.ToDateString()
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Gender))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Gender, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @(Model.UserProfile.Gender.GetDisplayName<GenderType>())
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Marriage))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Marriage, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @(Model.UserProfile.Marriage.GetDisplayName<MarriageType>())
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.HomePhone))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.HomePhone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.HomePhone, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.CompanyPhone))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.CompanyPhone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.CompanyPhone, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.SecondaryEmail, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.SecondaryEmail, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>*@
+
+
+    @if (Model.UserContentTypes.Contains(UserContentType.EmergencyContact))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.EmergencyContact, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.EmergencyContact, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.EmergencyPhone))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.EmergencyPhone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.EmergencyPhone, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Unit))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Unit, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Unit, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.UnitAddress))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.UnitAddress, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.UnitAddress, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Occupation))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Occupation, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Occupation, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Education))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Education, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Education, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.School))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.School, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.School, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Skill))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Skill, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Skill, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Language))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Language, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Language, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.SocialNetwork))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.SocialNetwork, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.SocialNetwork, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Sports))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Sports, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Sports, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Height))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Height, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Height, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Weight))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Weight, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Weight, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+
+    @if (Model.UserContentTypes.Contains(UserContentType.Referrer))
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserProfile.Referrer, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DisplayFor(model => model.UserProfile.Referrer, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    }
+</div>
+<p>
+    @if (string.IsNullOrEmpty(Request["goToId"]))
+    {
+        <input id="CancelBtn" type="button" value="回前頁" class="btn btn-default" />
+    }
+    else
+    {
+        <a href="@Url.Action("Index")" class="btn btn-default">回前頁</a>
+    }
+</p>

@@ -1,0 +1,244 @@
+﻿@using WabMaker.Web.Helpers
+@using WabMaker.Web.WebViewModels
+@using MyTool.Enums
+@using MyTool.ViewModels
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemListModel
+
+@* 課程文章列表 *@
+@{
+    ViewBag.Title = Model.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    //不分頁
+    Model.ItemPageModel.IsPaged = false;
+    var mainImage = Model.ItemViewModel.ItemFiles.Count == 0 ? new WabMaker.Web.WebViewModels.ItemWebFile() :
+                                                  Model.ItemViewModel.ItemFiles.FirstOrDefault(x => x.SourceType == SourceType.ItemConver);
+}
+@section css{
+    <style>
+        .products-filter-box label input[type=checkbox]:disabled + span,
+        .products-filter-box label input[type=checkbox]:hover:disabled + span {
+            color: #aaa;
+        }
+    </style>
+}
+@section scripts{
+    <script>
+        $(function () {
+
+            $("#filter-box input[type=checkbox]").change(function () {
+                if ($(this).is(":checked")) {
+                    $("#filter-box input[name='" + $(this).attr("name") + "'").prop("checked", false);
+                    $(this).prop("checked", true);
+                }
+                filterCourse();
+            });
+
+            $("#filter-box input[name=chk_month]").attr("disabled", true);
+
+            $("#filter-box #select_year").change(function () {
+                $("#filter-box input[name=chk_month]").prop("checked", false);
+
+                if ($(this).val() == "") {
+                    $("#filter-box input[name=chk_month]").attr("disabled", true);
+                } else {
+                    $("#filter-box input[name=chk_month]").removeAttr("disabled");
+                }
+
+                filterCourse();
+            });
+
+            function filterCourse() {
+
+                if ($("#filter-box input[type=checkbox]:checked").length == 0
+                    && $("#filter-box #select_year").val() == "") {
+
+                    $("#new_and_hot").show();
+                    $("#ListContent").hide();
+                    $(".course-item").show();
+
+                } else {
+                    $("#new_and_hot").hide();
+                    $("#ListContent").show();
+                    $(".course-item").hide();
+
+                    $(".course-item").each(function () {
+                        var me = $(this);
+                        var andShow = true;
+                        var orShow = false;
+
+                        //category
+                        orShow = $("#filter-box input[name=chk_category]:checked").length == 0;
+                        $("#filter-box input[name=chk_category]:checked").each(function () {
+                            if (me.data("categories").indexOf($(this).val()) >= 0) {
+                                orShow = true;
+                            }
+                        });
+                        andShow = andShow && orShow;
+
+                        //year
+                        orShow = $("#filter-box #select_year").val() == "";
+                        if ($("#filter-box #select_year").val() != "") {
+                            var value = $("#filter-box #select_year").val();
+                            var min = me.data("minyear");
+                            var max = me.data("maxyear");
+                                                     
+                            if (min <= value && value <= max) {
+                                orShow = true;                           
+                            }
+                        }
+                        andShow = andShow && orShow;
+
+                        //month
+                        orShow = $("#filter-box input[name=chk_month]:checked").length == 0;
+                        $("#filter-box input[name=chk_month]:checked").each(function () {
+                            var value = $("#filter-box #select_year").val() + $(this).val();
+                            var min = me.data("mindate");
+                            var max = me.data("maxdate");
+                                                      
+                            if (min <= value && value <= max) {
+                                orShow = true;
+                            }
+                        });
+                        andShow = andShow && orShow;
+
+
+                        if (andShow) {
+                            me.show();
+                        }
+                    });
+                }
+
+            }
+
+        });
+    </script>
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)) 0/cover no-repeat;">
+        <div class="auto-container">
+            @Html.Raw(Model.ItemViewModel.ItemLanguage.TemplateText)
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">首頁</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@Model.ItemViewModel.ItemLanguage.Subject</a></li>
+            </ol>
+        </div>
+
+        @* 篩選課程 *@
+        <div id="filter-box" class="products-filter-box">
+            <input type="hidden" name="tabs" value="1">
+            <div class="row pt-10 pb-10">
+                <div class="col-md-offset-3 col-md-6 text-center">
+                    @foreach (var item in Model.SubItemList)
+                    {
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="chk_category" value="@item.Item.ID"> <span>@item.ItemLanguage.Subject</span>
+                        </label>
+                    }
+                </div>
+            </div>
+            <div class="row  pt-10 pb-10 mr-0 ml-0 border-t">
+                <div class="col-md-offset-1 col-md-2">
+                    <select id="select_year" class="form-control">
+                        <option value="">年份</option>
+                        @for (int i = DateTime.Now.Year + 1; i >= 2018; i--)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="01"> <span>1月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="02"> <span>2月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="03"> <span>3月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="04"> <span>4月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="05"> <span>5月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="06"> <span>6月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="07"> <span>7月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="08"> <span>8月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="09"> <span>9月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="10"> <span>10月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="11"> <span>11月</span>
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="chk_month" value="12"> <span>12月</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            @* 最新和熱門 *@
+            <div id="new_and_hot" class="col-md-12 col-xs-12 mb-30">
+                <div class="p-20 w-back-g">
+                    <div class="row">
+                        <div class="hotnews-title">
+                            <span class="hotnews-title-inner">最新課程</span>
+                        </div>
+                        @* 最新課程 *@
+                        @Html.Action("Partial", "Item", new ItemPageModel
+                   {
+                       CacheName = "ListCourse_Page_new",
+                       ViewName = "ListCourse_Page",
+                       PageSize = 3,
+                       SortColumn = SortColumn.CreateTime,
+                       StructureJson = _Json.ModelToJson(new List<Guid> {
+                             new Guid("acfa272c-a682-444a-b513-d7e1006a09fe")})//課程文章
+                   })
+                    </div>
+                </div>
+                <div class="mb-30">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner">熱門課程</span>
+                    </div>
+                    <div class="row">
+                        @* 熱門課程 *@
+                        @Html.Action("Partial", "Item", new ItemPageModel
+                   {
+                       CacheName = "ListCourse_Page_hot",
+                       ViewName = "ListCourse_Page",
+                       PageSize = 3,
+                       SortColumn = SortColumn.ViewCount,
+                       StructureJson = _Json.ModelToJson(new List<Guid> {
+                             new Guid("acfa272c-a682-444a-b513-d7e1006a09fe")})//課程文章
+                   })
+                    </div>
+                </div>
+            </div>
+
+            @* 課程列表 *@
+            <div id="ListContent" class="col-md-12 col-xs-12 mb-30" style="display:none">
+                @Html.Action("Partial", new { model = Model.ItemPageModel })
+            </div>
+        </div>
+    </div>
+</section>

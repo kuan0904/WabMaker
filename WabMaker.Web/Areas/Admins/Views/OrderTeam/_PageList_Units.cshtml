@@ -1,0 +1,97 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.Tools
+@using WebMaker.Entity.ViewModels
+@model List<CompetitionUnitsModel>
+@{
+    ReportStyle style = ViewBag.ReportStyle;
+}
+@if (style == ReportStyle.Json)
+{
+    var json = _Json.ModelToJson(Model);
+   
+    <textarea rows="30" cols="50" style="width: 100%;">@json</textarea>
+}
+else
+{
+    <table class="table table-striped table-bordered bootstrap-datatable">
+    @*<tr class="active" style="text-align: right;font-size: 16px;">
+        <td colspan="14">金額共計: @Model.Sum(x => x.TotalPrice).ToString("0")</td>
+    </tr>*@
+    <tr class="active">
+        <th width="5%">建立人</th>
+        <th>聯絡電話</th>
+        <th width="10%">E-mail</th>
+
+        <th class="info">單位編號</th>
+        <th class="info" width="5%">縣市</th>
+        <th class="info">單位</th>
+        <th class="info">簡寫</th>
+        <th class="info">教練</th>
+        <th class="info">領隊</th>
+        <th class="info">管理</th>
+
+        <th class="success" width="10%">訂單編號</th>
+        @*<th class="success" width="10%">金額</th>*@
+
+        <th>選手數量</th>
+        <th width="3%">選手編號</th>
+        <th width="5%">姓名</th>
+    </tr>
+    @{ var count = 0;}
+    @foreach (var item in Model)
+    {
+        count++;
+        var len = item.Members.Count();
+        var rs = (len == 0 ? "" : len.ToString());      
+        <tr>
+            @showData_0(item, style == ReportStyle.Mearge ? rs : "") @*合併*@
+            @showData_1(item.Members.FirstOrDefault() ?? new CompetitionItemTeamMember())
+        </tr>
+        foreach (var i in item.Members.Skip(1))
+        {
+            <tr>
+                @if (style != ReportStyle.Mearge)
+                {
+                    @showData_0(item) //重複前面
+                }
+                @showData_1(i)
+            </tr>
+        }
+    }
+</table>
+}
+@* 聯絡人&單位 *@
+@helper showData_0(CompetitionUnitsModel item, string rs = "")
+{
+    <td rowspan="@rs">@item.Creater</td>
+    <td rowspan="@rs">@item.Phone</td>
+    <td rowspan="@rs">@item.Email</td>
+
+    <td rowspan="@rs">@item.TempNo</td>
+    <td rowspan="@rs">@item.County</td>
+    <td rowspan="@rs">@item.Unit</td>
+    <td rowspan="@rs">@item.UnitShort</td>
+    <td rowspan="@rs">@item.Coach</td>
+    <td rowspan="@rs">@item.Leader</td>
+    <td rowspan="@rs">@item.Manager</td>
+
+    <td rowspan="@rs">@item.OrderNumber</td>
+    @*<td rowspan="@rs">@item.TotalPrice.ToString("0")</td>*@
+
+    <td rowspan="@rs">@item.MemberCount</td>
+}
+
+@* 選手 *@
+@helper showData_1(CompetitionItemTeamMember item)
+{
+    <td>@item.TempNo</td>
+    <td>@item.MemberName</td>
+}
+
+
+
+
+<div class="page-area">
+    <span>共@(Model.Count)筆</span>
+</div>

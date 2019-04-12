@@ -1,0 +1,326 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using WebMaker.Entity.Models
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.ViewModels.ItemViewModel>
+@{
+    WebMaker.Entity.Models.cms_Structure structure = ViewBag.Structure;
+    var frontLanguageTypes = WebMaker.BLL.Helpers.SessionManager.Client.FrontLanguageTypes;
+
+    //包含檔案結構
+    List<cms_Structure> fileStructures = structure.ChildStructures.Where(x => !x.IsDelete && x.ItemTypes.HasValue((int)ItemType.Files)).ToList();
+    //包含人物結構
+    List<cms_Structure> peopleStructures = structure.ChildStructures.Where(x => !x.IsDelete && x.ItemTypes.HasValue((int)ItemType.Q8People)).ToList();
+    //包含訂單項目
+    List<cms_Structure> orderItemStructures = structure.ChildStructures.Where(x => !x.IsDelete && x.ItemTypes.HasValue((int)ItemType.OrderItem) || x.ItemTypes.HasValue((int)ItemType.OrderDiscount)).OrderBy(x => x.Sort).ToList();
+    //包含類型
+    var orderContentTypes = structure.OrderContentTypes.ToContainList<OrderContentType>();
+
+    //包含類型
+    List<ItemType> ItemTypes = structure.ItemTypes.ToContainList<ItemType>();
+    //列表欄位
+    List<ContentType> ListTypes = structure.ListTypes.ToContainList<ContentType>();
+    //分類不用新增
+    var isCategory = ItemTypes.Contains(ItemType.Category);
+
+    //系統設定
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+
+}
+
+<table class="table table-striped table-bordered bootstrap-datatable">
+    <tr>
+        <th width="20%"><!--seting--></th>
+
+        @if (ListTypes.Contains(ContentType.Department))
+            {
+            <th>單位</th>
+        }
+        @if (ListTypes.Contains(ContentType.Category))
+            {
+            <th>分類</th>
+        }
+        @if (ListTypes.Contains(ContentType.Subject))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].ItemLanguage.Subject)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.Cover))
+            {
+            <th>
+                @ContentType.Cover.GetDisplayName()
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.LinkUrl))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].ItemLanguage.LinkUrl)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.Date))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.Date)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.DateRange))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.StartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.EndTime)
+            </th>
+        }
+
+        @if (ListTypes.Contains(ContentType.SaleDateRange))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.SaleStartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.SaleEndTime)
+            </th>
+        }
+
+        @if (ListTypes.Contains(ContentType.SalePrice))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.SalePrice)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.StockCount))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.StockCount)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.SaleCount))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.SaleCount)
+            </th>
+        }
+
+        @if (ListTypes.Contains(ContentType.IsEnabled))
+            {
+            <th>
+                @*//todo 語系*@
+                @Html.DisplayNameFor(model => model.Data[0].ItemLanguage.IsEnabled)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.IsTop))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.IsTop)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.Author))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].ItemLanguage.Author)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.Sort))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.Sort)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.ViewCount))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.ViewCount)
+            </th>
+        }
+        @if (ListTypes.Contains(ContentType.UpdateUser))
+            {
+            <th>
+                @Html.DisplayNameFor(model => model.Data[0].Item.UpdateUser)
+            </th>
+        }
+    </tr>
+
+    @foreach (var item in Model.Data)
+    {
+        List<WebMaker.Entity.Models.cms_ItemFile> mainImage = item.ItemFiles.Where(x => x.SourceType == (int)SourceType.ItemConver).ToList();
+
+        <tr data-id="@item.ItemLanguage.ItemID">
+            <td>
+                @* 分組名單 *@
+                @if (orderContentTypes.Contains(OrderContentType.TeamName))
+                {
+                    <a href="@Url.Action("Index", "OrderTeam", new { articleID = item.Item.ID })" target="_blank" class="btn btn-sm btn-warning" title="分組名單"><i class="fa fa-bar-chart"></i></a>
+                }
+                @* 盃賽統計 *@
+                else if (ItemTypes.Contains(ItemType.ArticleGroup))
+                {
+                    <a href="@Url.Action("GetCompetitionCount", "OrderTeam", new { articleID = item.Item.ID })" target="_blank" class="btn btn-sm btn-warning" title="分組名單"><i class="fa fa-bar-chart"></i></a>
+
+                }
+
+                @*訂單項目*@
+                @foreach (var stru in orderItemStructures)
+                {
+                    var icon = string.IsNullOrWhiteSpace(stru.Description) ? "fa-list-ul" : stru.Description;
+                    <a href="javascript:" class="OptionList btn btn-sm btn-info" data-itemid="@item.Item.ID" data-optionstructureid="@stru.ID" data-subject="@item.ItemLanguage.Subject" title="@stru.Name"><i class="fa @icon"></i></a>
+                }
+
+                @*語系*@
+                @mHelper.LanguageButton(item.LangNodes, string.IsNullOrEmpty(frontLanguageTypes), showDelete: false)
+
+                @*人物資料*@
+                @foreach (var stru in peopleStructures)
+                {
+                    var icon = string.IsNullOrWhiteSpace(stru.Description) ? "fa-user" : stru.Description;
+                    <a href="javascript:" class="ItemUserProfile btn btn-sm btn-success" data-itemid="@item.Item.ID" data-subject="@stru.Name @item.ItemLanguage.Subject" title="@stru.Name"><i class="fa @icon"></i></a>
+                }
+
+                @*其他檔案*@
+                @foreach (var stru in fileStructures)
+                {
+                    var icon = string.IsNullOrWhiteSpace(stru.Description) ? "fa-file" : stru.Description;
+                    <a href="javascript:" class="ItemFileBtn btn btn-sm btn-info" data-itemid="@item.Item.ID" data-filestructureid="@stru.ID" title="@stru.Name"><i class="fa @icon"></i></a>
+                }
+
+                @* Delete *@
+                @if (!isCategory)
+                {
+                    <a href="javascript:" class="DeleteBtn btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash-o"></i></a>
+                }
+            </td>
+
+            @if (ListTypes.Contains(ContentType.Department))
+            {
+                <th>@Html.DisplayFor(modelItem => item.Item.mgt_Department.Name)</th>
+            }
+            @if (ListTypes.Contains(ContentType.Category))
+                {
+                @*<td>@string.Join(" > ", item.BreadCrumbs.Select(x => x.Subject).ToList())</td>*@
+                <td>@string.Join("、", item.ParentItems.Select(x => x.Subject).ToList())</td>
+            }
+            @if (ListTypes.Contains(ContentType.Subject))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemLanguage.Subject)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.Cover))
+                {
+                <td>
+                    @if (mainImage.Any())
+                    {
+                        var file = mainImage.FirstOrDefault();
+                        if (file.FileType == (int)FileType.YouTube)
+                        {
+                            <iframe width="160" height="90" src="@_YouTube.SetIframe(file.FilePath)" frameborder="0"></iframe>
+                        }
+                        else
+                        {
+                            <img src="@RouteHelper.SetUrlPath(file.FilePath, file.ThumbnailPath)" width="160" />
+                        }
+                    }
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.LinkUrl))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemLanguage.LinkUrl)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.Date))
+                {
+                <td>
+                    @item.Item.Date.ToDateString()
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.DateRange))
+                {
+                <td>
+                    @item.Item.StartTime.ToDateString()
+                </td>
+                <td>
+                    @item.Item.EndTime.ToDateString()
+                </td>
+            }
+
+            @if (ListTypes.Contains(ContentType.SaleDateHourRange))
+            {
+                <td>
+                    @item.Item.SaleStartTime.ToDateString("yyyy-MM-dd HH:mm")
+                </td>
+                <td>
+                    @item.Item.SaleEndTime.ToDateString("yyyy-MM-dd HH:mm")
+                </td>
+            }
+            else if (ListTypes.Contains(ContentType.SaleDateRange))
+            {
+                <td>
+                    @item.Item.SaleStartTime.ToDateString()
+                </td>
+                <td>
+                    @item.Item.SaleEndTime.ToDateString()
+                </td>
+            }
+
+            @if (ListTypes.Contains(ContentType.SalePrice))
+                {
+                <td>
+                    @item.Item.SalePrice.ToString("0")
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.StockCount))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item.StockCount)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.SaleCount))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item.SaleCount)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.IsEnabled))
+                {
+                <td>
+                    @mHelper.IsEnabled(item.ItemLanguage.IsEnabled)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.IsTop))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item.IsTop)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.Author))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemLanguage.Author)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.Sort))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item.Sort)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.ViewCount))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item.ViewCount)
+                </td>
+            }
+            @if (ListTypes.Contains(ContentType.UpdateUser))
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item.mgt_UserUpdate.Name)
+                </td>
+            }
+        </tr>
+    }
+</table>
+
+@Html.Partial("_Pagination", Model)
+

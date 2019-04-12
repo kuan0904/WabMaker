@@ -1,0 +1,30 @@
+﻿@using MyTool.Enums
+@model WebMaker.Entity.ViewModels.SendEmailViewModel
+@{
+//ViewBag.Title; //忘記密碼、重寄驗證信
+}
+
+@using (Html.BeginForm("SendValidCode", "Member", FormMethod.Post))
+{
+    @*<input type="hidden" id="returnUrl" value="@Url.Action("Login", "Member", new  { })" />*@
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.SystemMailType)
+    @Html.HiddenFor(model => model.ValidType)
+
+    <div class=alert-err></div>
+    <div class=login-inputs>
+        <input class="login-input" type="text" name="Email" id="forgot_email-mob" required><label>your email</label>
+    </div>
+
+    <div class=login-inputs>
+        <input class="login-input" type="text" name="Captcha" required autocomplete="off"><label>驗證碼</label>
+    </div>
+    <img class="imgverifycode" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+    <a class="btnnewcode" href="javascript:">重新產生驗證碼</a>
+
+    <input id="SaveBtn" type="button" class="login-button" value="寄送"/>
+}

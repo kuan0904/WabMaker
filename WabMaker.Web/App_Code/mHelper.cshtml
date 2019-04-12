@@ -1,0 +1,176 @@
+﻿
+@helper IsEnabled(bool value, string onText= "啟用", string offText = "停用")
+{
+if (value)
+{
+        <span class="label label-success">@onText</span>
+}
+else
+{
+        <span class="label">@offText</span>
+}
+}
+
+@helper OrderStatus(int status, string name)
+{
+var addclass = "";
+if (status == 100)//完成
+{
+    addclass = "label-success";
+}
+else if (status == 99 || status == 10 || status == 50)//取消、編輯中(灰)
+{
+    addclass = "";
+}
+else if (status == 90)
+{//合併
+    addclass = "label-grey";
+}
+else if (status == 70 || status == 110 || status == 23 || status == 105 || status == 300)//退回、作廢、付款過期、截止未完成 (黑)
+{
+    addclass = "label-inverse";
+}
+else if (status == 20)//待付款 (藍)
+{
+    addclass = "label-info";
+}
+else if (status == 30 || status == 80)//處理中、放棄 (粉紅)
+{
+    addclass = "label-pink";
+}
+else //待確認 (橘)
+{
+    addclass = "label-warning";
+}
+
+    <span class="label @addclass">@name</span>
+}
+
+@helper CreateButton()
+{
+    <button id="CreateBtn" class="btn btn-sm btn-primary" title="Create"><i class="fa fa-plus"></i></button>
+}
+
+@helper SortButton()
+{
+    <button id="SortBtn" class="btn btn-sm btn-warning" title="Sort"><i class="fa fa-list-ol"></i></button>
+}
+
+@helper ListButton()
+{
+    <a href="javascript:" class="EditBtn btn btn-sm btn-info" title="Edit"><i class="fa fa-pencil"></i></a>
+    <a href="javascript:" class="DeleteBtn btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash-o"></i></a>
+}
+
+@helper LanguageButton(List<MyTool.ViewModels.LangNode> langNodes, bool isMultiLang, bool showDelete = false)
+{
+foreach (var itemLang in langNodes)
+{
+    var title = (isMultiLang ? "Edit" : "Edit " + MyTool.Services._Enum.GetDisplayName(itemLang.Lang));
+
+        <button class="languageBtn btn @(itemLang.Status == MyTool.Enums.LanguageStatus.Show ? "btn-success" :"btn-dark")
+                           @(isMultiLang?"":"multiLang") "
+                value="@((int)itemLang.Lang)" title="@title">
+
+            @if (isMultiLang)
+            {
+                //不設定語系
+                <i class="fa fa-pencil"></i>
+                @*@:編輯*@
+            }
+            else
+            {
+                @*<i class="fa @(itemLang.Status == MyTool.Enums.LanguageStatus.None ? "fa-plus-circle" :"fa-pencil")"></i>*@
+                @MyTool.Services._Enum.GetShortName(itemLang.Lang)
+            }
+        </button>
+
+    if (isMultiLang) { break; }
+}//end foreach
+
+if (showDelete)
+{
+        <a href="javascript:" class="DeleteBtn btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash-o"></i></a>
+}//end delete btn
+}
+
+@helper Switch(string labelName, string inputName, bool isChecked, string addAttr = "", string bottomLabel = "")
+{
+    <div class="switch-block">
+        @if (!string.IsNullOrEmpty(labelName))
+        {
+            <div class="block-title">@labelName</div>
+        }
+        <label>
+            <input name="@inputName" class="ace ace-switch ace-switch-6" @(addAttr) type="checkbox" @(isChecked ? "checked" : "") value="true">
+            <span class="lbl"></span>
+        </label>
+        <div class="block-bottom">@bottomLabel</div>
+    </div>
+}
+
+@* binary checkbox to hideden sum *@
+@helper CheckboxContain(string labelName, string inputName, string value, List<System.Web.Mvc.SelectListItem> selectList)
+{
+    <div class="checkbox-block containGroup">
+        <div class="block-title">@labelName</div>
+        <input type="hidden" name="@inputName" value="@value" class="containSum" />
+
+        @foreach (var item in selectList)
+        {
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" class="ace containChk" value="@item.Value" @(item.Selected ? "checked" : "")>
+                    <span class="lbl">@item.Text</span>
+                </label>
+            </div>
+        }
+        <div class="block-bottom"></div>
+    </div>
+}
+
+@helper CheckboxList(string inputName, List<MyTool.ViewModels.CheckBoxListItem> selectList)
+{
+int i = 0;
+
+    <div class="checkbox-block">
+        @foreach (var item in selectList)
+        {
+            <input name="@(inputName)[@i].ID" type="hidden" value="@item.ID">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" class="ace" name="@(inputName)[@i].IsChecked" @(item.IsChecked ? "checked" : "") value="true">
+                    <span class="lbl">@item.Text</span>
+                </label>
+            </div>
+            i++;
+        }
+        <div class="block-bottom"></div>
+    </div>
+}
+
+
+@helper RadioList(string labelName, string inputName, long value, List<System.Web.Mvc.SelectListItem> selectList)
+{
+    <div class="checkbox-block">
+        @if (!string.IsNullOrEmpty(labelName))
+        {
+            <div class="block-title">@labelName</div>
+        }
+
+        @foreach (var item in selectList)
+        {
+            <div class="radio">
+                <label>
+                    <input type="radio" class="ace" name="@inputName" @(item.Selected ? "checked='True'" : "") value="@item.Value">
+                    <span class="lbl">@item.Text</span>
+                </label>
+            </div>
+        }
+        <div class="block-bottom"></div>
+    </div>
+}
+
+@helper HelpButton(string message) {//js popover
+   <span class="help-button" data-toggle="popover" data-trigger="hover" data-html="true" data-content="@message" title="">?</span>
+}

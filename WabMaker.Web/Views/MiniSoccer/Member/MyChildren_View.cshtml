@@ -1,0 +1,34 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WebMaker.Entity.Models.mgt_UserProfile
+@{
+    Layout = null;
+}
+
+<td>@Model.NickName</td>
+<td>@Model.Birthday.ToDateString()</td>
+<td>@(Model.Gender.GetDisplayName<GenderType>())</td>
+<td>@Model.IdentityCard.HidePartWords()</td>
+@{ var assigns = Model.mgt_UserAssign.Where(x => !x.IsDelete);}
+<td>@string.Join("、", assigns.Select(x => x.mgt_UserTo.Name))</td>
+<td>
+    @Ajax.RawActionLink("<button type='button' class='btn btn-style-sixteen'>指定教練</button>", "MyChildren_Assign", "Member", new { childID = Model.ID },
+                                                    new AjaxOptions()
+                                                    {
+                                                        HttpMethod = "GET",
+                                                        InsertionMode = InsertionMode.Replace,
+                                                        UpdateTargetId = "UserAssignModal",
+                                                        OnSuccess = "onModalAjax"
+                                                    },
+                                                    new { id = "AssignBtn" + Model.ID })
+</td>
+<td>
+    @*<button id="MyChildUpdateBtn" type="button" class="btn btn-style-seventeen btn-block">編輯</button>*@
+    @Ajax.RawActionLink("編輯", "GetMyChild", "Member", new { id = Model.ID, IsEdit = true },
+                new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "row_" + Model.ID }, new { @class = "MyChildEditBtn btn btn-style-seventeen btn-block" })
+
+    @*<button type="button" class="btn btn-style-nineteen btn-block MemberDeleteBtn" data-url="@Url.Action("DeleteMyChild", new { childID = Model.ID })">
+            <i class="fas fa-times"></i>
+        </button>*@
+</td>

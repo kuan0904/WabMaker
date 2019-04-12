@@ -1,0 +1,67 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+<div class="row news-grid">
+
+    @foreach (var item in Model.DataResult.Data)
+    {
+        var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+        <div class="col-xs-6">
+            <div class="thumbnail">
+                <div class="pic effect">
+                    @if (mainImage != null)
+                    {
+                        <img src="@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)" alt="" title="@item.ItemLanguage.Subject" />
+                    }
+                    <a class="view-more" href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" title="了解更多"><span>more</span></a>
+                </div>
+
+                <div class="caption">
+                    <div class="meta-info">
+                        @if (item.ParentItems != null)
+                        {
+                            foreach (var category in item.ParentItems)
+                            {
+                                <a href="@Url.Action("Get", "Item", new { routeName = category.RouteName })" class="post-category">@category.Subject</a>
+                            }
+                        }
+
+                        <span class=post-date><time>@item.Item.Date.ToDateString("MM/dd")</time></span>
+                    </div><!-- meta-info END -->
+
+                    <h3 class="title"><a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" title="@item.ItemLanguage.Subject">@item.ItemLanguage.Subject</a></h3>
+
+                </div>
+            </div>
+        </div><!-- col-xs-6 END -->
+    }
+
+</div><!-- news-grid END -->
+@* 搜尋-分頁 *@
+@{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number;
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+<ul class="pagination">
+    @* Pagination *@
+    @foreach (var item in buttons)
+    {
+        Model.ItemPageModel.CurrentPage = item.Page;
+
+        <li class="page-item @(item.IsCurrent?"active":"")">
+            @Ajax.RawActionLink(item.Name, "GetPageList", "Item", Model.ItemPageModel,
+                                new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" }, new { @class = "page-link" })
+        </li>
+    }
+</ul>
+
+
+
+
+
+
+

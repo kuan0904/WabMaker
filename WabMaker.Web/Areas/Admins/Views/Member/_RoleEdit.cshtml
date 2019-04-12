@@ -1,0 +1,43 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using WabMaker.Web.Helpers
+@model WebMaker.Entity.Models.mgt_UserRoleRelation
+@{
+    bool isCreate = Model.RoleID == Guid.Empty;
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+}
+
+<td>@(isCreate ? "" : Model.CreateTime.ToDateString())</td>
+<td>
+    @if (isCreate)
+    {
+        @Html.DropDownList("RoleID", (List<SelectListItem>)ViewBag.RoleSelectList, new { @class = "form-control selectpicker" })
+    }
+    else
+    {
+        @Html.HiddenFor(model => model.RoleID)
+        @Model.mgt_Role.Name
+    }
+</td>
+@if (clientSettings.Contains(ClientSetting.RolTimeLimit))
+{
+    <td>@Html.EditorFor(model => model.RoleNumber, new { htmlAttributes = new { @class = "form-control" } })</td>
+    <td>
+        @mHelper.Switch("", "IsTimeLimited", Model.IsTimeLimited, addAttr: "data-toggle=collapse data-target=#switch-panel")
+        <div id="switch-panel" class="collapse @(Model.IsTimeLimited ? "in" : "")">
+            <div class="input-group input-daterange">
+                <input type="text" class="form-control" name="StartTime" value="@Model.StartTime.ToDateString()" />
+                <div class="input-group-addon">to</div>
+                <input type="text" class="form-control" name="EndTime" value="@Model.EndTime.ToDateString()" />
+            </div>
+        </div>
+    </td>
+}
+@*<td>@mHelper.Switch("", "IsEnabled", Model.IsEnabled)</td>*@
+<td>
+    @Html.Hidden("isCreate", isCreate)
+    @Html.HiddenFor(model => model.ID)
+    @Html.HiddenFor(model => model.UserID)
+    <a id="SaveBtn" class="edittable-action-save" title="Save"><i class="fa fa-floppy-o"></i></a>
+    <a class="edittable-action-cancel" title="Cancel"><i class="fa fa-chevron-circle-left"></i></a>
+</td>

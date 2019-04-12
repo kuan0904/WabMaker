@@ -1,0 +1,49 @@
+﻿@model MyTool.ViewModels.PageModel
+
+@if (Model.TotalCount == 0)
+{
+    <div class="text-center h5">No Data</div>
+}
+else
+{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model);
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+
+    <div class="page-area">
+        @Html.HiddenFor(model => model.CurrentPage)
+        <div class="page-left">
+            <span class="page-info">每頁顯示</span>
+
+            @{ var sizeArr = new List<int> { 10, 20, 50, 100 };}         
+            <select id="PageSize">
+                @foreach (var s in sizeArr)
+                {
+                    <option value="@s" @(s == Model.PageSize ? "selected" : "")>@s</option>
+                }
+            </select>
+            <span class="page-info">筆</span>
+        </div>
+
+        <div class="page-center">
+            <span>第@(Model.DataStart)至@(Model.DataEnd)筆 / 共@(Model.TotalCount)筆</span>
+        </div>
+
+        <div class="page-right">
+            <div class="page-goto">
+                <span class="page-info">第@(Model.CurrentPage)頁 / 共@(Model.PageCount)頁，跳至</span>
+                <input type="text" id="page-text" class="form-control" />
+                @*<span class="page-info">頁</span>*@
+                @*<input type="button" id="topageBtn" class="btn btn-sm btn-info" value="GO" />*@
+            </div>
+
+            <ul class="pagination">
+                @foreach (var item in buttons)
+                {
+                    <li class="@(item.IsCurrent?"active":"")">
+                        <a href="javascript:" title="@item.Title" data-page="@item.Page">@item.Name</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+                }

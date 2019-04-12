@@ -1,0 +1,66 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using WabMaker.Web.Helpers
+@model WebMaker.Entity.ViewModels.UserViewModel
+
+@{
+    bool isNew = Model.User.ID == Guid.Empty;
+    ViewBag.Title = "會員身分編輯";
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+
+    <h1>
+        @if (Model.UserContentTypes.Contains(UserContentType.Name))
+        {
+            <small>@Html.LabelFor(model => model.User.Name): @Model.User.Name</small>
+        }
+        <small>@Html.LabelFor(model => model.User.Email): @Model.User.Email</small>
+    </h1>
+</div>
+
+@using (Html.BeginForm("RoleEdit", "Member", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <table id="editTable" class="table table-bordered"
+           data-view="@Url.Action("RoleGet")" data-create="@Url.Action("RoleEdit")" data-update="@Url.Action("RoleEdit")" data-remove="@Url.Action("RoleDelete")">
+        <thead>
+            <tr>
+                <th width="10%">建立時間</th>
+                <th width="10%">身分</th>
+                @if (clientSettings.Contains(ClientSetting.RolTimeLimit))
+                {
+                    <th width="15%">編號</th>
+                    <th width="30%">期限</th>
+                }
+                @*<th width="5%">是否啟用</th>*@
+                <th width="10%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.RoleRelations)
+            {
+                <tr data-addurl="?id=@(item.ID)&userID=@(item.UserID)">
+                    @Html.Partial("_RoleGet", item)
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="new-row" data-addurl="?userID=@(Model.User.ID)">
+                <td colspan="5" style="text-align:center">
+                    <a id="edittable-action-create" title="Create"><i class="fa fa-plus-circle"></i></a>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+}
+
+<br>
+<p>
+    <input id="CancelBtn" type="button" value="回前頁" class="btn btn-default" />
+</p>

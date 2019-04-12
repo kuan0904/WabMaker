@@ -1,0 +1,75 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using WabMaker.Web.Helpers
+@model WebMaker.Entity.ViewModels.FileDetailModel
+@{
+    string name = Model.name;
+    WebMaker.Entity.Models.cms_ItemFile file = Model.file;
+    var fileStatus = Model.file.ID == Guid.Empty ? FileStatus.New : FileStatus.Normal;
+    bool isImage = file.FileType == (int)FileType.Images || file.FileType == (int)FileType.YouTube;   
+}
+
+<li class="fileuploader-item">
+    <div class="columns">
+        <input type="hidden" name="@(name)[x].ID" class="ID" value="@file.ID" />
+        <input type="hidden" name="@(name)[x].Name" class="Name" value="@file.OriName" />
+        <input type="hidden" name="@(name)[x].FileStatus" class="FileStatus" value="@(fileStatus.ToString())" />
+        <input type="hidden" name="@(name)[x].FileType" class="FileType" value="@((FileType)file.FileType)" />
+        
+        @*for youtube*@
+        <input type="hidden" name="@(name)[x].FilePath" class="FilePath" value="@file.FilePath"/>
+        @*for preview *@
+        <input type="hidden" name="@(name)[x].SourceType" class="SourceType" value="" />
+
+        <div class="column-thumbnail">
+            <div class="fileuploader-item-image">
+
+                @* display image *@
+                @if (file.FileType == (int)FileType.YouTube)
+                {
+                    <a href="@_YouTube.SetUrl(file.FilePath)" target="_blank">
+                        <img src="@_YouTube.SetThumbnail(file.FilePath)" />
+                    </a>
+                }
+                else if (file.FileType == (int)FileType.Images)
+                {
+                    <a href="@RouteHelper.SetUrlPath(file.FilePath)" target="_blank">
+                        <img src="@RouteHelper.SetUrlPath(file.FilePath, file.ThumbnailPath)" />
+                    </a>
+                }
+                else
+                {
+                    <a href="" target="_blank">
+                        <img src="" class="hidden" />
+                    </a>
+                }
+
+                @* display fileType *@
+                <a href="@RouteHelper.SetUrlPath(file.FilePath)" download="@file.OriName" target="_blank">
+                    <div class="fileuploader-item-icon @(isImage?"hidden":"")">
+                        <span class="FileType">@((FileType)file.FileType)</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="column-title">
+            <div class="column-title-filename"><span class="Name">@file.OriName</span></div>
+            <div class="column-title-filesize"><span class="Size">@(file.Size == 0 ? "" : file.Size.ToString())</span></div>
+        </div>
+
+        @if (Model.FileToolTypes !=null && Model.FileToolTypes.Contains(FileToolType.Subject))
+        {
+            <div class="column-edit">
+               <input type="text" name="@(name)[x].Subject" value="@file.Subject" class="form-control" placeholder="標題" />
+            </div>
+        }
+
+        <div class="column-actions">
+            <a class="fileuploader-action-sort" title="Sort"><i class="fa fa-arrows"></i></a>
+            <a class="fileuploader-action-remove" title="Remove"><i class="fa fa-trash-o"></i></a>
+
+            <span class="fileuploader-action-new @(fileStatus == FileStatus.New?"":"hidden")"><i class="fa fa-upload"></i></span>
+        </div>
+    </div>
+</li>

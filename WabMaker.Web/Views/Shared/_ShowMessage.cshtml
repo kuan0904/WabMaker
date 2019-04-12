@@ -1,0 +1,37 @@
+﻿@using MyTool.Services
+
+@* alert訊息 *@
+<input type="hidden" id="AlertMessage" value="@(TempData["AlertMessage"].FieldToString())" />
+<input type="hidden" id="AlertType" value="@(TempData["AlertType"].FieldToString())" />
+
+
+@* confirm modal *@
+<div id="confirm_box" class="modal fade" tabindex="-1" role="dialog" style="z-index: 10001;">
+    <div class="modal-dialog" style="max-width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align: center;border-bottom: none;padding-bottom: 0;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div id="confirm_success" style="color: #00b570;margin: 0 auto 10px auto;padding: 10px 0 0 20px; display:none"><i class="fa fa-check" style="font-size: 36px;"></i></div>
+                <div id="confirm_fail" style="color:#e62e04;margin: 0 auto 10px auto;padding: 10px 0 0 20px; display:none"><i class="fa fa-exclamation-triangle" style="font-size: 36px;"></i></div>
+
+                <div class="modal-title" style="margin: 15px 0 0 10px;color: #343434;font-weight: 500;display: inline;font-size: 20px;"></div>
+            </div>
+            <div class="modal-body" style="text-align: center;font-size:15px;color: #555;padding: 15px 20px;">
+                @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-top: -10px;">×</button>*@
+                <div class="confirm_message"></div>
+                <div class="confirm_captcha hidden" style="display:flex;margin-top: 40px;align-items: center;">
+                    <input class="form-control" type="text" name="Captcha" required="" autocomplete="off" placeholder="請輸入驗證碼" style="display: inline;width: 200px;">
+                    <img class="imgverifycode" src="" alt="驗證碼" style="display: inline;padding: 0 5px 0 2px;height: 35px;" />
+                    <a class="btnnewcode" href="javascript:" style="font-size: 12px;line-height: 1.4;">重新產生</a>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align: center;margin-top: 0;padding: 20px;">
+                <button id="confirm_cancel" type="button" class="btn btn-sm btn-default" style="background: none;text-shadow: none;border-radius: 3px;width: 80px;">Cancel</button>
+                <button id="confirm_ok" type="button" class="btn btn-sm btn-primary" style="width: 80px;">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

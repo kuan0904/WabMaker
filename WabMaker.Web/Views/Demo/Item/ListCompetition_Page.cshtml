@@ -1,0 +1,34 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using System.Dynamic
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@foreach (var item in Model.DataResult.Data)
+{
+    var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+    <div>
+        <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })">@item.ItemLanguage.Subject</a>
+    </div>      
+}
+
+@{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number_PreNext;
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+
+<div class="page-info">第@(Model.DataResult.CurrentPage)頁 / 共@(Model.DataResult.PageCount)頁</div>
+
+<ul class="pagination">
+    @foreach (var item in buttons)
+    {
+        Model.ItemPageModel.CurrentPage = item.Page;
+
+        <li class="@(item.IsCurrent?"active":"")">
+            @Ajax.ActionLink(item.Name, "GetPageList", Model.ItemPageModel,
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" })
+        </li>
+    }
+</ul>

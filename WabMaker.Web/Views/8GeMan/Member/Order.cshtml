@@ -1,0 +1,47 @@
+﻿@using WebMaker.BLL.Helpers
+@using MyTool.Enums
+@model WebMaker.Entity.ViewModels.OrderListModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = Model.Structure.OrderName;
+    //每頁顯示筆數
+    //Model.OrderPageModel.PageSize = 3;
+}
+@* 會員背景 *@
+@Html.Action("Get", "Item", new
+{
+    routeName = "PrivacyPolicy",
+    specViewName = "_MemberBackgroud"
+})
+
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">首頁</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@ViewBag.Title</a></li>
+            </ol>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+            </div>
+
+            <div class="col-md-9">
+                <div class="w-back-g p-20">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner mb-20">@ViewBag.Title</span>
+                    </div>
+
+                    <div id="ListContent">
+                        @Html.Action("OrderPartial", new { model = Model.OrderPageModel })
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,14 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+
+@{
+    Layout = null;
+    //var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    //var imgUrl = mainImage?.FilePath;
+    //var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+}
+
+@Html.Raw(Model.ItemLanguage.Content)
+

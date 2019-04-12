@@ -1,0 +1,68 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    var imgUrl = mainImage?.FilePath;
+    //var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+}
+
+<div class="main-content">
+
+    <div class="breadArea">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li><a href="@Url.Action("Index","Home")">HOME</a></li>    
+                <li class="active">@ViewBag.Title</li>
+            </ol>
+        </div>
+    </div><!-- breadArea END -->
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-md-8 main-content">
+                <div class="main-content-inner">
+
+                    <article class="post-layout post">
+
+                        <div class="post-header">
+
+                            <div class="post-information">
+                                <h1>@Model.ItemLanguage.Subject</h1>
+                                <div class="meta-info">
+                                </div><!-- meta-info END -->
+                            </div><!-- post-information END -->
+
+                        </div><!-- post-header END -->
+
+                        <div class="post-content">
+                                            
+                            @Html.Raw(Model.ItemLanguage.Content)
+                       
+                            @if (Model.Item.RouteName == "SiteMap")
+                            {
+                                <ul>
+                                    @Html.Action("Menu", "Item", new { position = MyTool.Enums.MenuPosition.Top })
+                                </ul>
+                            }                     
+                                              
+                        </div><!-- post-content END -->
+
+                    </article>
+
+                </div><!-- main-content-inner END -->
+
+            </div><!-- col-md-8 td-main-content END -->
+
+
+        </div><!-- row END -->
+
+    </div><!-- container END -->
+
+</div><!-- main-content END -->

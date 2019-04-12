@@ -1,0 +1,55 @@
+﻿@using WabMaker.Web.Helpers
+@model List<MyTool.ViewModels.TreeViewModel>
+
+@if (Model != null)
+{
+    @GenerateMenu(Model)
+}
+
+@helper GenerateMenu(List<MyTool.ViewModels.TreeViewModel> nodes)
+{
+if (nodes != null)
+{
+        <ul class="nav nav-list">
+
+            @foreach (var item in nodes)
+            {
+                var url = WabMaker.Web.Helpers.RouteHelper.CreateUrl(item.Controller, item.Action, item.Url);
+                var isActive = RouteHelper.Url() == url;
+
+                <li class="@(isActive?"active":"")">
+                    <a href="@url" class="dropdown-toggle">
+                        <span class="menu-text">@item.Name</span>
+                        @if (item.Nodes != null)
+                        {
+                            <b class="arrow fa fa-angle-down"></b>
+                        }
+                    </a>
+                    @if (item.Nodes != null)
+                    {
+                        @ChildMenu(item.Nodes)
+                    }
+                </li>
+            }
+        </ul>
+}
+}
+
+@helper ChildMenu(List<MyTool.ViewModels.TreeViewModel> nodes)
+{
+    <ul class="submenu">
+        @foreach (var item in nodes)
+        {
+            var url = RouteHelper.CreateUrl(item.Controller, item.Action, item.Url);
+            var isActive = RouteHelper.Url() == url;
+
+            <li class="@(isActive?"active":"")">
+                <a href="@url">
+                    <i class="icon-double-angle-right fa fa-angle-double-right"></i>@item.Name
+                </a>
+            </li>
+        }
+    </ul>
+}
+
+

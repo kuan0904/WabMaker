@@ -1,0 +1,18 @@
+﻿@using WebMaker.BLL.Helpers
+@using MyTool.Enums
+@model WebMaker.Entity.ViewModels.OrderListModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = Model.Structure.OrderName;
+    //每頁顯示筆數
+    //Model.OrderPageModel.PageSize = 3;
+}
+
+@Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+
+<h4>@ViewBag.Title</h4>
+
+<div id="ListContent">
+    @Html.Action("OrderPartial", new { model = Model.OrderPageModel })
+</div>
+

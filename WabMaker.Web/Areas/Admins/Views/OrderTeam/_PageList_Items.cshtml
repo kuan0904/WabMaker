@@ -1,0 +1,115 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.Tools
+@using WebMaker.Entity.ViewModels
+@model List<CompetitionItemsModel>
+@{
+    ReportStyle style = ViewBag.ReportStyle;
+}
+@if (style == ReportStyle.Json)
+{
+    var json = _Json.ModelToJson(Model);
+
+    <textarea rows="30" cols="50" style="width: 100%;">@json</textarea>
+}
+else
+{
+    <table class="table table-striped table-bordered bootstrap-datatable">
+        <tr class="active" style="text-align: right;font-size: 16px;">
+            <td colspan="10">金額共計: @Model.Sum(x => x.Teams.Sum(y => y.DetailPrice + y.DiscountPrice)).ToString("0")</td>
+        </tr>
+        <tr>
+            <th class="info">項目</th>
+            <th class="info">組別</th>
+            <th>團隊數量</th>
+
+            <th width="5%">選手編號</th>
+            <th width="10%">姓名</th>
+            <th>單位</th>
+
+            <th width="15%">參賽團隊</th>
+            <th width="5%">檔案</th>
+            <th class="success">價格</th>
+            <th class="success">優惠</th>
+        </tr>
+        @{ var count = 0;}
+        @foreach (var item in Model)
+        {
+            count++;
+            var len = item.Teams.Sum(x => x.Members.Count());
+            var rs = (len == 0 ? "" : len.ToString());
+            <tr>
+                @showData_0(item, style == ReportStyle.Mearge ? rs : "") @*合併*@
+                @showData_level(item, item.Teams.FirstOrDefault() ?? new CompetitionItemTeam())
+            </tr>
+            foreach (var teams in item.Teams.Skip(1))
+            {
+                <tr>
+                    @if (style != ReportStyle.Mearge)
+                    {
+                        @showData_0(item) //重複前面
+                    }
+                    @showData_level(item, teams)
+                </tr>
+            }
+        }
+    </table>
+            }
+
+@helper showData_level(CompetitionItemsModel item, CompetitionItemTeam team)
+{
+ReportStyle style = ViewBag.ReportStyle;
+var len = team.Members.Count();
+var rs = (len == 0 ? "" : len.ToString());
+
+    @showMember(team.Members.FirstOrDefault() ?? new CompetitionItemTeamMember())
+    @showTeam(team, style == ReportStyle.Mearge ? rs : "") @*合併*@
+foreach (var member in team.Members.Skip(1))
+{
+    <tr>
+        @if (style != ReportStyle.Mearge)
+        {
+            @showData_0(item) //重複前面
+        }
+        @showMember(member)
+        @if (style != ReportStyle.Mearge)
+        {          
+            @showTeam(team)  //重複前面
+        }
+    </tr>
+}
+}
+
+
+@helper showData_0(CompetitionItemsModel item, string rs = "")
+{
+    <td rowspan="@rs">@item.Subject</td>
+    <td rowspan="@rs">@item.Option</td>
+    <td rowspan="@rs">@item.TeamCount</td>
+}
+
+
+@helper showTeam(CompetitionItemTeam team, string rs = "")
+{
+    <td rowspan="@rs">@team.DetailTeamName</td>
+    <td rowspan="@rs">
+        @if (!string.IsNullOrEmpty(team.FilePath))
+        {
+            <a href="@Url.Content(team.FilePath)" target="_blank">檔案</a>
+        }
+    </td>
+    <td rowspan="@rs">@team.DetailPrice.ToString("0")</td>
+    <td rowspan="@rs">@team.DiscountPrice.ToString("0")</td>
+}
+
+@helper showMember(CompetitionItemTeamMember member)
+{
+    <td>@(member.TempNo == 0 ? "" : member.TempNo.ToString())</td>
+    <td>@member.MemberName</td>
+    <td>@member.Unit</td>
+}
+
+
+<div class="page-area">
+    <span>共@(Model.Count)筆</span>
+</div>

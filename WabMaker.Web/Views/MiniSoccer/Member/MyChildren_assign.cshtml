@@ -1,0 +1,58 @@
+﻿@using WabMaker.Web.Helpers
+@model List<WebMaker.Entity.Models.mgt_UserAssign>
+@{
+    Layout = null;
+    WebMaker.Entity.Models.mgt_UserProfile member = ViewBag.Member;
+}
+
+@* in modal 指定教練 *@
+<div class="modal-dialog" role="document">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div class="hotnews-title">
+                <span class="hotnews-title-inner text-center">指定@(member.NickName)的教練</span>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                @using (Html.BeginForm("CreateAssign", null, FormMethod.Post))
+                {
+                    <input type="hidden" id="successMessage" data-title="指定教練" />
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="childID" id="AssignChildID" value="@member.ID" />
+
+                    <label class="col-sm-3 form-label text-center mt-10">請輸入教練電話</label>
+                    <div class="col-sm-5">
+                        <input class="form-control mt-10 enterToSave" type="text" name="AssignPhoneNumber" id="AssignPhoneNumber"
+                               data-val="true" data-val-required="請輸入電話" autocomplete="off">
+                        <span class="field-validation-valid text-danger" data-valmsg-for="AssignPhoneNumber" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-sm-4">
+                        <button id="AssignSaveBtn" type="button" class="btn btn-style-fifteen btn-block mt-10">搜尋並加入</button>
+                    </div>
+                }
+            </div>
+            <div class="member-event-step3-arena">
+                @foreach (var item in Model)
+            {
+                    <a class="AssignDeleteBtn" data-title="指定教練" data-url="@Url.Action("DeleteAssign", new { id = item.ID })">
+                        <span class="badge badge-pill badge-nametags-pick">
+                            @item.mgt_UserTo.Name
+                            <i class="fas fa-times"></i>
+                        </span>
+                    </a>
+                }
+
+            </div>
+        </div>
+        @*<div class="modal-footer">
+                <button type="button" class="btn btn-style-sixteen btn-block">關閉</button>
+            </div>*@
+    </div>
+
+</div>

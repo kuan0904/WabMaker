@@ -1,0 +1,153 @@
+﻿@using MyTool.Enums
+@using WebMaker.Entity.Models
+@using WebMaker.Entity.ViewModels
+@model MyTool.ViewModels.SiteInfoViewModel
+
+@{
+    ViewBag.Title = "網站基本資料";
+}
+
+<div id="editView">
+    <div class="page-header">
+        <h1>@ViewBag.Title</h1>
+    </div>
+
+   @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+   {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.SiteName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.SiteName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.SiteName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MetaTagDescription, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <textarea cols="20" id="MetaTagDescription" name="MetaTagDescription" rows="3" class="form-control">@Model.MetaTagDescription</textarea>
+                    @Html.ValidationMessageFor(model => model.MetaTagDescription, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MetaTagKeyword, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">                    
+                    <textarea cols="20" id="MetaTagKeyword" name="MetaTagKeyword" rows="3" class="form-control">@Model.MetaTagKeyword</textarea>
+                    @Html.ValidationMessageFor(model => model.MetaTagKeyword, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.MetaTagAuthor, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.MetaTagAuthor, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.MetaTagAuthor, "", new { @class = "text-danger" })
+                </div>
+            </div>
+                     
+            <div class="form-group">
+                @Html.LabelFor(model => model.MetaTagOgImage, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @{
+                        var fileList = new List<cms_ItemFile>();
+                        if (!string.IsNullOrEmpty(Model?.MetaTagOgImage))
+                        {
+                            //id for dislpay oldFile
+                            fileList.Add(new cms_ItemFile { FileType = (int)FileType.Images, FilePath = Model.MetaTagOgImage, ID = Guid.NewGuid() });
+                        }
+                    }
+                    @Html.Partial("_FileList", new FileViewModel
+               {
+                   IdName = "ImageModel",
+                   FileTypes = new List<FileType> { FileType.Images },
+                   FileList = fileList,
+                   IsMultiple = false
+               })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Footer, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <input type="hidden" id="ContentImagesJson" name="ContentImagesJson" />
+                    @Html.TextAreaFor(model => model.Footer, new { id = "ContentText", @class = "ckeditor" })
+                    @Html.ValidationMessageFor(model => model.Footer, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Footer2, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <textarea cols="20" id="Footer2" name="Footer2" rows="3" class="form-control">@Model.Footer2</textarea>
+                    @Html.ValidationMessageFor(model => model.Footer2, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Copyright, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Copyright, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Copyright, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Facebook, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Facebook, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Facebook, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.YouTube, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.YouTube, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.YouTube, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Instagram, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Instagram, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Instagram, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input id="SaveBtn" type="button" value="Save" class="btn btn-info" />              
+                    <a id="returnUrl" href="@Url.Action("Index")" class="btn btn-default">取消</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+
+        $(function () {
+            site.fileUpload.fileList = [];
+            $(site.editView).find(".fileuploader").each(function () {
+                site.fileUpload.bindEvent($(this));
+            });
+        });
+    </script>
+}

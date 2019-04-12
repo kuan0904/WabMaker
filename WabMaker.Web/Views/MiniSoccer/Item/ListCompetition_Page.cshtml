@@ -1,0 +1,68 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using System.Dynamic
+@model  WabMaker.Web.WebViewModels.ItemPageResult
+
+<div class="row">
+
+    @foreach (var item in Model.DataResult.Data)
+    {
+        var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+        <div class="col-md-4 col-xs-12 mb-30">
+            <div class="list-inner pb-10">
+                <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="hot-title">
+
+                    <span> @item.Item.Date.ToDateString("yyyy.MM.dd")</span>
+                    @if (mainImage != null)
+                    {
+                        if (mainImage.FileType == FileType.YouTube)
+                        {
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="imgbox" style="background-image: url(@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath))"></div>
+
+                        }
+                    }
+                    <h3 class="mb-6">@item.ItemLanguage.Subject</h3>
+                    <p>@_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Content), 100)</p>
+                    @*<a href="@(Url.Action("NewCompetition", "Order", new { id = item.Item.ID  }))" class="btn btn-block btn-style-twenty-One">我要報名</a>*@
+                </a>
+
+            </div>
+        </div>
+
+    }
+</div>
+
+@{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number_PreNext;
+    buttonModel.PreviousText = string.Format("<i class='fa fa-angle-left'></i>");
+    buttonModel.NextText = string.Format("<i class='fa fa-angle-right'></i>");
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+
+@*<div class="page-info">第@(Model.DataResult.CurrentPage)頁 / 共@(Model.DataResult.PageCount)頁</div>*@
+
+<div class="row clearfix">
+    <div class="pro-pagination">
+        <ul class="blog-pagination">
+            @foreach (var item in buttons)
+            {
+                Model.ItemPageModel.CurrentPage = item.Page;
+
+                <li class="@(item.IsCurrent?"active":"")">
+                    @Ajax.RawActionLink(item.Name, "GetPageList", "Item", Model.ItemPageModel,
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" }, null)
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+

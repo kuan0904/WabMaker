@@ -1,0 +1,94 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.ViewModels.RoleViewModel
+
+@{
+    bool isNew = Model.Role.ID == Guid.Empty;
+    ViewBag.Title = (isNew ? "新增" : "編輯") + "角色";
+}
+
+<div class="page-header">
+    <h1>@ViewBag.Title</h1>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })       
+        @Html.Hidden("Role.ID", Model.Role.ID, new { id = "ID" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Role.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Role.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Role.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Role.AccountType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Role.AccountType",
+                    _Enum.EnumtoSelectAndName<AccountType>(Model.Role.AccountType),
+                    new { @class = "selectpicker" })
+            </div>
+        </div>
+       
+        <div class="form-group">
+            @Html.LabelFor(model => model.Role.MemberLevel, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">             
+                @Html.DropDownList("Role.MemberLevel",
+                     _Enum.EnumtoSelectAndName<MemberLevel>(Model.Role.MemberLevel),
+                     "", new { @class = "selectpicker" })             
+                @Html.ValidationMessageFor(model => model.Role.MemberLevel, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Role.Sort, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Role.Sort, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Role.Sort, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Role.IsEnabled, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @mHelper.Switch("", "Role.IsEnabled", Model.Role.IsEnabled)
+            </div>
+        </div>
+
+        <div class="form-group form-group-border">
+            <label class="control-label col-sm-2"></label>
+
+            <div class="col-sm-3">
+                <div class="block-title">選單與權限</div>
+                <ul id="treeView" class="mTree checkTree">
+                    @Html.Partial("_TreeCheck")
+                </ul>
+            </div>
+            <!--包含類型-->
+            <div class="col-sm-2 vertical-checks">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.mgt_Role>("UserContentTypes"),
+                                        "Role.UserContentTypes", Model.Role.UserContentTypes, _Enum.ToContainCheck<UserContentType>(Model.Role.UserContentTypes))
+            </div>
+            <!--必填類型-->
+            <div class="col-sm-2 vertical-checks">
+                @mHelper.CheckboxContain(_Model.GetDisplayName<WebMaker.Entity.Models.mgt_Role>("UserRequiredTypes"),
+                                        "Role.UserRequiredTypes", Model.Role.UserRequiredTypes, _Enum.ToContainCheck<UserRequiredType>(Model.Role.UserRequiredTypes))
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="SaveBtn" type="button" value="儲存" class="btn btn-info" />
+                <input id="CancelBtn" type="button" value="取消" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}

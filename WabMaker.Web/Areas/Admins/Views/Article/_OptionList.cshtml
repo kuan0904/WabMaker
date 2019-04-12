@@ -1,0 +1,167 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using MyTool.ViewModels
+@using WebMaker.Entity.ViewModels
+@using MyTool.Services
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.ViewModels.ItemViewModel>
+@* 比賽(訂單)項目 *@
+@{
+    WebMaker.Entity.Models.cms_Structure structure = ViewBag.Structure;
+    WebMaker.Entity.Models.cms_Structure discStructure = structure.ParentStructure.FirstOrDefault(x => x.ItemTypes.HasValue((int)ItemType.OrderDiscount));
+    var itemID = ViewBag.ItemID;
+    int columnCount = 1;
+
+    //包含類型
+    List<ItemType> ItemTypes = structure.ItemTypes.ToContainList<ItemType>();
+    //包含欄位
+    List<ContentType> ContentTypes = structure.ContentTypes.ToContainList<ContentType>();
+    //必填欄位
+    List<ContentType> RequiredTypes = structure.RequiredTypes.ToContainList<ContentType>();
+}
+
+<div class="page-header">
+    <h1>@structure.Name</h1>
+    <h1><small>@ViewBag.Subject</small></h1>
+</div>
+<p>
+    <input id="CancelBtn" type="button" value="回前頁" class="btn btn-default" />
+</p>
+
+@using (Html.BeginForm("OptionEdit", "Article", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <table id="editTable" class="table table-bordered grayCheck @(ContentTypes.Contains(ContentType.Sort) ? "sort-table" : "")"
+           data-view="@Url.Action("OptionGet")" data-create="@Url.Action("OptionCreate")" data-update="@Url.Action("OptionUpdate")" data-remove="@Url.Action("OptionDelete")">
+        <thead>
+            <tr>
+
+                @if (ContentTypes.Contains(ContentType.Department))
+                {
+                    columnCount++;
+                    <th width="5%">單位</th>
+                }
+
+                @if (ContentTypes.Contains(ContentType.Subject))
+                {
+                    columnCount++;
+                    <th width="10%">名稱</th>
+                }
+
+                @if (ContentTypes.Contains(ContentType.OrderCreateRole))
+                {
+                    columnCount++;
+                    <th width="10%">完成後新增身分</th>
+                }
+
+                @if (ContentTypes.Contains(ContentType.Options))
+                {
+                    //todo structure add OptionName
+                    columnCount++;
+                    <th width="15%">
+                        <span>組別</span>
+                        @mHelper.Switch("", "AllSwitch", true)
+                    </th>
+                }
+
+                @if (ContentTypes.Contains(ContentType.DiscountType))
+                {
+                    columnCount++;
+                    <th width="5%">
+                        類型
+                    </th>
+                }
+                @if (ContentTypes.Contains(ContentType.DateLimit))
+                {
+                    columnCount++;
+                    <th width="6%">
+                        年齡限制 (日期以後出生)
+                    </th>
+                }
+                @if (ContentTypes.Contains(ContentType.StockCount))
+                {
+                    columnCount++;
+                    <th width="6%">
+                        @(ItemTypes.Contains(ItemType.OrderDiscount) ? "條件數量" : "販售數量")
+                    </th>
+                }
+                @if (ContentTypes.Contains(ContentType.SaleLimit))
+                {
+                    columnCount++;
+                    <th width="6%">
+                        限制數量
+                    </th>
+                }
+                @if (ContentTypes.Contains(ContentType.SalePrice))
+                {
+                    columnCount++;
+                    <th width="5%">
+                        @(ItemTypes.Contains(ItemType.OrderDiscount) ? "優惠價" : "金額")
+                        @(ContentTypes.Contains(ContentType.SalePricePerPerson) ? "(每人)" : "")
+                    </th>
+                }
+                @if (ContentTypes.Contains(ContentType.PriceType))
+                {
+                     columnCount++;
+                    <th width="3%">計價方式</th>
+                }
+                @if (ContentTypes.Contains(ContentType.PeopleRange))
+                {
+                    columnCount++;
+                    <th width="8%">人數限制</th>
+                }
+
+                @if (ContentTypes.Contains(ContentType.Description))
+                {
+                    columnCount++;
+                    <th width="8%">描述</th>
+                }
+
+                @if (discStructure != null)
+                {
+                    columnCount++;
+                    <th width="8%">適用優惠</th>
+                }
+                <th width="6%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr data-addurl="?itemID=@(item.Item.ID)&langType=@(item.ItemLanguage.LanguageType)"
+                    data-id="@(item.Item.ID)">
+                    @Html.Partial("_OptionGet", new EditItemViewModel(item))
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="new-row" data-addurl="?structureIDs=@(structure.ID)&itemID=@(itemID)">
+                <td colspan="@columnCount" style="text-align:center">
+                    <a id="edittable-action-create" title="Create"><i class="fa fa-plus-circle"></i></a>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+}
+
+@if (ContentTypes.Contains(ContentType.DiscountType))
+{
+    <br>
+    <div class="form-group well">
+        <div class="col-md-offset-2">
+            <h4>說明:<span>項目套用適用優惠後才能生效</span></h4>
+            @foreach (DiscountType item in Enum.GetValues(typeof(DiscountType)))
+                {
+                <div>
+                    <b>@item.GetDisplayName() : </b>@item.GetDescription()
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<br>
+<p>
+    <input id="CancelBtn" type="button" value="回前頁" class="btn btn-default" />
+</p>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="d2d07ea7d8b54501b02cecbfb23028e7" Name="Diagram1" ZoomLevel="86">
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_SystemSetting" Width="1.75" PointX="0.75" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_ItemFile" Width="1.625" PointX="16" PointY="13.125" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_UserValidCode" Width="1.625" PointX="3.125" PointY="20" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_Email" Width="1.5" PointX="6" PointY="19.375" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_EmailSendUser" Width="1.5" PointX="8.375" PointY="19.5" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_EmailSendUser_cms_Email" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_UserExternalLogin" Width="1.5" PointX="5.875" PointY="16.625" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_Role" Width="1.5" PointX="5.625" PointY="6" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_Menu" Width="1.875" PointX="11" PointY="3.25" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_Menu_mgt_Menu" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_RoleMenuRelation" Width="1.5" PointX="8.375" PointY="4.75" />
+        <AssociationConnector Association="WebMakerDBModel.FK_RoleMenuRelation_Menu" />
+        <AssociationConnector Association="WebMakerDBModel.FK_RoleMenuRelations_Roles" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_ItemLanguage" Width="1.5" PointX="13.75" PointY="9.75" />
+        <EntityTypeShape EntityType="WebMakerDBModel.erp_OrderLog" Width="1.5" PointX="16.625" PointY="9.125" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_ItemRelation" Width="1.75" PointX="13.75" PointY="14.25" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_UserLog" Width="1.5" PointX="5.875" PointY="13.25" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_Department" Width="2" PointX="3.375" PointY="1.375" />
+        <AssociationConnector Association="WebMakerDBModel.FK_Departments_Departments" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_User" Width="1.875" PointX="3.25" PointY="10.25" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_Email_mgt_User2" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_Email_mgt_User3" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_EmailSendUser_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemFile_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderLog_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_User_mgt_Department" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserExternalLogin_mgt_User1" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserLog_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserVaildCode_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_UserLogs_Users" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_Client" Width="1.5" PointX="0.75" PointY="1.5" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_Email_mgt_Client" />
+        <AssociationConnector Association="WebMakerDBModel.FK_Departments_Clients" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_Role_mgt_Client" />
+        <AssociationConnector Association="WebMakerDBModel.FK_SystemSettings_Clients" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_Structure" Width="1.75" PointX="8.625" PointY="8.625" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemFile_cms_ItemContent" />
+        <AssociationConnector Association="WebMakerDBModel.FK_ItemTypes_Clients" />
+        <AssociationConnector Association="WebMakerDBModel.cms_StructureRelation" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_UserProfile" Width="1.875" PointX="0.625" PointY="10.625" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_User_mgt_UserProfile" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_Item" Width="1.75" PointX="11.25" PointY="8.5" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_Item_mgt_Department" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_Item_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_Item_mgt_User1" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemFiles_cms_Item" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemLanguage_cms_Item" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemRelation_cms_Item" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemRelation_cms_Item1" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_Items_cms_ItemContent" />
+        <AssociationConnector Association="WebMakerDBModel.FK_Items_Clients" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserProfile_cms_Item" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_ItemOrderRoleRelation" Width="2" PointX="16.375" PointY="6.75" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemRoleRelation_cms_Item" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_ItemRoleRelation_mgt_Role" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_UserRoleRelation" Width="1.5" PointX="3.25" PointY="6.125" />
+        <AssociationConnector Association="WebMakerDBModel.FK_UserRoleRelations_Roles" />
+        <AssociationConnector Association="WebMakerDBModel.FK_UserRoleRelations_Users1" />
+        <EntityTypeShape EntityType="WebMakerDBModel.erp_OrderDiscount" Width="1.5" PointX="19" PointY="3.75" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderDiscount_cms_Item" />
+        <EntityTypeShape EntityType="WebMakerDBModel.erp_Order" Width="2" PointX="13.875" PointY="0.5" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_Order_cms_Item" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_Order_cms_Structure" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_Order_erp_Order" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_Order_mgt_Client" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_Order_mgt_User1" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderDiscount_erp_Order" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderLog_erp_Order" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserProfile_erp_Order" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserRoleRelation_erp_Order" />
+        <EntityTypeShape EntityType="WebMakerDBModel.erp_GetPayMessage" Width="1.5" PointX="19.625" PointY="0.75" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_GetPayMessage_erp_Order" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_GetPayMessage_mgt_Client" />
+        <EntityTypeShape EntityType="WebMakerDBModel.erp_OrderDetail" Width="1.5" PointX="16.75" PointY="1.625" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderDetail_cms_Item" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderDetail_erp_Order" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderDetail_erp_Order1" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderDiscount_erp_OrderDetail" />
+        <AssociationConnector Association="WebMakerDBModel.erp_OrderDetailTeam" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserProfile_mgt_User" />
+        <EntityTypeShape EntityType="WebMakerDBModel.erp_OrderUnit" Width="1.5" PointX="19.625" PointY="6.875" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderUnit_erp_Order" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderUnit_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserProfile_erp_OrderUnit" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_EmailTemplate" Width="1.5" PointX="10.75" PointY="19.625" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_EmailTemplate_cms_Structure" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_EmailTemplate_mgt_Client" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_EmailTemplate_mgt_User" />
+        <EntityTypeShape EntityType="WebMakerDBModel.cms_SmsLog" Width="1.5" PointX="12.625" PointY="19.625" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_SmsLog_mgt_Client" />
+        <AssociationConnector Association="WebMakerDBModel.FK_cms_SmsLog_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserProfile_mgt_Client" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserProfile_mgt_UserProfile" />
+        <EntityTypeShape EntityType="WebMakerDBModel.mgt_UserAssign" Width="1.75" PointX="3.75" PointY="23.5" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserAssign_mgt_User" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserAssign_mgt_User1" />
+        <AssociationConnector Association="WebMakerDBModel.FK_mgt_UserAssign_mgt_UserProfile" />
+        <AssociationConnector Association="WebMakerDBModel.FK_erp_OrderUnit_erp_OrderDetail" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

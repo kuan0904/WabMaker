@@ -1,0 +1,26 @@
+﻿@model List<WabMaker.Web.WebViewModels.TreeWebViewModel>
+
+@GenerateTree(Model)
+
+@helper GenerateTree(List<WabMaker.Web.WebViewModels.TreeWebViewModel> nodes, int level = 1)
+{
+
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+        bool hasChild = item.Nodes != null && item.Nodes.Any();
+            <li class="menu-item @(hasChild?"sf-dropdown":"")">
+                <a href="@item.Url">@item.Name@(Html.Raw(ViewBag.style == "mobile" && hasChild ? "<i class='fa fa-chevron-down'></i>" : ""))</a>
+                @if (hasChild)
+                {
+                    <ul class="sub-menu">
+                        @GenerateTree(item.Nodes, level + 1)
+                    </ul>
+                }
+            </li>
+    }//end foreach
+
+}
+
+}

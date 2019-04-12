@@ -1,0 +1,48 @@
+﻿@model WebMaker.Entity.ViewModels.LoginViewModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "會員登入";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<a href="@Url.Action("FacebookLogin","Member")" class="btn btn-primary" name="externalType" title="Facebook Login"><i class="fa fa-facebook" aria-hidden="true"></i>Facebook登入</a>
+@*@using (Html.BeginForm("ExternalLogin", "Member", new { returnUrl = Request.RawUrl }))
+{
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-primary" name="externalType" value="@MyTool.Enums.ExternalType.Facebook" title="Facebook Login"><i class="fa fa-facebook" aria-hidden="true"></i>Facebook登入</button>
+}*@
+
+@using (Html.BeginForm("Login", "Member", new { }, FormMethod.Post, new { }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <input type="hidden" name="url" value="@Request.QueryString["url"]" />
+
+    @Html.TextBoxFor(model => model.Account, new { @class = "form-control", placeholder = "帳號(電子郵件)" })
+    @Html.ValidationMessageFor(model => model.Account, "", new { @class = "text-danger" })
+    <br>
+
+    @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "密碼" })
+    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+    <br>
+
+    <br>
+    @Html.TextBoxFor(model => model.Captcha, "", new { @class = "form-control enterToSave", placeholder = "驗證碼", autocomplete = "off" })
+    @Html.ValidationMessageFor(model => model.Captcha, "", new { @class = "text-danger" })
+    <img class="imgverifycode" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+    <a class="btnnewcode" href="javascript:">重新產生驗證碼</a>
+    <br><br>
+
+    <input type="submit" value="登入" class="btn btn-info" />
+}
+
+<br>
+<br>
+<a href="@Url.Action("ForgotPassword","Member")">忘記密碼</a><br>
+<a href="@Url.Action("ReSend","Member")">重寄驗證信</a><br>
+<a href="@Url.Action("SignUp","Member")">註冊會員</a><br>
+
+

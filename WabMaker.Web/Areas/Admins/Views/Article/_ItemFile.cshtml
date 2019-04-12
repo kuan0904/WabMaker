@@ -1,0 +1,31 @@
+﻿@model  WebMaker.Entity.ViewModels.FileViewModel
+@{
+    WebMaker.Entity.Models.cms_Structure structure = ViewBag.Structure;
+}
+<div class="page-header">
+    <h1>@structure.Name</h1>
+</div>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+ 
+    <input type="hidden" name="ItemID" value="@Model.ItemID"/>
+    <input type="hidden" name="StructureID" value="@structure.ID" />
+    
+    <div class="form-horizontal itemFile">
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.Partial("_FileList", Model)
+            </div>
+        </div>
+
+        <div class="form-group" style="padding-top: 10px;">
+            <div class="col-md-12 text-center">
+                <input id="SaveBtn" type="button" value="儲存" class="btn btn-info" />
+                <input id="CancelBtn" type="button" value="取消" class="btn btn-default" />
+            </div>
+        </div>
+
+    </div>
+}

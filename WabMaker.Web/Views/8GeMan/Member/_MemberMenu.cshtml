@@ -1,0 +1,35 @@
+﻿@using WabMaker.Web.Helpers
+@{
+    List<MyTool.ViewModels.TreeViewModel> tree = WebMaker.BLL.Helpers.SessionManager.MenuTree;
+}
+
+<div class="w-back-g p-20">
+    <div class="hotnews-title">
+        <span class="hotnews-title-inner mb-20">會員功能</span>
+    </div>
+    <div class="mb-sm-30">
+        <div class="single-sidebar">
+            <ul class="theme_menu mb-15">
+                @GenerateMenu(tree)
+                <li><a href="@Url.Action("LogOut", "Member")">登出</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@helper GenerateMenu(List<MyTool.ViewModels.TreeViewModel> nodes)
+{
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+
+        var url = WabMaker.Web.Helpers.RouteHelper.CreateUrl(item.Controller, item.Action, item.Url);
+        var isActive = RouteHelper.Url() == url;
+
+            <li>
+                <a href="@url" class="@(isActive?"active":"")"> @item.Name</a>
+            </li>
+    }
+}
+}

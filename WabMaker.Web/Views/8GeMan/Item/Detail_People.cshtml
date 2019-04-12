@@ -1,0 +1,182 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    //封面圖
+    //var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    //var imgUrl = mainImage == null ? "" : RouteHelper.SetUrlPath(mainImage.FilePath, mainImage.ThumbnailPath, true);
+    //內頁圖
+    var subImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemSubImage);
+    var subImageUrl = subImage?.FilePath;
+    //相簿
+    var albums = Model.ItemFiles.Where(x => x.SourceType == SourceType.ItemFile && x.StructureID == new Guid("3f02b333-6f46-4720-a918-2a269e9b5e28")).ToList();
+    //作品
+    var productions = Model.ItemFiles.Where(x => x.SourceType == SourceType.ItemFile && x.StructureID == new Guid("b015bf2b-ce7c-4b85-932c-b6dc11929ce9")).ToList();
+
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemLanguage.Subject" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@subImageUrl" />
+    <meta property="og:description" content="@description" />
+}
+@section css    {
+    <link href="~/html/8GeMan/css/flexslider.css" type="text/css" rel="stylesheet">
+}
+@section scripts    {
+    <script src="~/html/8GeMan/js/jquery.flexslider.js"></script>
+}
+
+<section class="character-section mt-65">
+    <div class="character-back character-back2" style="background: url(@subImageUrl) 0/cover no-repeat;">
+        <div class="auto-container">
+            <h2>@Model.ItemLanguage.Subject</h2>
+            <p>@Model.ItemLanguage.Description</p>
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">首頁</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Get","Item", new { routename = "People" })">人才庫</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@Model.ItemLanguage.Subject</a></li>
+            </ol>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-xs-12 mb-30">
+                <div class="flexslider mb-0" id="f1">
+                    <ul class="slides">
+                        @foreach (var img in albums)
+                        {
+                            <li>
+                                <img src="@RouteHelper.SetImagePath(img.FilePath, img.ThumbnailPath)" />
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="flexslider carousel" id="f2">
+                    <ul class="slides">
+                        @foreach (var img in albums)
+                        {
+                            <li>
+                                <img src="@RouteHelper.SetImagePath(img.FilePath, img.ThumbnailPath)" />
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xs-12 mb-30">
+                <div class="actor-introduction">
+                    @if (Model.UserProfile != null)
+                    {
+                        <h2>@Model.UserProfile.Description</h2>
+                        <div class="row">
+                            <label class="col-xs-4" for="">姓名</label>
+                            <p class="col-xs-8">@Model.ItemLanguage.Subject</p>
+                            <p class="col-xs-offset-4 col-xs-8">@Model.UserProfile.EngName</p>
+
+                            @if (!string.IsNullOrEmpty(Model.UserProfile.NickName))
+                            {
+                                <label class="col-xs-4" for="">別名</label>
+                                <p class="col-xs-8">@Model.UserProfile.NickName</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.UserProfile.Skill))
+                            {
+                                <label class="col-xs-4" for="">特殊專長</label>
+                                <p class="col-xs-8">@Model.UserProfile.Skill</p>
+                            }
+
+                            @if (Model.UserProfile.Height != null || Model.UserProfile.Weight != null)
+                            {
+                                <label class="col-xs-4" for="">身高體重</label>
+                                <p class="col-xs-8">@(Model.UserProfile.Height)cm / @(Model.UserProfile.Weight)kg</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.UserProfile.Language))
+                            {
+                                <label class="col-xs-4" for="">語言</label>
+                                <p class="col-xs-8">@Model.UserProfile.Language</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.UserProfile.SecondaryEmail))
+                            {
+                                <label class="col-xs-4" for="">Email</label>
+                                <p class="col-xs-8">@Model.UserProfile.SecondaryEmail</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.UserProfile.Education))
+                            {
+                                <label class="col-xs-4" for="">學歷</label>
+                                <p class="col-xs-8">@Model.UserProfile.Education</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.UserProfile.SocialNetwork))
+                            {
+                                <label class="col-xs-4" for="">社群連結</label>
+                                <div class="col-xs-8">
+                                    @Html.Raw(_Html.CustomFormat_Link(Model.UserProfile.SocialNetwork, "underline", true))
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="actor-detail no-arrow">
+            <h2 class="border-b">簡介</h2>
+            <div class="text-orange text24 text-center pt-50 pb-50">
+                @Model.ItemLanguage.Description
+            </div>
+
+            <h2 class="border-b">演藝經歷及作品</h2>
+            <div class="text18 pt-20 pb-50">
+                @Html.Raw(Model.ItemLanguage.Content)
+            </div>
+
+            @*<h2 class="border-b">得獎紀錄</h2>
+                <div class="text18 pt-20 pb-50">
+                </div>*@
+
+            <h2 class="border-b">作品</h2>
+            <div class="three-item-carousel owl-carousel owl-theme">
+                @foreach (var img in productions)
+                {
+                    <div class="list-inner">                     
+                        @if (img != null)
+                        {
+                            if (img.FileType == FileType.YouTube)
+                            {
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(img.FilePath)" frameborder="0"></iframe>
+                                </div>
+                                @*<a href="@_YouTube.SetUrl(img.FilePath)" target="_blank">
+                                    <img src="@_YouTube.SetThumbnail(img.FilePath)" alt="" />
+                                </a>*@
+                            }
+                            else
+                            {
+                                <img src="@RouteHelper.SetImagePath(img.FilePath, img.ThumbnailPath)" alt="" />
+                            }
+                        }
+                        <h2 class="mb-10 text24">@img.Subject</h2>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

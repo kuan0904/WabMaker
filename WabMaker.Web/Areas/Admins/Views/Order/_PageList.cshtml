@@ -1,0 +1,258 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.Tools
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.ViewModels.OrderViewModel>
+@{
+    WebMaker.Entity.Models.cms_Structure structure = ViewBag.Structure;
+    //包含流程
+    var orderStatus = structure.OrderStatuses.ToContainList<OrderStatus>();
+    //包含付款方式
+    var payTypes = structure.PayTypes.ToContainList<PayType>();
+    //包含類型
+    var orderContentTypes = structure.OrderContentTypes.ToContainList<OrderContentType>();
+    //是會員名單or訂單列表
+    bool isMemberList = Request["DisplayProfile"] == "true";
+    //系統設定
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+    var cellCount = 4;
+}
+
+<table class="table table-striped table-bordered bootstrap-datatable">
+    <tr>
+        <th></th>
+        <th>@Html.DisplayNameFor(model => model.Data[0].Order.CreateUser)</th>
+        <th>@Html.DisplayNameFor(model => model.Data[0].Order.OrderNumber)</th>
+        <th>@Html.DisplayNameFor(model => model.Data[0].Order.CreateTime)</th>
+
+        @if (isMemberList)
+        {
+            //比賽團隊
+            if (orderContentTypes.Contains(OrderContentType.TeamName))
+            {
+                cellCount += 1;
+                <th>團隊</th>
+            }
+            //個人
+            else
+            {
+                cellCount += 3;
+                <th>Email</th>
+                <th>性別</th>
+                <th>生日</th>
+                if (clientSettings.Contains(ClientSetting.RolTimeLimit))
+                {
+                    cellCount += 3;
+                    //有編號和時間
+                    <th>身分</th>
+                    <th>編號</th>
+                    <th>期限</th>
+                }
+            }
+        }
+        @* ----------------訂單欄位start------------------ *@
+        else
+        {
+            @* 付費方式:只有虛擬帳號 *@
+        if (payTypes.Count == 1 && payTypes.Contains(PayType.ATMVirtual))
+        {
+            cellCount += 2;
+            <th>虛擬帳號</th>
+            <th>交易時間</th>
+        }
+        else
+        {
+            cellCount += 1;
+            <th>@Html.DisplayNameFor(model => model.Data[0].Order.PayType)</th>
+        }
+
+        @*@if (payTypes.Contains(PayType.ATMVirtual))     { @mHelper.HelpButton("<i class='fa fa-check' aria-hidden='true'></i> 表示自動入帳") }*@
+            @*<th> @Html.DisplayNameFor(model => model.Data[0].Order.DeliveryType)  </th>*@
+        cellCount += 2;
+        <th>@Html.DisplayNameFor(model => model.Data[0].Order.TotalPrice)</th>
+        <th>內容</th>
+        }
+        @* -----------------訂單欄位end----------------- *@
+        @{cellCount += 1;}
+        <th>@Html.DisplayNameFor(model => model.Data[0].Order.OrderStatus)</th>
+    </tr>
+
+    @foreach (var item in Model.Data)
+    {
+        var allowStep = OrderTool.AllowSteps((OrderStatus)item.Order.OrderStatus, AccountType.Admin, orderStatus);
+
+        <tr data-id="@item.Order.ID">
+            <td>
+                @if (allowStep.Any())
+                {
+                    <a href="javascript:" class="EditBtn btn btn-sm btn-info" title="Edit"><i class="fa fa-pencil"></i></a>
+                }
+                else
+                {
+                    <a href="javascript:" class="ViewBtn btn btn-sm btn-success" title="View"><i class="fa fa-eye"></i></a>
+                }
+                @* 編輯比賽 *@
+                @if (orderStatus.Contains(OrderStatus.AdminEdit))
+                {
+                    <a href="@Url.Content($"~/Order/ManageCompetition/{item.Order.ID}")" class="btn btn-sm btn-warning" title="Edit" target="_blank"><i class="fa fa-wrench"></i></a>
+
+                }
+            </td>
+            <td>
+                <a href="@Url.Action("Index", "Member", new { goToId = item.Order.CreateUser })" target="_blank">
+                    @item.Order.mgt_User.Name
+                </a>
+            </td>
+            <td>@Html.DisplayFor(modelItem => item.Order.OrderNumber)</td>
+            <td>@item.Order.CreateTime.ToString("yyyy/MM/dd HH:mm:ss")</td>
+
+            @if (isMemberList)
+            {
+                //比賽團隊
+                if (orderContentTypes.Contains(OrderContentType.TeamName))
+                {
+                    <td>
+                        @if (item.Units != null)
+                        {
+                            if (!orderContentTypes.Contains(OrderContentType.UnitInOrderDetail))
+                            {
+                                //單位列表
+                                foreach (var unit in item.Units)
+                                {
+                                    <div class="child-column">
+                                        【@unit.Unit】 領隊：@unit.Leader 教練：@unit.Coach 管理：@unit.Manager <br>
+                                        選手: @string.Join(" ", unit.mgt_UserProfile.Select(x => x.NickName))
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                //每個項目只有一單位
+                                foreach (var detail in item.OrderDetails)
+                                {
+                                    var unit = item.Units.FirstOrDefault(x => x.OrderDetailID == detail.ID);
+                                    var members = item.TeamMembers.Where(x => x.erp_OrderDetail.Any(y => y.ID == detail.ID));
+                                    if (unit != null)
+                                    {
+                                        <div class="child-column">
+                                            @detail.ItemSubject 【@unit.Unit】 領隊：@unit.Leader 教練：@unit.Coach 管理：@unit.Manager<br>
+                                            選手: @string.Join(" ", members.Select(x => x.NickName))
+                                        </div>
+                                    }
+                                }
+                            }
+                        }
+                    </td>
+                }
+                //個人
+                else
+                {
+                    <td>@item.Order.mgt_User.Email</td>
+                    <td>@(item.Order.mgt_User.mgt_UserProfile.Gender.GetDisplayName<GenderType>())</td>
+                    <td>@(item.Order.mgt_User.mgt_UserProfile.Birthday.ToDateString())</td>
+                    if (clientSettings.Contains(ClientSetting.RolTimeLimit))
+                    {
+                        //有編號和時間
+                        var role = item.Order.mgt_UserRoleRelation.FirstOrDefault();
+                        <td>@(role?.mgt_Role.Name)</td>
+                        <td>@(role?.RoleNumber)</td>
+                        <td>@(role != null && role.IsTimeLimited ? role.StartTime.ToDateString() + "~" + role.EndTime.ToDateString() : "")</td>
+                    }
+                }
+            }
+            @* -----------------訂單欄位start----------------- *@
+            else
+            {
+
+                var payMessage = item.Order.erp_GetPayMessage.FirstOrDefault();
+                if (payTypes.Count == 1 && payTypes.Contains(PayType.ATMVirtual))
+                {
+                    <td>@item.Order.VirtualAccount</td>
+                    <td>@(payMessage?.PayTime.ToDateString("yyyy/MM/dd HH:mm"))</td>
+                }
+                else
+                {
+                    <td>
+                        @(item.Order.PayType.GetDisplayName<PayType>())
+                    </td>
+                }
+
+                @*@if (payMessage != null)
+                    {
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    }*@
+
+
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.DeliveryType)
+                    </td>*@
+
+                <td>@item.Order.TotalPrice.ToString("0")</td>
+                <td>
+                    @{
+                        //只有單一內容且等於文章標題
+                        bool isOnlyItem = item.ItemViewModel != null && item.OrderDetails.Count == 1 && item.OrderDetails.FirstOrDefault().ItemSubject == item.ItemViewModel.ItemLanguage.Subject;
+                    }
+                    @*--訂單文章標題--*@
+                    @if (item.ItemViewModel != null)
+                    {
+                        var parentItem = item.ParentItemViewModel?.ItemLanguage?.Subject ?? "";
+                        if (isOnlyItem)
+                        {
+                            @item.ItemViewModel.ItemLanguage.Subject
+                        }
+                        else
+                        {
+                            @:【@parentItem @item.ItemViewModel.ItemLanguage.Subject】
+                    }
+                    }
+
+                    @if (item.Order.ToCombineOrder != null)
+                    {
+                        <span>(併入訂單 @item.Order.ToCombineOrder.OrderNumber)</span>
+                    }
+                    @*--明細--*@
+                    @if (!isOnlyItem)
+                    {
+                        @*if (item.OrderDetails.Count == 1 && !orderContentTypes.Contains(OrderContentType.TeamName))
+                            {
+                                @item.OrderDetails.FirstOrDefault().ItemSubject
+                            }
+                            else
+                            {*@
+                        //所有商品
+                        foreach (var detail in item.OrderDetails)
+                        {
+                            <div>@detail.ItemSubject</div>
+                        }
+                        //}
+                    }
+                </td>
+
+                        }
+            @* ------------------訂單欄位end---------------- *@
+            <td>
+                @if (!orderContentTypes.Contains(OrderContentType.Detail))
+                {
+                    //訂單狀態
+                    @mHelper.OrderStatus(item.Order.OrderStatus, item.Order.OrderStatus.GetDisplayName<OrderStatus>())
+                }
+                else
+                {
+                    //明細狀態
+                    var statusList = item.OrderDetails.Select(x => x.OrderStatus).Distinct();
+                    foreach (var status in statusList)
+                    {
+                        <div>@(mHelper.OrderStatus(status, status.GetDisplayName<OrderStatus>()))x @item.OrderDetails.Count(x => x.OrderStatus == status)</div>
+                    }
+
+                }
+            </td>
+
+        </tr>
+                        }
+    <tr class="active" style="text-align: right;font-size: 16px;">
+        <td colspan="@cellCount">金額共計: @Model.PriceSum.ToString("0")</td>
+    </tr>
+</table>
+
+@Html.Partial("_Pagination", Model)

@@ -1,0 +1,105 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@model WebMaker.Entity.ViewModels.RoleViewModel
+
+
+@GenerateTree(Model.MenuCheckList)
+
+
+@functions{
+    int i = 0; // 遞迴共用計數
+}
+
+@helper GenerateTree(List<MyTool.ViewModels.TreeViewModel> nodes, int count = 0)
+{
+
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+            <li class="type-@(item.Type.ToString()) ViewNode binaryGroup" data-id="@item.ID">
+
+                @if (item.ID == Guid.Empty)
+                {
+                    //first level: type
+                    <div class="timeline-label no-edit">
+                        <div class="timeline-text">
+                            <h6>@item.Name</h6>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+                    <div class="timeline-label">
+                        <div class="timeline-text">
+
+                            <input name="MenuCheckList[@i].ID" type="hidden" value="@item.ID">
+                            <div class="checkbox-block">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" class="ace" name="MenuCheckList[@i].IsChecked" checked="@item.IsChecked" value="true">
+                                        <span class="lbl">@item.Name</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                  
+                    <input name="MenuCheckList[@i].MenuActions" type="hidden" value="@item.MenuActions">
+                    <input name="MenuCheckList[@i].RoleActions" type="hidden" value="@item.RoleActions" class="binarySum">
+
+                    i += 1;
+                }
+                                
+                <ul>
+                    @* 包含權限 *@                 
+                    @GenerateActionTree(item.ID, item.MenuActions, item.RoleActions)
+
+                    @* child menu *@
+                    @if (item.Nodes != null && item.Nodes.Any())
+                    {
+                        @GenerateTree(item.Nodes, i)
+                    }
+                </ul>
+
+            </li>
+    }
+}
+
+}
+
+@helper GenerateActionTree(Guid menuId, string menuActions, string roleActions)
+{
+foreach (int act in Enum.GetValues(typeof(ActionType)))
+{
+    var value = act.ToContainStr();
+
+    if (menuActions.HasValue(act))
+    {
+        //menu 包含權限
+        <li class="type-Action ViewNode">
+
+            <div class="timeline-label">
+                <div class="timeline-text">
+
+                    <div class="checkbox-block">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="ace binaryChk" value="@value" checked="@(roleActions?.Contains(value))">
+                                <span class="lbl">@(act.GetDisplayName<ActionType>())</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </li>
+
+    }
+
+}
+
+}

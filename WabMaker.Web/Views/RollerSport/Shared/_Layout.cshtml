@@ -1,0 +1,344 @@
+﻿@using MyTool.ViewModels
+@using WebMaker.BLL.Helpers
+@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@{
+    SiteInfoViewModel SiteInfo = ApplicationHelper.SiteInfo;
+}
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset=UTF-8 />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="theme-color" content="#b483a6">
+    <meta name="msapplication-navbutton-color" content="#b483a6">
+<meta name="google-site-verification" content="hzpjmNH3HKl8Jw_Xy0UP8Jc4sfjyaqF9Ua3G7D5nRZw" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="#b483a6">
+    @if (SiteInfo != null)
+    {
+        @Html.Partial("_BaseMeta", SiteInfo)
+    }
+ 
+  <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="0">
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 22 Jul 2002 11:12:01 GMT">
+    <link rel="stylesheet" href='~/html/RollerSport/assets/font-awesome/css/font-awesome.min.css' />
+    <link rel="stylesheet" href='~/html/RollerSport/assets/bootstrap/css/bootstrap.min.css' />
+    <link rel="stylesheet" href='~/html/RollerSport/css/reset.css' />
+    <link rel="stylesheet" href='~/html/RollerSport/assets/swipe/swiper.min.css' />
+    <link rel="stylesheet" href='~/html/RollerSport/css/theme.css?v=5' />
+    <link rel="stylesheet" href='~/html/RollerSport/css/post-layout.css' />
+    <link rel="stylesheet" href='~/html/RollerSport/css/style.css?v=1' />
+    <link rel="shortcut icon" href="~/html/RollerSport/images/favicon.ico" />
+    <!--[if lt IE 9]><script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+    @RenderSection("css", required: false)
+    @RenderSection("meta", required: false)
+</head>
+
+<body class="hp">
+
+    <div class="scroll-up"><i class="fa fa-chevron-up"></i></div>
+
+    <div class="menu-background"></div>
+    <div id="mobile-nav">
+        <div class="container">
+            <div class="menu-socials-wrap">
+                <ul class="menu-socials">
+                    <li>
+                        <a target="_blank" href="@SiteInfo.Facebook" title="Facebook">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </li>
+                    @*<li>
+                            <a target="_blank" href="#" title="Google+">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="#" title=Instagram>
+                                <i class="fa fa-instagram"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="#" title=Twitter>
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="#" title=Youtube>
+                                <i class="fa fa-youtube-play"></i>
+                            </a>
+                        </li>*@
+                </ul>
+                <div class=btn-close-mob>
+                    <a href="#"><i class=icon-close-mob></i></a>
+                </div><!-- btn-close-mob END -->
+            </div><!-- menu-socials-wrap END -->
+
+            <div class=login-section>
+                <div class=guest-wrap>
+                    @if (SessionManager.UserID != Guid.Empty && SessionManager.AccountType == MyTool.Enums.AccountType.Member)
+                    {
+                        <a class="menu-item" href="@Url.Action("Index","Member")"><i class=""></i>會員中心</a>
+
+                        <a href="@Url.Action("LogOut", "Member")">登出</a>
+                    }
+                    else
+                    {
+                        @*<a href="@Url.Action("Login", "Member")">登入/註冊會員</a>*@
+                        <a id=login-link-mob>登入</a>
+                    }
+                </div><!-- guest-wrap END -->
+            </div><!-- login-section END -->
+
+            <div class="mobile-content">
+                <ul class="mobile-main-menu">
+                    @Html.Action("Menu", "Item", new { position = MyTool.Enums.MenuPosition.Top, style = "mobile" })
+                </ul>
+            </div><!-- mobile-content END -->
+        </div><!-- container END -->
+
+        <div class=register-section>
+            <div id=btn-login-mob class="login-animation">
+                <div class=login-close>
+                    <a href="javascript:" class=btn-back><i class="fa fa-chevron-down"></i></a>
+                    <div class=login-title>登入</div>
+                    <div class=btn-close-mob>
+                        <a href="javascript:"><i class=icon-close-mob></i></a>
+                    </div><!-- btn-close-mob END -->
+                </div><!-- login-close END -->
+
+                <div class=login-form-wrap>
+                    <div class=login-panel-title><span>歡迎!</span>請登入您的帳戶</div>
+
+                    @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "0_Login_mobile"), new WebMaker.Entity.ViewModels.LoginViewModel())
+
+                </div><!-- login-form-wrap END -->
+            </div><!-- btn-login-mob END -->
+            @*<div id="forgot-pass-mob" class="login-animation">
+                    <div class="forgot-pass-close">
+                        <a href="javascript:" class="btn-back"><i class="fa fa-chevron-down"></i></a>
+                        <div class="login-title">密碼重置</div>
+                    </div><!-- forgot-pass-close END -->
+
+                    <div class="login-form-wrap">
+                        <div class="login-panel-title">重置您的密碼</div>
+                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "2_SendValidCode"), new WebMaker.Entity.ViewModels.SendEmailViewModel
+                   {
+                       SystemMailType = SystemMailType.ForgotPassword,
+                       ValidType = ValidType.ForgotPassword
+                   })
+                    </div><!-- login-form-wrap END -->
+                </div>*@<!-- forgot-pass-mob END -->
+        </div><!-- register-section END -->
+    </div><!-- mobile-nav END -->
+
+    <div class=search-background></div>
+    <div class=search-wrap-mob>
+        <div class=dropDown-search>
+
+            <div class=search-form action="#">
+                <div class="search-close">
+                    <a href="javascript:"><i class="icon-close-mob"></i></a>
+                </div>
+                <form method="get" action="@Url.Action("Search", "Home")">
+                    <div role="search" class="search-input">
+                        <span>搜尋</span>
+                        <input id="search-input-mob" name="q" type="text" required />
+                    </div>
+                </form>
+            </div><!-- search-form END -->
+        </div>
+    </div><!-- search-wrap-mob END -->
+
+
+    <div id="" class="wrapper">
+
+        <div class="header">
+
+            <div class="top-bar">
+                <div class="container">
+                    <div class="top-menu">
+                        <ul class="nav nav-pills">
+                            <li>
+                                <a target="_blank" href="@SiteInfo.Facebook" title="Facebook"><i class="fa fa-facebook"></i></a>
+                            </li>
+                            @*<li>
+                                    <a target="_blank" href="#" title="Youtube"><i class="fa fa-youtube-play"></i></a>
+                                </li>
+                                <!-- <li>
+                                    <a target="_blank" href="#" title="Email"><i class="fa fa-envelope"></i></a>
+                                </li> -->*@
+
+                            @if (SessionManager.UserID != Guid.Empty && SessionManager.AccountType == MyTool.Enums.AccountType.Member)
+                            {
+                                <li><a class="menu-item" href="@Url.Action("Index","Member")"><i class=""></i>會員中心</a></li>
+                                <li><a class="menu-item" href="@Url.Action("LogOut", "Member")"><i class=""></i>登出</a></li>
+                            }
+                            else
+                            {
+                                @*<a href="@Url.Action("Login", "Member")">登入/註冊會員</a>*@
+                                <li><a class="login-modal-js menu-item" href="#login-form" data-effect="mpf-login-effect"><i class="fa fa-user"></i>登入/註冊會員</a></li>
+                            }
+
+                            @*<li>
+                                    <a class="menu-item" href="account.html"><i class=""></i>會員中心</a>
+                                </li>*@
+                        </ul>
+                    </div> <!-- top-menu END -->
+                </div><!-- container END -->
+            </div><!-- top-bar END -->
+            <!-- logo center -->
+            <div class="logo">
+                <a href="@Url.Action("Index", "Home")" title="">
+                    <span class="visual-hidden">@(SiteInfo?.SiteName)</span>
+                </a>
+            </div>
+
+            <div class="navbar">
+
+                <div id="header-navbar" class="header-main-menu">
+                    <div class="container">
+
+                        <div class="navbar-header">
+                            <button type="button" id=navbar-sticky-menu class="navbar-toggle collapsed">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+
+                            <div class="navbar-brand">
+                                <a href="index.html">
+                                    <span class="visual-hidden">中華民國滑輪溜冰協會</span>
+                                </a>
+                            </div>
+                        </div><!-- navbar-header END -->
+
+                        <div class="main-menu">
+                            <ul class="sf-menu">
+                                @Html.Action("Menu", "Item", new { position = MyTool.Enums.MenuPosition.Top })
+                            </ul><!-- menu-main-1 END -->
+                        </div><!-- main-menu END -->
+
+                        <div class="search-wrapper">
+                            <div id="top-search">
+                                <div class="header-search-wrap">
+                                    <div class="dropdown header-search">
+                                        <a id="header-btn-search" href="javascript:" role="button" class="dropdown-toggle" data-toggle=dropdown><i class="fa fa-search"></i></a>
+                                        <a id="header-btn-search-mob" href="javascript:" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-search"></i></a>
+                                    </div><!-- dropdown END -->
+                                </div><!-- header-search-wrap END -->
+                            </div><!-- top-search END -->
+                        </div><!-- search-wrapper END -->
+
+                        <div class="header-search-wrap">
+                            <div class="dropdown header-search">
+                                <div class="dropDown-search" aria-labelledby="header-btn-search">
+                                    <div class="search-form">
+                                        <form method="get" action="@Url.Action("Search", "Home")">
+                                            <div role="search">
+                                                <input class="needsclick" id=search-input type=text value="" name="q" required />
+                                                <input class="wpb_button wpb_btn-inverse btn" type=submit id=header-search-top value=Search />
+                                            </div>
+                                        </form>
+                                    </div><!-- search-form END -->
+                                </div><!-- dropDown-search END -->
+                            </div><!-- dropdown END -->
+                        </div> <!-- header-search-wrap END -->
+
+                    </div><!-- container END -->
+                </div><!-- navbar header-navbar END -->
+
+            </div><!-- navbar END -->
+
+            <div id=login-form class="white-popup-block mfp-hide mfp-with-anim">
+                <div class=login-wrap>
+                    <a href="javascript:" class="btn-back"><i class="fa fa-chevron-left"></i></a>
+
+                    <div id=login-pop class="login-form-div display-block">
+                        <div class=login-panel-title>會員登入</div>
+                        <div class=login-panel-descr>歡迎！請登入您的帳號</div>
+
+                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "0_Login"), new WebMaker.Entity.ViewModels.LoginViewModel())
+
+                    </div><!-- login-pop END -->
+                    @*<div id=forgot-pass-pop class="login-form-div display-none">
+                             <div class=login-panel-title>密碼重置</div>
+                             <div class=login-panel-descr>重置您的密碼</div>
+
+                             @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "2_SendValidCode"), new WebMaker.Entity.ViewModels.SendEmailViewModel()
+                        {
+                            SystemMailType = SystemMailType.ForgotPassword,
+                            ValidType = ValidType.ForgotPassword
+                        })
+
+                             <div class=login-info-text>我們將會寄送密碼至您的信箱</div>
+                         </div>*@<!-- forgot-pass-pop END -->
+                </div><!-- login-wrap END -->
+            </div><!-- login-form END -->
+
+        </div><!-- header END -->
+
+        @RenderBody()
+
+        <footer class="footer">
+
+            <div class="sub-footer">
+                <div class="container">
+                    <div class=row>
+
+                        <div class="col-md-12 sub-footer-menu">
+                            @Html.Action("Menu", "Item", new { position = MyTool.Enums.MenuPosition.Bottom })
+                        </div><!-- col-md-12 END -->
+
+                        <div class="col-md-12 sub-footer-copy">
+                            @if (!string.IsNullOrEmpty(SiteInfo.Footer))
+                            {
+                        @Html.Raw(SiteInfo.Footer)
+                            }
+                            <p>@(SiteInfo?.Copyright)</p>
+                        </div><!-- col-md-4 END -->
+
+
+                    </div><!-- row END -->
+                </div><!-- container END -->
+
+            </div><!-- sub-footer END -->
+        </footer><!-- footer END -->
+
+    </div><!-- wrapper END -->
+
+    @Scripts.Render("~/bundles/jquery")
+    <script src="~/html/RollerSport/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src='~/html/RollerSport/js/device.js'></script>
+    <script src='~/html/RollerSport/js/theme.js'></script>
+    <script src="~/html/RollerSport/assets/swipe/swiper.min.js"></script>
+    <script src="~/html/RollerSport/assets/magnific/jquery.magnific-popup.min.js"></script>
+    <script src='~/html/RollerSport/js/script.js'></script>
+    @Html.Partial("_ShowMessage")
+    @Html.Partial("_BaseScripts")
+    <script>
+        $(function () {
+            var backToUrl = web.getUrlParameter("url");
+            if (web.getUrlParameter("url") != undefined) {
+                $(".login-modal-js").click();
+            }
+
+            $(document).on('click', '.btnNotLogin', function (e) {
+                e.stopPropagation();
+                var url = $(this).data("url");
+                if (url.indexOf("Member/Confirm") == -1) {
+                    $("input[name=url]").val(url);
+                }
+               
+                $(".login-modal-js").click();
+            });
+        });
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,47 @@
+﻿@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services
+@model string
+@* 搜尋結果 *@
+@{
+    ViewBag.Title = "搜尋結果";
+    Layout = "../Shared/_Layout.cshtml";
+}
+
+<section class="hotnews-section mt-65">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">首頁</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@ViewBag.Title</a></li>
+            </ol>
+        </div>
+        <div class="row">
+            <div class="col-md-offset-1 col-md-10 col-xs-12 mb-30">
+                <div class="hotnews-recommend">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner">@Model @ViewBag.Title</span>
+                    </div>
+                </div>
+
+                <div id="ListContent" class="action-tab panel">
+                    @Html.Action("Partial", "Item", new ItemPageModel
+               {
+                   ViewName = "Search_Page",
+                   PageSize = 10,
+                   SortColumn = SortColumn.Date,
+                   StructureJson = _Json.ModelToJson(new List<Guid> {
+                       new Guid("a8345d10-8002-4e1b-8795-9fa076a162e7"),//一般文章
+                       new Guid("f0e9749c-0111-4d60-b257-a9eca9bf6e35")}),//人物文章
+                   SearchString = Model
+               })
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+

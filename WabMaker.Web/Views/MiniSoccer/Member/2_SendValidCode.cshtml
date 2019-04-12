@@ -1,0 +1,70 @@
+﻿@using MyTool.Enums
+@model WebMaker.Entity.ViewModels.SendEmailViewModel
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    //ViewBag.Title; //忘記密碼、重寄驗證信
+}
+
+<section class="character-section mt-65">
+    <div class="character-back character-back2">
+        <div class="auto-container">
+            <h2></h2>         
+        </div>
+    </div>
+</section>
+
+@using (Html.BeginForm("SendValidCode", "Member", FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action("Login", "Member", new  { })" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.SystemMailType)
+    @Html.HiddenFor(model => model.ValidType)
+
+    <section class="hotnews-section mt-md-250">
+        <div class="auto-container">
+            <div class="row w-back-g pb-15 pt-15">
+                <div class="col-md-offset-1 col-md-10 col-xs-12">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner mb-20 text-center">@ViewBag.Title</span>
+                    </div>
+                    <div class="singup-inner mb-20">
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">註冊時的Email</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control"})
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>                            
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">驗證碼</label>
+                            <div class="col-sm-2">
+                                @Html.TextBoxFor(model => model.Captcha, "", new { @class = "form-control", autocomplete = "off" })
+                                @Html.ValidationMessageFor(model => model.Captcha, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-sm-2">
+                                <img class="imgverifycode" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+                            </div>
+                            <div class="col-sm-3"><a class="btnnewcode" href="javascript:">重新產生驗證碼</a></div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <div class="singup-link  mb-20">
+                                <button id="SaveBtn" type="button" class="btn btn-style-fifteen btn-block">送  出</button>
+                            </div>
+                            <div class="singup-link  mb-20">
+                                <h4>返回<a href="@Url.Action("Login","Member")"> 登入頁</a></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+}

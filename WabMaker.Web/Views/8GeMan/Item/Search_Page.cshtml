@@ -1,0 +1,49 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* 搜尋-分頁 *@
+@{ 
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number;
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+
+<div class="panel-heading">
+    <ul class="nav nav-tabs">
+        @* Pagination *@        
+        @foreach (var item in buttons)
+        {
+            Model.ItemPageModel.CurrentPage = item.Page;
+
+            <li class="@(item.IsCurrent?"active":"")">
+                @Ajax.RawActionLink(item.Name, "GetPageList", "Item", Model.ItemPageModel,
+                                new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" }, null)
+            </li>
+        }      
+    </ul>
+</div>
+
+<div class="panel-body">
+    <div class="news-inner mb-20">
+
+        @foreach (var item in Model.DataResult.Data)
+        {
+            <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="border-b">
+                <div class="news-date">
+                    @item.Item.Date.ToDateString("yyyy.MM.dd")
+                </div>
+                <div class="news-list">
+                    @item.ItemLanguage.Subject
+                </div>
+            </a>
+        }
+
+    </div>
+</div>
+
+
+
+
+

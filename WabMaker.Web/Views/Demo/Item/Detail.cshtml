@@ -1,0 +1,68 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    var imgUrl = mainImage == null ? "" : RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath);
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+    //相關檔案
+    var filedownloads = Model.ItemFiles.Where(x => x.SourceType == SourceType.ItemFile && x.StructureID == new Guid("43e5672d-7412-47f0-b918-1dc3a281e27c")).ToList();
+
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemLanguage.Subject" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@imgUrl" />
+    <meta property="og:description" content="@description" />
+}
+
+@if (Model.ParentItems != null)
+{
+    foreach (var category in Model.ParentItems)
+    {
+        <a href="@Url.Action("Get","Item", new { routeName = category.RouteName })">@category.Subject</a>
+    }
+}
+
+<hr>
+
+@if (mainImage != null)
+{
+    if (mainImage.FileType == FileType.YouTube)
+    {
+        <iframe width="180" height="100" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+    }
+    else
+    {
+        <img src="@imgUrl" width="100" />
+    }
+}
+<h3>@Model.ItemLanguage.Subject</h3>
+ By@(Model.ItemLanguage.Author) - @Model.Item.Date.ToDateString() - @Model.Item.ViewCount <br>
+
+@{ var keywordArr = Model.ItemLanguage.Keywords?.Split(','); }
+@if (keywordArr != null)
+{
+    foreach (var k in keywordArr)
+    {
+        <li><a href="@Url.Action("Search", "Home", new { q = k })"><i>@k</i></a></li>
+    }
+}
+<br>
+
+
+@Model.ItemLanguage.Description <br>
+@Html.Raw(Model.ItemLanguage.Content) <br>
+
+
+<h4>相關檔案</h4>
+@foreach (var file in filedownloads)
+{
+    <a class="text-oragne underline" href="@file.FilePath" download="@file.OriName">@file.OriName</a><br>
+}

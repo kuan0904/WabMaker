@@ -1,0 +1,63 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using System.Dynamic
+@model  WabMaker.Web.WebViewModels.ItemPageResult
+
+<div class="">@* area-box-md *@
+    @{
+        //比賽分區
+        var selectList = Model.DataResult.Data.SelectMany(x => x.ParentItems)
+            .Where(x => x.StructureID == new Guid("b0730072-1495-45b3-9ba8-2562c53f3bfc"))
+            .Select(x => new { ID = x.ID, Subject = x.Subject })
+            .Distinct().ToList()
+            .OrderBy(x => SortSubject(x.Subject));
+    }
+
+    @functions{
+        public int SortSubject(string str)
+        {
+            switch (str)
+            {
+                case "北區":
+                    return 1;
+                case "中區":
+                    return 2;
+                case "南區":
+                    return 3;
+                case "東區":
+                    return 4;
+                default:
+                    return 0;
+            }
+        }
+    }
+
+    <select id="setail_competition_area" class="form-control">
+        @foreach (var item in selectList)
+        {
+            <option value="@item.ID">@item.Subject</option>
+        }
+    </select>
+
+    @foreach (var item in Model.DataResult.Data)
+    {
+        <div class="area-box competition_area_box" data-categories="@string.Join(",",item.ParentItems?.Select(x => x.ID).ToList())">
+            <h4>@item.ItemLanguage.Subject</h4>
+            @*<div>報名開始 @item.Item.SaleStartTime.ToDateString("yyyy/MM/dd HH:mm")</div>
+            <div>報名結束 @item.Item.SaleEndTime.ToDateString("yyyy/MM/dd HH:mm")</div>*@                        
+            <span>@Html.Raw(item.ItemLanguage.Description.BreakLine())</span>
+            <a href="@(Url.Action("NewCompetition", "Order", new { id = item.Item.ID  }))" class="btn-style-fifteen btn-block text-center mt-10 mb-10">我要報名</a>
+        </div>
+    }
+
+</div>
+@*<div class="area-box-sm ">
+        <div class="area-box">
+            <select class="form-control">
+                <option>台北市（2019.03.22 ~ 2019.05.10）</option>
+                <option>新北市（2019.03.22 ~ 2019.05.10）</option>
+            </select>
+            <a href="event_sign_up.html" class="btn-style-fifteen btn-block text-center mt-10 mb-10">我要報名</a>
+        </div>
+    </div>*@

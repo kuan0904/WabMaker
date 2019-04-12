@@ -1,0 +1,71 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.ViewModels.UserViewModel>
+@{
+    List<ClientSetting> clientSettings = WebMaker.BLL.Helpers.SessionManager.Client.ClientSetting.ToContainList<ClientSetting>();
+}
+<table class="table table-striped table-bordered bootstrap-datatable">
+    <tr>
+        <th width="12%"><!--setting--></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.LoginTypes)
+        </th>
+        <th>
+            身分
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.UserStatus)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].User.CreateTime)
+        </th>
+    </tr>
+    @foreach (var item in Model.Data)
+    {
+        <tr data-id="@item.User.ID">
+            <td>
+                <a href="javascript:" class="ViewBtn btn btn-sm btn-success" title="View"><i class="fa fa-eye"></i></a>
+                @if (clientSettings.Contains(ClientSetting.RoleEdit))
+                {
+                    <a href="javascript:" class="RoleListBtn btn btn-sm btn-info" title="Edit Role"><i class="fa fa-user"></i></a>
+                }
+                @if (WebMaker.BLL.Helpers.SessionManager.IsSuperManager)
+                {
+                    @*<a href="javascript:" class="LogBtn btn btn-sm btn-warning" title="Record"><i class="fa fa-clock-o"></i></a>*@
+                }
+                @if (!item.User.EmailIsVerify && !string.IsNullOrEmpty(item.User.Email))
+                {
+                    <a href="javascript:" class="SendConfirmMail btn btn-sm btn-info" title="重寄驗證信"><i class="fa fa-envelope-o"></i></a>
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Email)
+            </td>
+            <td>
+                @{var loginTyps = item.User.LoginTypes.ToContainStrList<LoginType>();  }
+                @string.Join(",", loginTyps)
+            </td>
+            <td>
+                @string.Join(", ", item.RoleRelations.Select(x => x.mgt_Role.Name))
+            </td>
+            <td>
+                @(((UserStatus)item.User.UserStatus).GetDisplayName())
+            </td>
+            <td>
+                @item.User.CreateTime.ToDateString("yyyy/MM/dd HH:mm")
+            </td>
+        </tr>
+                    }
+</table>
+
+@Html.Partial("_Pagination", Model)
+

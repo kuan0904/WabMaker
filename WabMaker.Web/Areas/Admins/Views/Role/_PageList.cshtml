@@ -1,0 +1,49 @@
+﻿@using MyTool.Services
+@model MyTool.ViewModels.PageModel<WebMaker.Entity.Models.mgt_Role>
+
+<table class="table table-striped table-bordered bootstrap-datatable">
+    <tr>
+        <th width="15%"><!--setting--></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].AccountType)
+        </th>
+        <td>
+            @Html.DisplayNameFor(model => model.Data[0].MemberLevel)
+        </td>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].Sort)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Data[0].IsEnabled)
+        </th>
+    </tr>
+
+    @foreach (var item in Model.Data)
+    {
+        <tr data-id="@item.ID">
+            <td>
+                @mHelper.ListButton()
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @(item.AccountType.GetDisplayName<MyTool.Enums.AccountType>())
+            </td>
+            <td> 
+                @(item.MemberLevel.GetDisplayName<MyTool.Enums.MemberLevel>())
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sort)
+            </td>
+            <td>
+                @mHelper.IsEnabled(item.IsEnabled)               
+            </td>
+        </tr>
+    }
+
+</table>
+

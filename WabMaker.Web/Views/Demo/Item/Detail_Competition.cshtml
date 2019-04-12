@@ -1,0 +1,43 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+    var imgUrl = mainImage == null ? "" : RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath);
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemLanguage.Subject" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@imgUrl" />
+    <meta property="og:description" content="@description" />
+}
+
+@string.Join(" > ", Model.BreadCrumbs.Select(x => x.Subject).ToList())
+<hr>
+
+@if (mainImage != null)
+{
+    if (mainImage.FileType == FileType.YouTube)
+    {
+        <iframe width="180" height="100" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+    }
+    else
+    {
+        <img src="@imgUrl" width="100" />
+    }
+}
+
+<h3>@Model.ItemLanguage.Subject</h3><br>
+文章日期: @Model.Item.Date.ToDateString() <br><br>
+報名時間: @Model.Item.SaleStartTime.ToDateString() ~ @Model.Item.SaleEndTime.ToDateString()<br>
+<a class="btn btn-large btn-info" href="@Url.Action("NewCompetition","Order",new { id=Model.Item.ID })" class="hot-title">報名</a>
+<br><br>
+@Html.Raw(Model.ItemLanguage.Content) <br>
+

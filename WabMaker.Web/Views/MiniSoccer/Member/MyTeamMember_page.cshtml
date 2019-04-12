@@ -1,0 +1,55 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model MyTool.ViewModels.PageResult<WebMaker.Entity.ViewModels.UserAssignViewModel>
+@{
+    var buttonModel = new MyTool.ViewModels.PageButtonModel(Model.DataResult);
+    buttonModel.PageType = MyTool.ViewModels.PageType.Number_PreNext;
+    buttonModel.PreviousText = string.Format("<i class='fa fa-angle-left'></i>Back");
+    buttonModel.NextText = string.Format("Next<i class='fa fa-angle-right'></i>");
+    var buttons = MyTool.Tools.PageTool.SetPageButton(buttonModel);
+}
+
+<div class="pro-pagination mb-20">
+    <div class="product-pagination">
+        <span class="grid-item-list pr-10">顯示 @(Model.DataResult.DataStart) 到 @(Model.DataResult.DataEnd) 筆</span>
+ 
+    </div>
+    <ul class="blog-pagination">
+        @foreach (var item in buttons)
+        {
+            Model.PageModel.CurrentPage = item.Page;
+
+            <li class="@(item.IsCurrent?"active":"")">
+                @Ajax.RawActionLink(item.Name, "GetMyTeamMemberPageList", "Member", Model.PageModel,
+           new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "ListContent" }, null)
+            </li>
+        }
+    </ul>
+</div>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped member-list-tab">
+        <thead>
+            <tr>
+                <th scope="col" class="text-center" width="20%">選手姓名</th>
+                <th scope="col" class="text-center" width="15%">生日</th>
+                <th scope="col" class="text-center" width="15%">姓別</th>
+                <th scope="col" class="text-center" width="25%">聯絡人</th>
+                <th scope="col" class="text-center" width="25%">聯絡電話</th>
+            </tr>
+        </thead>
+        <tbody>
+@foreach (var item in Model.DataResult.Data)
+{
+    <tr>
+        <td>@item.Member.NickName</td>
+        <td>@item.Member.Birthday.ToDateString()</td>
+        <td>@(item.Member.Gender.GetDisplayName<GenderType>())</td>
+        <td>@item.FromUser.Name</td>
+        <td>@item.FromUserPhone</td>
+    </tr>
+}
+           
+        </tbody>
+    </table>
+</div>

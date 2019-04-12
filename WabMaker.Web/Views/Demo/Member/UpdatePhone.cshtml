@@ -1,0 +1,38 @@
+﻿@using MyTool.Services
+@model string
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "變更手機號碼";
+}
+
+<h2>@ViewBag.Title</h2>
+@Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+@using (Html.BeginForm(null, null, FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action("UpdatePhoneCorfirm")" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    if (!string.IsNullOrEmpty(Model))
+    {
+        <div class="form-group row">
+            <label class="col-sm-2 form-label text-right">現在的手機號碼</label>
+            <div class="col-sm-9">
+                <div>@Model</div>
+            </div>
+        </div>
+    }
+
+    <div class="form-group row">
+        <label class="col-sm-2 form-label text-right">新的手機號碼</label>
+        <div class="col-sm-9">
+            <input type="text" id="Phone" name="Phone" class="form-control"
+                   data-val="true" data-val-required="請輸入手機號碼" autocomplete="off">
+            <span class="field-validation-valid text-danger" data-val-length="不得大於20個字元" data-val-length-max="20" data-valmsg-for="PhoneNumber" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+
+    <input id="SaveBtn" type="button" value="儲存並發送驗證碼" class="btn btn-default" />
+}

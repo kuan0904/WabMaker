@@ -1,0 +1,102 @@
+﻿@using WabMaker.Web.Helpers
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@model WabMaker.Web.WebViewModels.ItemWebViewModel
+
+@{
+    ViewBag.Title = Model.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var mainImage = Model.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+    var imgUrl = mainImage == null ? "" :
+        (mainImage.FileType == FileType.YouTube) ?
+        _YouTube.SetThumbnail(mainImage.FilePath) ://YouTube縮圖
+        mainImage.FilePath;//封面
+
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemLanguage.Content), 200);
+}
+
+@section meta
+{
+    <meta property="og:title" content="@Model.ItemLanguage.Subject" />
+    <meta property="og:url" content="@RouteHelper.Url(true)" />
+    <meta property="og:image" content="@imgUrl" />
+    <meta property="og:description" content="@description" />
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@imgUrl) 0/cover no-repeat;">
+        <div class="auto-container">
+            <h2>@Model.ItemLanguage.Subject</h2>
+            <p>@*@Model.ItemLanguage.Description*@</p>
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">首頁</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Get","Item", new { routeName = "Course" })">課程資訊</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@Model.ItemLanguage.Subject</a></li>
+            </ol>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 mb-30">
+                <div class="p-20 w-back-g">
+                    @*<img class="w-100 mb-20" src="@imgUrl" alt="">*@
+                    @*<h2 class="mb-20"><span class="text-orange pr-20">課程名稱</span>成人戲劇課</h2>*@
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner">課程介紹</span>
+                    </div>
+                    <div class="">
+                        @Html.Raw(Model.ItemLanguage.Content)
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-20" style="background-color: #fff;">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner">線上報名</span>
+                    </div>
+                    <div class="list-inner pb-10">
+                        <a href="@Url.Action("SignUp","Order",new {id=Model.Item.ID })" class="hot-title">
+                            <div class="border-b pb-10 mb-10">
+                                活動名稱 : @Model.ItemLanguage.Subject<br>
+                                活動日期 : @Model.Item.StartTime.ToDateString() ~ @Model.Item.EndTime.ToDateString()<br>
+                                活動地點 : @Model.ItemLanguage.Address
+                            </div>
+                            <div class="border-b pb-10 mb-10">
+                                報名上限人數 : @(Model.Item.StockCount)人<br>
+                                目前報名人數 : @(Model.Item.SaleCount)人<br>
+                                報名截止時間 : @Model.Item.SaleEndTime.ToDateString("yyyy/MM/dd HH:mm")
+                            </div>
+                            <div class="pb-10 mb-10">
+                                報名費用 : $@Model.Item.SalePrice.ToString("0")
+                            </div>
+                            <span class="fr">Join</span>
+                        </a>
+                    </div>
+
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner">相關活動</span>
+                    </div>
+                    @Html.Action("Partial", "Item", new WabMaker.Web.WebViewModels.ItemPageModel
+               {                   
+                   ViewName = "Partial_RelatedCourse",
+                   PageSize = 2,
+                   SortColumn = SortColumn.Random,
+                   StructureJson = _Json.ModelToJson(new List<Guid> { Model.Item.StructureID }),
+                   ExceptID = Model.Item.ID
+               })
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

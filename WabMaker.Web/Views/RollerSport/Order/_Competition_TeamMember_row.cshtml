@@ -1,0 +1,99 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@model WebMaker.Entity.Models.mgt_UserProfile
+@{
+    var isRequiredNickName = true;
+    var isRequiredBirth = true;
+    var isRequiredGender = true;
+    var isRequiredIDCard = true;
+    var isRequiredUnit = true;
+    var isRequiredUnitShort = true;
+    var randomID = Guid.NewGuid(); 
+}
+
+<tr>
+    <td>
+        <input type="text" name="NickName_@randomID" rename="OrderViewModel.TeamMembers[x].NickName" class="form-control" value="@Model.NickName"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequiredNickName ? "data-val-required='請輸入姓名'" : ""))>
+        @Html.ValidationMessage("NickName_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="date" name="Birthday_@randomID" rename="OrderViewModel.TeamMembers[x].Birthday" class="form-control" value="@Model.Birthday.ToDateString("yyyy-MM-dd")"
+               data-val="true" data-val-date @Html.Raw((isRequiredBirth ? "data-val-required='請輸入出生年月日'" : "")) placeholder="yyyy-mm-dd">
+        @Html.ValidationMessage("Birthday_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <label class="radio-inline">
+            <input type="radio" name="Gender_@randomID" rename="OrderViewModel.TeamMembers[x].Gender" value="@((int)GenderType.Male)" @(Model.Gender == (int)GenderType.Male ? "checked" : "")
+                   data-val="true" @Html.Raw((isRequiredGender ? "data-val-required='請輸入性別'" : ""))>男
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="Gender_@randomID" rename="OrderViewModel.TeamMembers[x].Gender" value="@((int)GenderType.Female)" @(Model.Gender == (int)GenderType.Female ? "checked" : "")>女
+        </label>
+        <br>
+        @Html.ValidationMessage("Gender_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="text" name="IdentityCard_@randomID" rename="OrderViewModel.TeamMembers[x].IdentityCard" class="form-control" value="@Model.IdentityCard"
+               data-val="true" @Html.Raw((isRequiredIDCard ? "data-val-required='請輸入身分證字號'" : ""))>
+        @Html.ValidationMessage("IdentityCard_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <select name="UnitID_@randomID" rename="OrderViewModel.TeamMembers[x].UnitID" class="unitsSelect form-control selectpicker" data-level="1" data-value="@Model.UnitID"></select>
+    </td>
+    @*<td>
+        <input type="text" name="Unit_@randomID" rename="OrderViewModel.TeamMembers[x].Unit" class="form-control" value="@Model.Unit"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequiredUnit ? "data-val-required='請輸入單位'" : ""))>
+        @Html.ValidationMessage("Unit_" + randomID, "", new { @class = "text-danger" })
+    </td>
+
+    <td>
+        <input type="text" name="UnitShort_@randomID" rename="OrderViewModel.TeamMembers[x].UnitShort" class="form-control" value="@Model.UnitShort"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequiredUnitShort ? "data-val-required='請輸入單位簡寫'" : ""))>
+        @Html.ValidationMessage("UnitShort_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        @{ var addressList = new List<string>
+            {
+               "台北市",
+               "基隆市",
+               "新北市",
+               "宜蘭縣",
+               "桃園市",
+               "新竹縣",
+               "新竹市",
+               "苗栗縣",
+               "台中市",
+               "彰化縣",
+               "南投縣",
+               "嘉義市",
+               "嘉義縣",
+               "雲林縣",
+               "台南市",
+               "高雄市",
+               "澎湖縣",
+               "屏東縣",
+               "台東縣",
+               "花蓮縣",
+               "金門縣",
+               "連江縣",
+               "南海諸島",
+               "釣魚台列嶼",
+               "其它"
+            };}
+        <select name="HouseholdAddress_@randomID" rename="OrderViewModel.TeamMembers[x].HouseholdAddress" class="form-control">
+            @foreach (var item in addressList)
+            {
+                <option value="@item" @(Model.HouseholdAddress == item ? "selected='selected'" : "")>@item</option>
+            }
+        </select>
+        @Html.ValidationMessage("HouseholdAddress" + randomID, "", new { @class = "text-danger" })
+    </td>*@
+    <td>
+        <input type="hidden" name="ID_@randomID" rename="OrderViewModel.TeamMembers[x].ID" value="@Model.ID">
+        <button type="button" class="rowDeleteBtn btn btn-danger btn-sm">x</button>
+    </td>
+</tr>

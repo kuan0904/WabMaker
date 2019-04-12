@@ -1,0 +1,37 @@
+﻿@* 共用樹結構-節點 *@
+@using MyTool.Services
+@using MyTool.Enums
+@model MyTool.ViewModels.TreeViewModel
+@{
+    var frontLanguageTypes = WebMaker.BLL.Helpers.SessionManager.Client.FrontLanguageTypes;
+}
+
+@if (Model.ID == Guid.Empty)
+{
+    <p><i class="fa fa-plus-circle"></i>@Model.Name</p>
+}
+else
+{
+    @* 語系 *@
+if (Model.TreeLangs != null && Model.TreeLangs.Any())
+{
+    <div class="timeline-btn">
+        @mHelper.LanguageButton(Model.TreeLangs, string.IsNullOrEmpty(frontLanguageTypes))
+    </div>
+}
+
+    <div class="timeline-text">
+        <p class="subject">@Model.Name</p>
+
+        @if (WebMaker.BLL.Helpers.SessionManager.IsSuperManager)
+        {
+            <p class="description" style="white-space:nowrap;">@Model.ID</p>
+        }        
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <p class="description">@Html.Raw(Model.Description)</p>
+        }
+    </div>
+
+}

@@ -1,0 +1,121 @@
+﻿@using WabMaker.Web.Helpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理後台</title>
+    <link rel="icon" type="image/png" href="~/Images/admins/favicon.ico">
+
+    @Styles.Render("~/Content/backcss")
+    <style>
+        .container-login {
+            width: 100%;
+            min-height: 100vh;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            position: relative;
+            z-index: 1;
+        }
+
+            .container-login::before {
+                content: "";
+                display: block;
+                position: absolute;
+                z-index: -1;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                background-color: rgba(165, 165, 165, 0.1);
+            }
+
+        .wrap-login {
+            width: 390px;
+            border-radius: 5px;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .login-subject {
+            font-size: 20px;
+            font-weight: 500;
+            text-align: center;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+        }
+
+        .login-form {
+            width: 100%;
+            background: rgba(255,255,255,0.6);
+            padding: 33px;
+            text-align: center;
+        }
+
+            .login-form .form-control {
+                margin-bottom: 10px;
+            }
+
+            .login-form .btn {
+                color: #fff;
+                background: #272727 !important;
+                border-color: #272727 !important;
+                border-radius: 20px;
+                width: 100%;
+                font-size: 16px;
+                margin-top: 15px;
+            }
+
+                .login-form .btn:hover {
+                    background: #383838 !important;
+                    border-color: #383838 !important;
+                }
+    </style>
+
+</head>
+<body>
+    @*<div id="wrap" style="height: 100%; width: 100%;">
+            <img class="bgfade" src="/Images/Assessment/Morning/1.jpg" style="display: none;">
+        </div>*@
+
+    <div class="container-login" style="background-image: url('/Images/admins/@(ApplicationHelper.AdminLoginImage).jpg');">
+        <div class="wrap-login">
+            
+            <div class="login-subject">@(ApplicationHelper.SiteInfo?.SiteName) 管理後台</div>
+            @using (Html.BeginForm("Login", "User", new { }, FormMethod.Post, new { @class = "login-form", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+            <input type="hidden" name="url" value="@Request.QueryString["url"]"/>
+
+                <input name="account" type="text" class="form-control" placeholder="UserName" required>
+                <input name="password" type="password" class="form-control" placeholder="Password" required>
+
+                <input type="submit" value="登入" class="btn" />
+            }
+
+        </div>
+    </div>
+
+    @Scripts.Render("~/bundles/backjs")
+    <script src="~/Scripts/custom/site.js?v=2018.9.19"></script>
+    @Html.Partial("_ShowMessage")
+    <script>
+        site.initMessage();
+    </script>
+</body>
+</html>

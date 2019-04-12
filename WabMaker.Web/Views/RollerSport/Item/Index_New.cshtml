@@ -1,0 +1,47 @@
+﻿@using MyTool.Services
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* 首頁 最新文章/熱門文章 *@
+@foreach (var item in Model.DataResult.Data)
+            {
+    <div class="col-md-12">
+        <div class="col-md-4 newsColor">
+            <div class=meta-info>
+                @if (item.ParentItems != null)
+                            {
+                                foreach (var category in item.ParentItems)
+                                {
+                            <a href="@Url.Action("Get", "Item", new { routeName = category.RouteName })" class="post-category">@category.Subject</a>
+                                }
+                            }
+            </div>
+            <h3><a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })">@item.ItemLanguage.Subject</a></h3>
+        </div>
+        <div class="col-md-8 newsColor">
+            <p>
+                @_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Content), 120)
+            </p>
+            <div class=meta-info>
+                <div class=post-author>
+                    <span>By</span>
+                    <a href="#">@(item.ItemLanguage.Author)</a>
+                    <span> - </span>
+                </div>
+                <span class=post-date><time>@item.Item.Date.ToDateString()</time></span>
+                <div class=post-views>
+                    <i class="fa fa-eye"></i>@item.Item.ViewCount
+                </div>
+                <div class=post-comments>
+                    <a href="#respond"><i class="fa fa-comments"></i>0</a>
+                </div>
+                <div class="post-keywords">
+                    <i class="fa fa-tags"></i>
+                    @*<a href="#">搜尋引擎</a>
+                        <a href="#">網站維護</a>
+                        <a href="#">SEO</a>
+                        <a href="#">CMS</a>*@
+                </div>
+            </div>
+        </div>
+    </div><!-- col-md-12 END -->
+}

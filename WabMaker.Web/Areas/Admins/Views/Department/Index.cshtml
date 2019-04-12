@@ -1,0 +1,65 @@
+﻿@model List<MyTool.ViewModels.TreeViewModel>
+
+@{
+    ViewBag.Title = "組織圖";
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action()" />
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    <br>
+    @mHelper.SortButton()
+
+    <!--Tree-->
+    <ul id="treeView" class="deptTree mTree loadData"></ul>
+</div>
+
+<div id="editView" style="display:none;">
+   
+</div>
+
+@* demo modal *@
+@*<button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#positionHistoryModal">Open position</button>
+    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#userHistoryModal">Open user</button>
+    @Html.Partial("positionHistoryModal")*@
+
+@section scripts{
+    <script>
+        $(function () {
+            site.bindEvent();
+            //site.tree.init();
+        });
+
+    </script>
+}
+@section css{
+    <style>
+        /*tree block*/
+        .deptTree .timeline-label {
+            width: 100px;
+        }
+          #treeSort li {
+            width: 150px;
+        }
+
+        /*user block*/
+        .deptTree .type-User .timeline-label {
+            background: #ffffff;
+            width: auto;
+        }
+
+            .deptTree .type-User .timeline-label .subject {
+                font-size: 12px;
+                color: #555;
+            }
+
+            .deptTree .type-User .timeline-label .timeline-btn {
+                display: none;
+            }
+
+            .deptTree .type-User .timeline-label .timeline-text {
+                width: 100%;
+            }
+    </style>
+}

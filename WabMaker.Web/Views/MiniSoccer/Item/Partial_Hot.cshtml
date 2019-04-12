@@ -1,0 +1,40 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+@* first *@
+@if (Model.DataResult.Data.Any())
+{
+    var item = Model.DataResult.Data.First();
+    var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == SourceType.ItemConver);
+
+    <div class="hot-video pb-10 border-b">
+        @if (mainImage.FileType == FileType.YouTube)
+        {
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+            </div>
+        }
+        else
+        {
+            <img src="@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)" alt="" />
+        }
+        <h4>@item.ItemLanguage.Subject</h4>
+        <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="hot-title">@_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Content), 70)</a>
+    </div>
+}
+
+<div class="hot-inner">
+    <ul>
+        @foreach (var item in Model.DataResult.Data.Skip(1))
+        {
+            <li class="ptb-15 border-b">
+                <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })">
+                 @item.ItemLanguage.Subject
+                </a>
+            </li>           
+        }
+    </ul>
+</div>
+

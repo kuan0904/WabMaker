@@ -1,0 +1,288 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+
+@model WebMaker.Entity.ViewModels.OrderViewModel
+@{
+    ViewBag.Title = Model.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    var structure = Model.ItemViewModel.Item.cms_Structure;
+    var mainImage = Model.ItemViewModel.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+
+    var imgUrl = mainImage == null ? "" :
+        (mainImage.FileType == (int)FileType.YouTube) ?
+        _YouTube.SetThumbnail(mainImage.FilePath) ://YouTube縮圖
+        mainImage.FilePath;//封面
+
+    var description = _Html.WordSubstring(_Html.RemoveHtml(Model.ItemViewModel.ItemLanguage.Content), 200);
+    //檔案下載
+    //var filedownloads = Model.ItemViewModel.ItemFiles.Where(x => x.SourceType == (int)SourceType.ItemFile && x.StructureID == new Guid("c3a94bc2-a6be-4f0f-8a99-489abdc153f0")).ToList();
+
+    //編輯(新訂單/退回)or瀏覽
+    var isEditing = Model.Order.ID == Guid.Empty || Model.Order.OrderStatus == (int)OrderStatus.Refuse;
+
+    var routeName = Model.ItemViewModel.Item.RouteName;
+}
+
+<div class="breadArea">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="@Url.Action("Index","Home")">HOME</a></li>
+            <li><a href="@Url.Action("Index","Member")">會員中心</a></li>
+            @if (!isEditing)
+            {
+                <li><a href="@Url.Action("Order", "Member", new { type = structure.ID })">會員資格申請紀錄</a></li>
+            }
+            <li class="active">@ViewBag.Title</li>
+        </ol>
+    </div>
+</div>
+
+@using (Html.BeginForm("SignUp", "Order", new { id = "" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action("Order", "Member", new { type = structure.ID })" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="account center">
+                    <h2>@Model.ItemViewModel.ItemLanguage.Subject</h2>
+                    <p>@Html.Raw(_Html.BreakLine(Model.ItemViewModel.ItemLanguage.Description))</p>
+                </div>
+            </div>
+        </div>
+        @if (Model.Order.ID == Guid.Empty) //新增時,退回不修改
+        {
+            <div class="row mb-5">
+                <div class="col-lg-12">
+                    <div class="account g-form">
+                        <h3>更新會員資料</h3>
+                        <div class="col-lg-12 col-md-12 col-sm-12"></div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                            <label class="label-helper">* E-mail</label>
+                            <div>
+                                @Model.User.Email
+                            </div>
+                        </div>
+                        @Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_Profile"), Model)
+                    </div>
+                </div>
+            </div>
+            <hr>
+        }
+
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <div class="account g-form mt-5">
+                    <h3>申請資料 @(Model.Order.OrderStatus == (int)OrderStatus.Refuse ? "-退回編輯" : "")</h3>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                        @{
+                            var isRequiredFile = (routeName == "MemberRoleApply_國手" || routeName == "MemberRoleApply_教練" || routeName == "MemberRoleApply_裁判");
+                        }
+                        <label class="label-helper">@(isRequiredFile ? "* " : "")@Html.Raw(_Html.RemoveHtml(Model.ItemViewModel.ItemLanguage.Content))</label>
+                        @if (isEditing)
+                        {
+                            <input type="file" name="file" accept="image/png, image/jpeg" data-val="true" @Html.Raw((isRequiredFile ? "data-val-required='請上傳檔案'" : ""))>
+                            <span class="field-validation-valid text-danger" data-valmsg-for="file" data-valmsg-replace="true"></span>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Order.FilePath))
+                        {
+                            <div>
+                                <a href="@RouteHelper.SetUrlPath(Model.Order.FilePath)" target="_blank">
+                                    <img src="@RouteHelper.SetUrlPath(Model.Order.FilePath)" width="200" />
+                                </a>
+                            </div>
+                        }
+                    </div>
+
+                    @*<div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                            <label class="label-helper">選擇身分</label>
+                            <div class="dropdown">
+                                @Html.DropDownList("Order.RoleID", Model.RoleSelectList, "請選擇", new { @class = "form-control" })
+                            </div>
+                        </div>*@
+
+                    @* 項目 *@
+                    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                        <label class="label-helper">選擇身分</label>
+                        @if (Model.Order.ID == Guid.Empty)//新增時,退回不修改
+                        {
+                            var roleSelect = new List<SelectListItem>();
+                            if (Model.SubItemViewModel != null)
+                            {
+                                roleSelect = Model.SubItemViewModel.Select(x => new SelectListItem
+                                {
+                                    Text = $"{x.ItemLanguage.Subject}: 新台幣 {x.Item.SalePrice.ToString("0")} 元",
+                                    Value = x.Item.ID.ToString()
+                                }).ToList();
+                            }
+                            <div class="dropdown">
+                                @Html.DropDownList("OrderDetails[0].ItemID", roleSelect, new { @class = "form-control" })
+                            </div>
+                        }
+                        else
+                        {
+                            if (Model.OrderDetails.Any())
+                            {
+                                @Html.Hidden("OrderDetails[0].ItemID", Model.OrderDetails[0].ItemID)
+                                @Html.Hidden("OrderDetails[0].Quantity", Model.OrderDetails[0].Quantity)
+                            }
+                            <div>
+                                @(Model.NewRoleRelation?.mgt_Role?.Name)
+                            </div>
+                        }
+                    </div>
+
+                    @{ //教練、裁判證號必填
+                        var isRequiredRoleNumber = (routeName == "MemberRoleApply_教練" || routeName == "MemberRoleApply_裁判");
+                    }
+                    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                        <label class="label-helper">@(isRequiredRoleNumber ? "* " : "")證號</label>
+                        @if (isEditing)
+                        {
+                            <input type="text" id="NewRoleRelation_RoleNumber" name="NewRoleRelation.RoleNumber" class="form-control account-num"
+                                   data-val="true" @Html.Raw((isRequiredRoleNumber ? "data-val-required='請輸入證號'" : "")) value="@Model.NewRoleRelation.RoleNumber">
+                            @*@Html.EditorFor(model => model.NewRoleRelation.RoleNumber, new { htmlAttributes = new { @class = "form-control account-num" } })*@
+                            @Html.ValidationMessageFor(model => model.NewRoleRelation.RoleNumber, "", new { @class = "text-danger" })
+                        }
+                        else
+                        {
+                            <div>
+                                @(Model.NewRoleRelation?.RoleNumber)
+                            </div>
+                        }
+                    </div>
+                    @if (isEditing)
+                    {
+                        @Html.HiddenFor(model => model.Order.ID)
+                        @Html.HiddenFor(model => model.Order.OrderStatus)
+                        @Html.HiddenFor(model => model.Order.StructureID)
+                        @Html.HiddenFor(model => model.Order.ItemID)
+                        @Html.Hidden("Order.DeliveryType", (int)DeliveryType.None)
+
+                        @*<div class="col-lg-6 col-md-6 col-sm-12 mt-3" style="height:69.8px;">
+                                <label class="label-helper">費用</label>
+                                <div>
+                                    $@Model.ItemViewModel.Item.SalePrice.ToString("0")
+                                </div>
+                            </div>*@
+
+                        @*<div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                                <label class="label-helper">匯款資訊</label>
+                                <input type="text" id="Order_PayInfo" name="Order.PayInfo" class="form-control account-num" placeholder="戶名 / 銀行名稱 / 帳號末五碼"
+                                       data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" data-val-required="請輸入匯款資訊">
+                                @Html.ValidationMessageFor(model => model.Order.PayInfo, "", new { @class = "text-danger" })
+                            </div>*@
+
+                        @Html.Hidden("Order.PayType", (int)PayType.ATMVirtual)
+                    }
+                    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+                        <label class="label-helper">備註</label>
+                        @if (isEditing)
+                        {
+                            @Html.EditorFor(model => model.Order.OrderNote, new { htmlAttributes = new { @class = "form-control account-num" } })
+                            @Html.ValidationMessageFor(model => model.Order.OrderNote, "", new { @class = "text-danger" })
+                        }
+                        else
+                        {
+                            <div>
+                                @Model.Order.OrderNote
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 mt-5 mb-5">
+                <div class="btn-width-sm">
+                    @if (isEditing)
+                    {
+                        <button id="SaveBtn" type="button" class="DoneBtn btn-sm">確認送出</button>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Order", "Member", new { type = structure.ID })">
+                            <button type="button" class="DoneBtn btn-sm">返回會員中心</button>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+                        }
+
+@*
+    <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+          <label class="label-helper">付款方式</label>
+          @{ var payTypes = structure.PayTypes.ToContainList<PayType>();}
+          @if (Model.ItemViewModel.Item.SalePrice == 0)
+          {
+              @PayType.None.GetDisplayName()
+              @Html.Hidden("Order.PayType", (int)PayType.None)
+          }
+          else
+          {
+              foreach (PayType item in payTypes)
+              {
+                  <label class="radio-inline autoSwitch">
+                      <input type="radio" name="Order.PayType" value="@((int)item)"
+                             data-val="true" data-val-required="請選擇付款方式">@item.GetDisplayName()
+                      </label>
+              }
+          }
+          @Html.ValidationMessageFor(model => model.Order.PayType, "", new { @class = "text-danger" })
+
+      </div>
+*@
+
+@*
+    <div class="form-group row">
+        <label class="col-sm-offset-2 label-helper">授權同意書</label>
+        <div class="col-sm-5">
+            <div class="checkbox">
+                <label>
+                    <input id="IsArgee" name="IsArgee" type="checkbox" data-val="true" data-rule-required="true" data-msg-required="請勾選同意">
+                    我已詳細閱讀並同意<a class="text-oragne underline" href="@Url.Content("~/PrivacyPolicy")" target="_blank">授權同意書</a>
+                </label>
+            </div>
+            <span class="text-danger field-validation-valid" data-valmsg-for="IsArgee" data-valmsg-replace="true"></span>
+        </div>
+    </div>*@
+
+@*if (filedownloads.Any())
+    {
+        <div class="form-group row">
+            <label class="col-sm-2">檔案下載</label>
+            <div class="col-sm-5">
+                @foreach (var file in filedownloads)
+                        {
+                    <a class="text-oragne underline" href="@RouteHelper.SetUrlPath(file.FilePath, null, true)" download="@file.OriName">@file.OriName</a><br>
+                }
+            </div>
+        </div>
+    }*@
+
+
+
+@section scripts{
+    <script>
+        $(function () {
+            //init contain check
+            web.containCheck.sum($(".wrapper"));
+        });
+    </script>
+}

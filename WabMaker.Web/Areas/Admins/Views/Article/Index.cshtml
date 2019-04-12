@@ -1,0 +1,136 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.Models.cms_Structure
+
+@{
+    ViewBag.Title = Model.Name;
+}
+
+<input type="hidden" id="baseUrl" value="@Url.Action(null, null, new { StructureIDs = Model.ID, LangType = Model.DefaultLanguage })" />
+<input type="hidden" id="ImageUploadUrl" value="@Url.Action("CKEditorUpload")" />
+
+
+<div id="masterView">
+    <h2>@ViewBag.Title</h2>
+    <p>
+        @*分類不用新增*@
+        @if (!Model.ItemTypes.HasValue((int)ItemType.Category))
+        {
+            @mHelper.CreateButton()
+        }
+
+        @if (Model.ContentTypes.HasValue((int)ContentType.Sort))
+            {
+            @mHelper.SortButton()
+        }
+    </p>
+
+    <div class="toolbar">
+        <div style="width:18%">
+            <input type="text" name="SearchString" class="form-control" placeholder="search..." />
+        </div>
+
+        <div>
+            @if (Model.ContentTypes.HasValue((int)ContentType.IsEnabled))
+            {
+                @mHelper.Switch("篩選已啟用", "SelectEnabled", false)
+            }
+
+            @if (Model.ContentTypes.HasValue((int)ContentType.IsTop))
+            {
+                @mHelper.Switch("篩選置頂", "SelectTop", false)
+            }
+        </div>
+
+    </div>
+
+    <div id="mainTable" class="container-fluid"></div>
+</div>
+
+<div id="editView" style="display:none;"></div>
+
+@section Scripts {
+    <script>
+        site.bindEvent();
+
+        //go to file
+        $(site.masterView).on("click", ".ItemFileBtn", function (e) {
+            var addurl = "itemID=" + $(this).data("itemid") + "&fileStructureID=" + $(this).data("filestructureid");
+            site.showEdit("ItemFile", addurl);
+        });
+
+        //go to userProflie
+        $(site.masterView).on("click", ".ItemUserProfile", function (e) {
+            var addurl = "itemID=" + $(this).data("itemid") + "&subject=" + $(this).data("subject");
+            site.showEdit("ItemUserProfile", addurl);
+        });
+
+        //go to option
+        $(site.masterView).on("click", ".OptionList", function (e) {
+            var addurl = "itemID=" + $(this).data("itemid") + "&optionStructureID=" + $(this).data("optionstructureid") + "&subject=" + $(this).data("subject");
+            site.showEdit("OptionList", addurl);
+        });
+
+        site.showMaster();
+    </script>
+}
+@section css{
+    <style>
+        .checkTree .timeline-label, .checkTree .timeline-label:not(.no-edit):hover:hover {
+            background: none;
+            margin: 0;
+            min-width: 0;
+        }
+
+            .checkTree .timeline-label.no-edit {
+                padding: 2px 5px;
+                border-radius: 3px;
+                background: #efefef;
+                min-width: 0;
+            }
+
+        .checkTree, .checkTree li {
+            list-style: none;
+            margin-bottom: 3px;
+        }
+
+            .checkTree, .checkTree li > ul {
+                margin-left: 20px;
+                /*display: inline;*/
+            }
+
+                .checkTree li.CheckNode {
+                    /*display: inline;*/
+                }
+
+                .checkTree .timeline-text {
+                    padding: 0;
+                }
+
+        #editTable .checkTree, #editTable .checkTree li > ul {
+            margin-left: 0px;
+        }
+
+        #editTable .radio label, #editTable .checkbox label {
+            padding-left: 0;
+        }
+
+        #editTable {
+            max-width: 1000px;
+        }
+     
+            #editTable .input-group {
+                min-width: 110px;
+            }
+
+                #editTable .input-group.GroupRange .input-group-addon {
+                    width: 20px;
+                    padding: 4px;
+                }
+
+            #editTable .bootstrap-select {
+                width: 75px;
+            }
+
+    </style>
+}

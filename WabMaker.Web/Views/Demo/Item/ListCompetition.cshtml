@@ -1,0 +1,18 @@
+﻿@model WabMaker.Web.WebViewModels.ItemListModel
+
+@{
+    ViewBag.Title = Model.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    //每頁顯示筆數
+    Model.ItemPageModel.PageSize = 2;
+}
+
+<h2>@Model.ItemViewModel.ItemLanguage.Subject</h2>
+
+<div id="ListContent">
+    @Html.Action("Partial", new { model = Model.ItemPageModel })
+</div>
+
+
+
+

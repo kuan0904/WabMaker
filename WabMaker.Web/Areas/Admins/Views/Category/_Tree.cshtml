@@ -1,0 +1,61 @@
+﻿@* 共用樹結構 *@
+@using MyTool.ViewModels
+@model List<MyTool.ViewModels.TreeViewModel>
+
+
+@GenerateTree(Model)
+
+@* new data *@
+<li class="CreateNode">
+    <div class="timeline-label">
+        @Html.Partial("_TreeNode", new MyTool.ViewModels.TreeViewModel { Name = "新增" })
+    </div>
+</li>
+
+
+@helper GenerateTree(List<MyTool.ViewModels.TreeViewModel> nodes, int level = 1)
+{
+
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+        bool isMultiLanguage = item.TreeLangs != null;
+        TreeType treeType = item.Type;
+
+        if (treeType == TreeType.Item || treeType == TreeType.Menu)
+        {
+                <li class="type-@(item.Type.ToString()) ViewNode" data-id="@item.ID" data-sort="@item.Sort">
+                    <div class="timeline-label @(isMultiLanguage ? "no-edit" : "")">
+                        @Html.Partial("_TreeNode", item)
+                    </div>
+
+                    @if (item.Nodes != null && item.Nodes.Any())
+                    {
+                        <ul>
+                            @GenerateTree(item.Nodes, level + 1)
+                        </ul>
+                    }
+                </li>
+            }
+            else if (treeType == TreeType.Structure)
+            {
+                @* 新增指定類別Structure *@
+                <li class="CreateNode" data-structureid="@item.ID">
+                    <div class="timeline-label">
+                        @Html.Partial("_TreeNode", new TreeViewModel { Name = item.Name })
+                    </div>
+
+                    @*<ul>
+                            @if (item.Nodes != null && item.Nodes.Any())
+                            {
+                                @GenerateTree(item.Nodes, level + 1)
+                            }
+                        </ul>*@
+                </li>
+
+        }
+    }
+}
+
+}

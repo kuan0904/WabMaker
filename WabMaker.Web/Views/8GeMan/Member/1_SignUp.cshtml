@@ -1,0 +1,141 @@
+﻿@model WebMaker.Entity.ViewModels.SignUpViewModel
+
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "SignUp";
+}
+
+@* 會員背景 *@
+@Html.Action("Get", "Item", new
+{
+    routeName = "PrivacyPolicy",
+    specViewName = "_MemberBackgroud"
+})
+
+@using (Html.BeginForm(null, null, FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action("Login", "Member", new  { })" />
+    <input type="hidden" id="successMessage" data-title="註冊完成" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.ExternalType)
+
+    <section class="hotnews-section mt-md-250">
+        <div class="auto-container">
+            <div class="text-right">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">首頁</a></li>
+                    <li class="breadcrumb-item active"><a href="@Url.Action()">@ViewBag.Title</a></li>
+                </ol>
+            </div>
+            <div class="row w-back-g pb-15 pt-15">
+                <div class="col-xs-12">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner mb-20">加入會員</span>
+                        <span class="title-star">星號(*)為必填欄位</span>
+                    </div>
+                    <div class="singup-inner @(Model.ExternalType == null?"mb-50":"") p-lg-rl-50">
+
+                        <h3 class="text-orange">個人基本資料</h3>
+                        @if (Model.ExternalType != null)
+                        {
+                            <p>使用 Facebook 登入，請填入以下資訊以完成註冊程序</p>
+                        }
+                        <hr>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">@(Model.ExternalType == null ? "登入帳號/" : "")Email(*)</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "請輸入電子郵件", autocomplete = "off" })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        @if (Model.ExternalType == null)
+                        {
+                            <div class="form-group row">
+                                <label class="col-sm-offset-2 col-sm-2 form-label text-right">密碼(*)</label>
+                                <div class="col-sm-5">
+                                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "請輸入 6-12 個英數字", autocomplete = "off" })
+                                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-offset-2 col-sm-2 form-label text-right">確認密碼(*)</label>
+                                <div class="col-sm-5">
+                                    @Html.PasswordFor(model => model.PasswordConfirm, new { @class = "form-control", placeholder = "", autocomplete = "off" })
+                                    @Html.ValidationMessageFor(model => model.PasswordConfirm, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="singup-inner mb-50 p-lg-rl-50">
+                        @if (Model.ExternalType == null)
+                        {
+                            <h3 class="text-orange">會員資料設定</h3>
+                            <hr>
+                        }
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">姓名(*)</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", autocomplete = "off" })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">手機</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">地址</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        @if (Model.ExternalType == null)
+                        {
+                            <div class="form-group row">
+                                <label class="col-sm-offset-2 col-sm-2 form-label text-right">驗證碼(*)</label>
+                                <div class="col-sm-3">
+                                    @Html.TextBoxFor(model => model.Captcha, "", new { @class = "form-control", placeholder = "", autocomplete = "off" })
+                                    @Html.ValidationMessageFor(model => model.Captcha, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-offset-4 col-sm-2 col-xs-6">
+                                    <img class="imgverifycode" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+                                </div>
+                                <div class="col-sm-2 col-xs-6 pt-10">
+                                    <a class="btnnewcode" href="javascript:">重新產生驗證碼</a>
+                                </div>
+                            </div>
+                        }
+                        <div class="form-group row">
+                            <div class="col-sm-offset-5 col-sm-6">
+                                <div class="checkbox">
+                                    <label>
+                                        <input id="IsArgee" name="IsArgee" type="checkbox" data-val="true" data-rule-required="true" data-msg-required="請勾選同意">
+                                        我已詳細閱讀並同意<a class="text-oragne underline" href="@Url.Content("~/PrivacyPolicy")" target="_blank">授權同意書</a>
+                                    </label>
+                                </div>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="IsArgee" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <a href="@Url.Action("Login","Member")"><button type="button" class="btn btn-default border-n n-back-g text-gray text28">Cancel</button></a>
+                            <button id="SaveBtn" type="button" class="btn btn-default border-n n-back-g text-black text28">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}

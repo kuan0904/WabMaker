@@ -1,0 +1,12 @@
+﻿@using WabMaker.Web.WebViewModels
+@using MyTool.ViewModels
+@using MyTool.Services
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "會員中心";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@Html.Partial(WabMaker.Web.Controllers.BaseController.ViewName("Member", "_MemberMenu"))
+<hr>

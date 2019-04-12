@@ -1,0 +1,81 @@
+﻿@using MyTool.ViewModels
+@using WebMaker.BLL.Helpers
+@using WabMaker.Web.Helpers
+@{
+    SiteInfoViewModel SiteInfo = ApplicationHelper.SiteInfo;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    @if (SiteInfo != null)
+    {
+        @Html.Partial("_BaseMeta", SiteInfo)
+    }
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    @RenderSection("css", required: false)
+    @RenderSection("meta", required: false)
+</head>
+
+<body>
+    <h2><a href="@Url.Action("Index", "Home")">@(SiteInfo?.SiteName)</a></h2>
+    <ul>
+        @Html.Action("Menu", "Item", new { position = MyTool.Enums.MenuPosition.Top })
+    </ul>
+
+
+    @if (SessionManager.UserID != Guid.Empty &&
+                                 SessionManager.AccountType == MyTool.Enums.AccountType.Member)
+    {
+        //已登入
+        @SessionManager.UserName
+        <a href="@Url.Action("Index", "Member")">會員中心</a>
+        <a href="@Url.Action("LogOut", "Member")">登出</a>
+    }
+    else
+    {
+        <a href="@Url.Action("Login", "Member")">登入</a>
+        <span>/</span>
+        <a href="@Url.Action("SignUp", "Member")">註冊</a>
+    }
+
+    <hr>
+    <div class="container">
+        @RenderBody()
+    </div>
+    <hr>
+
+    <footer>
+        @if (!string.IsNullOrEmpty(SiteInfo?.Footer))
+        {
+            @Html.Raw(SiteInfo.Footer)
+        }
+        @Html.Action("Menu", "Item", new { position = MyTool.Enums.MenuPosition.Bottom })
+
+        <ul>
+            @if (!string.IsNullOrEmpty(SiteInfo?.Facebook))
+            {
+                <li><a href="@SiteInfo.Facebook" target="_blank">FB</a></li>
+            }
+            @if (!string.IsNullOrEmpty(SiteInfo?.Instagram))
+            {
+                <li><a href="@SiteInfo.Instagram" target="_blank">IG</a></li>
+            }
+            @if (!string.IsNullOrEmpty(SiteInfo?.YouTube))
+            {
+                <li><a href="@SiteInfo.YouTube" target="_blank">YouTube</a></li>
+            }
+            @if (!string.IsNullOrEmpty(SiteInfo?.Email))
+            {
+                <li><a href="mailto:@(SiteInfo.Email)">Email</a></li>
+            }
+        </ul>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Html.Partial("_ShowMessage")
+    @Html.Partial("_BaseScripts")
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

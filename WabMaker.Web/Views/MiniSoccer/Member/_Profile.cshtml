@@ -1,0 +1,18 @@
+﻿@using MyTool.Enums
+@using MyTool.Services
+@model WebMaker.Entity.ViewModels.UserViewModel
+
+@* in 會員基本資料、報名活動 *@
+
+@if (Model.UserContentTypes.Contains(UserContentType.Name))
+{
+    var isRequired = Model.UserRequiredTypes.Contains(UserRequiredType.Name);
+    <div class="form-group row">
+        <label class="col-sm-3 form-label text-right">姓名@(isRequired ? "*" : "")</label>
+        <div class="col-sm-8">
+            <input type="text" id="User_Name" name="User.Name" class="form-control" value="@Model.User.Name"
+                   data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequired ? "data-val-required='請輸入姓名'" : ""))>
+            @Html.ValidationMessageFor(model => model.User.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>    
+}

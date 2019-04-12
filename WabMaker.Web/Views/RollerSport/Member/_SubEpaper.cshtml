@@ -1,0 +1,21 @@
+﻿@model WebMaker.Entity.ViewModels.SendEmailViewModel
+
+@*訂閱電子報*@
+
+@using (Html.BeginForm("SubEpaper", "Member", FormMethod.Post))
+{
+    <input type="hidden" id="successMessage" data-title="訂閱完成" value="@MyTool.Enums.MessageType.Toast" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <p>精選國內外設計與藝文大事、設計大師最新訪談，每週最新資訊定期遞送給您。</p>
+    <div class="form-inline">
+        <div class="form-group">
+            <label class="sr-only" for="Email">Email</label>
+            <input type="email" class="form-control" id="Email" name="Email" placeholder="yourmail@example.com">
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+        </div>
+        <button id="SaveBtn" type="button" class="btn btn-default">訂閱</button>
+    </div>
+}

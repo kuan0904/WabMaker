@@ -1,0 +1,31 @@
+﻿@using WabMaker.Web.Helpers
+@{
+    List<MyTool.ViewModels.TreeViewModel> tree = WebMaker.BLL.Helpers.SessionManager.MenuTree;
+}
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <ul>
+        @GenerateMenu(tree)
+
+    </ul>
+</div>
+
+@helper GenerateMenu(List<MyTool.ViewModels.TreeViewModel> nodes)
+{
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+        var url = WabMaker.Web.Helpers.RouteHelper.CreateUrl(item.Controller, item.Action, item.Url);
+        var isActive = RouteHelper.Url() == url;
+
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a href="@url">@item.Name</a>
+                    </h4>
+                </div>
+            </div>
+
+    }
+}
+}

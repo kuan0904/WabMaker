@@ -1,0 +1,107 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@* 比賽報名-團隊成員 *@
+@model WebMaker.Entity.ViewModels.EditOrderViewModel
+@{
+    var structure = Model.OrderViewModel.ItemViewModel.Item.cms_Structure;
+    var unit = Model.OrderViewModel.Units.FirstOrDefault(x => x.OrderDetailID == Model.OrderDetailID) ?? new WebMaker.Entity.Models.erp_OrderUnit();
+    var orderDetail = Model.OrderViewModel.OrderDetails.FirstOrDefault(x => x.ID == Model.OrderDetailID);
+    var updateTargetId = "Unit_" + Model.OrderDetailID;
+    var orderStatus = orderDetail.OrderStatus;
+}
+
+@* Editing *@
+@if (Model.IsEditing)
+{
+    @Html.HiddenFor(model => model.Block)
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ItemID)
+    @Html.HiddenFor(model => model.OrderViewModel.Order.ID)
+    @Html.Hidden("OrderViewModel.Units[0].OrderDetailID", Model.OrderDetailID)
+    <input type="hidden" name="OrderViewModel.Units[0].ID" class="form-control" value="@unit.ID">
+
+    if (((orderStatus == (int)OrderStatus.TeamEdit ||
+        orderStatus == (int)OrderStatus.TeamEditConfirm ||
+        orderStatus == (int)OrderStatus.TeamEditDone)
+        && Model.IsCheckSuccess))//|| Model.IsAdmin
+    {
+        <div class="col-md-12">
+            <button id="SaveBtn" class="btn btn-style-sixteen" title="Save">儲存</button>
+            @Ajax.RawActionLink("取消", "GetCompetition", "Order", new { id = Model.OrderViewModel.Order.ID, block = OrderEditBlock.DetailUnit, isEditing = false, OrderDetailID = Model.OrderDetailID },
+            new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = updateTargetId }, new { @class = "btn btn-style-eighteen orderCancelBtn" })
+        </div>
+    }
+
+    <div class="col-md-12 row">
+        <label class="col-xs-4 form-label">隊伍名稱</label>
+        <div class="col-xs-8">
+            <input type="text" name="OrderViewModel.Units[0].Unit" class="form-control" value="@unit.Unit"
+                   data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" data-val-required='請輸入隊伍名稱'>
+            @Html.ValidationMessage("OrderViewModel.Units[0].Unit", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="col-md-12 row">
+        <label class="col-xs-4 form-label">教練</label>
+        <div class="col-xs-8">
+            <input type="text" name="OrderViewModel.Units[0].Coach" class="form-control" value="@unit.Coach"
+                   data-val="true" data-val-length="不得大於50個字元" data-val-length-max="100" data-val-required='請輸入教練'>
+            @Html.ValidationMessage("OrderViewModel.Units[0].Coach", "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+        <div class="col-md-12 row">
+            <label class="col-xs-4 form-label">領隊</label>
+            <div class="col-xs-8">
+                <input type="text" name="OrderViewModel.Units[0].Leader" class="form-control" value="@unit.Leader"
+                       data-val="true" data-val-length="不得大於50個字元" data-val-length-max="100" data-val-required='請輸入領隊'>
+                @Html.ValidationMessage("OrderViewModel.Units[0].Leader", "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-md-12 row">
+            <label class="col-xs-4 form-label">管理</label>
+            <div class="col-xs-8">
+                <input type="text" name="OrderViewModel.Units[0].Manager" class="form-control" value="@unit.Manager"
+                       data-val="true" data-val-length="不得大於50個字元" data-val-length-max="100" data-val-required='請輸入管理'>
+                @Html.ValidationMessage("OrderViewModel.Units[0].Manager", "", new { @class = "text-danger" })
+            </div>
+        </div>
+}
+
+        @* View *@
+else
+{
+    if (((orderStatus == (int)OrderStatus.TeamEdit ||
+        orderStatus == (int)OrderStatus.TeamEditConfirm ||
+        orderStatus == (int)OrderStatus.TeamEditDone)
+     && Model.IsCheckSuccess))//|| Model.IsAdmin
+    {
+        <div class="col-md-12">
+            @Ajax.RawActionLink("編輯資訊", "GetCompetition", "Order", new { id = Model.OrderViewModel.Order.ID, block = OrderEditBlock.DetailUnit, isEditing = true, OrderDetailID = Model.OrderDetailID },
+                     new AjaxOptions() { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = updateTargetId }, new { @class = "btn btn-style-sixteen orderEditBtn" })
+        </div>
+    }
+
+    <div class="col-md-12 row">
+        <label class="col-xs-4 form-label">隊伍名稱</label>
+        <div class="col-xs-8">@unit.Unit</div>
+    </div>
+
+    <div class="col-md-12 row">
+        <label class="col-xs-4 form-label">教練</label>
+        <div class="col-xs-8">@unit.Coach</div>
+    </div>
+
+        <div class="col-md-12 row">
+            <label class="col-xs-4 form-label">領隊</label>
+            <div class="col-xs-8">@unit.Leader</div>
+        </div>
+
+        <div class="col-md-12 row">
+            <label class="col-xs-4 form-label">管理</label>
+            <div class="col-xs-8">@unit.Manager</div>
+        </div>
+}

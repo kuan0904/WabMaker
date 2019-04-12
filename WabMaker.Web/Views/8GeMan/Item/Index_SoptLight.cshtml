@@ -1,0 +1,33 @@
+﻿@using MyTool.Services
+@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@model WabMaker.Web.WebViewModels.ItemPageResult
+
+<div class="four-item-carousel owl-carousel owl-theme">
+    @foreach (var item in Model.DataResult.Data)
+    {
+        var mainImage = item.ItemFiles?.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+        <div class="list-inner">
+            @if (mainImage != null)
+            {
+                if (mainImage.FileType == FileType.YouTube)
+                {
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="@_YouTube.SetIframe(mainImage.FilePath)" frameborder="0"></iframe>
+                    </div>
+                }
+                else
+                {
+                    <img src="@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)" alt="" />
+                }
+            }
+            <a href="@Url.Action("Get","Item", new { routeName = item.Item.RouteName })" class="hot-title">
+                <h3 class="mb-10">@item.ItemLanguage.Subject</h3>
+                <p>@_Html.WordSubstring(_Html.RemoveHtml(item.ItemLanguage.Content), 100)</p>
+                <span>@item.Item.CreateTime.ToString("yyyy.MM.dd")</span>
+                <span class="fr">More</span>
+            </a>
+        </div>
+
+    }
+</div>

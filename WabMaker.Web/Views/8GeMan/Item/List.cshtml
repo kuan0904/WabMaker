@@ -1,0 +1,39 @@
+﻿@using MyTool.Enums
+@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.ViewModels
+@model WabMaker.Web.WebViewModels.ItemListModel
+
+@* 一般文章列表 *@
+@{
+    ViewBag.Title = Model.ItemViewModel.ItemLanguage.Subject;
+    Layout = "../Shared/_Layout.cshtml";
+    //每頁顯示筆數
+    Model.ItemPageModel.PageSize = 6;
+    var mainImage = Model.ItemViewModel.ItemFiles.Count == 0 ? new WabMaker.Web.WebViewModels.ItemWebFile() :
+                                                    Model.ItemViewModel.ItemFiles.FirstOrDefault(x => x.SourceType == (int)SourceType.ItemConver);
+}
+
+<section class="character-section mt-65">
+    <div class="character-back" style="background: url(@RouteHelper.SetImagePath(mainImage.FilePath, mainImage.ThumbnailPath)) 0/cover no-repeat;">
+        <div class="auto-container">
+            @Html.Raw(Model.ItemViewModel.ItemLanguage.TemplateText)
+        </div>
+    </div>
+</section>
+
+<section class="hotnews-section mt-md-250">
+    <div class="auto-container">
+        <div class="text-right">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">首頁</a></li>
+                <li class="breadcrumb-item active"><a href="@Url.Action()">@Model.ItemViewModel.ItemLanguage.Subject</a></li>
+            </ol>
+        </div>
+        <div id="ListContent" class="row">
+            @Html.Action("Partial", new { model = Model.ItemPageModel })
+        </div>
+    </div>
+</section>
+
+

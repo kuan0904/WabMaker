@@ -1,0 +1,47 @@
+﻿@model WebMaker.Entity.ViewModels.LoginViewModel
+
+
+@*<a href="@Url.Action("FacebookLogin","Member")" class="btn btn-primary" name="externalType" title="Facebook Login"><i class="fa fa-facebook" aria-hidden="true"></i>Facebook登入</a>*@
+
+@using (Html.BeginForm("Login", "Member", new { }, FormMethod.Post, new { }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <input type="hidden" name="url" value="@Request.QueryString["url"]" />
+
+    <div class=alert-err></div>
+    <div class=login-inputs>
+        <input class="login-input" type="text" name="Account" id="login_email-mob" required><label>your E-mail</label>
+    </div>
+    <div class=login-inputs>
+        <input class="login-input" type="password" name="Password" id="login_pass-mob" required><label>your password</label>
+    </div>
+    <div class=login-inputs>
+        <input class="login-input" type="text" name="Captcha" required autocomplete="off"><label>驗證碼</label>
+    </div>
+    <img class="imgverifycode code-img" src="@Url.Action("CaptchaImage","Member")" alt="驗證碼" />
+    <a class="btnnewcode" href="javascript:"><img class="code-btn" src="~/html/RollerSport/images/code-btn.svg" alt=""></a>
+
+    <input type="submit" name="login_button" id="login_button-mob" class="wpb_button btn login-button" value="會員登入">
+
+    <div class=login-info-text>
+        @*<a href="#" id=forgot-pass-link-mob>忘記密碼</a>*@
+        <a href="@Url.Action("ForgotPassword","Member")" id=forgot-pass-link>忘記密碼?</a>
+        <a href="@Url.Action("ReSend","Member")">重寄驗證信</a>
+    </div>
+
+    <div class="Registration"  style="background: #2763bd;color: #fff;">
+        <a href="@Url.Action("FacebookLogin", "Member",new {  url = Request["url"]})">Facebook 登入</a>      
+       
+    </div>
+
+    <div class="Registration"><a href="@Url.Action("SignUp","Member")" style="color:#000;">還不是會員? 立即註冊</a></div>
+}
+
+
+@*<a href="@Url.Action("ForgotPassword","Member")">忘記密碼</a><br>
+    <a href="@Url.Action("ReSend","Member")">重寄驗證信</a><br>
+    <a href="">註冊會員</a><br>*@
+
+

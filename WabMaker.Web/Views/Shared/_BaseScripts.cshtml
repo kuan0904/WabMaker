@@ -1,0 +1,39 @@
+﻿@using MyTool.ViewModels
+@using WabMaker.Web.Helpers
+@{
+    ApiKeyViewModel ApiKey = ApplicationHelper.ApiKey;
+}
+
+
+@* pagination *@
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+@* validate *@
+@Scripts.Render("~/bundles/jqueryval")
+@* custom *@
+<script src="~/Scripts/custom/web.js?v=2019.4.2"></script>
+<script>
+    web.init();
+</script>
+
+@if (!ApplicationHelper.IsLocal)
+{
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    if (ApiKey != null && !string.IsNullOrEmpty(ApiKey.GoogleAnalyticsId))
+    {
+        <script async src="https://www.googletagmanager.com/gtag/js?id=@(ApiKey.GoogleAnalyticsId)"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', '@(ApiKey.GoogleAnalyticsId)');
+        </script>
+    }
+
+    if (!string.IsNullOrEmpty(ApplicationHelper.SiteName))
+    {
+        <script id='xn' ci='@ApplicationHelper.SiteName' src='https://xa.xnet.world/xn.js'></script>
+    }
+}
+
+

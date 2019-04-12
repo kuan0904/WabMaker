@@ -1,0 +1,24 @@
+﻿@using WabMaker.Web.Helpers
+@{
+    List<MyTool.ViewModels.TreeViewModel> tree = WebMaker.BLL.Helpers.SessionManager.MenuTree;
+}
+<ul>
+    @GenerateMenu(tree)
+    <li><a href="@Url.Action("LogOut", "Member")">登出</a></li>
+</ul>
+
+@helper GenerateMenu(List<MyTool.ViewModels.TreeViewModel> nodes)
+{
+if (nodes != null)
+{
+    foreach (var item in nodes)
+    {
+        var url = WabMaker.Web.Helpers.RouteHelper.CreateUrl(item.Controller, item.Action, item.Url);
+        var isActive = RouteHelper.Url() == url;
+
+            <li class="@(isActive?"active":"")">
+                <a href="@url">@item.Name</a>
+            </li>
+    }
+}
+}

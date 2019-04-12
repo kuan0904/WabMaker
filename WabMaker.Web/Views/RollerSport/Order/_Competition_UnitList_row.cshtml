@@ -1,0 +1,89 @@
+﻿@using WabMaker.Web.Helpers
+@using WebMaker.Entity.ViewModels
+@using MyTool.Enums
+@using MyTool.Services
+@using MyTool.ViewModels
+@model WebMaker.Entity.Models.erp_OrderUnit
+@{
+    var isRequiredUnit = true;
+    var isRequiredUnitShort = true;
+
+    var isRequiredManager = true;
+    var isRequiredLeader = true;
+    var isRequiredCoach = true;
+
+    var randomID = Guid.NewGuid();
+}
+
+<tr>
+    <td>
+        @{ var addressList = new List<string>
+            {
+               "台北市",
+               "基隆市",
+               "新北市",
+               "宜蘭縣",
+               "桃園市",
+               "新竹縣",
+               "新竹市",
+               "苗栗縣",
+               "台中市",
+               "彰化縣",
+               "南投縣",
+               "嘉義市",
+               "嘉義縣",
+               "雲林縣",
+               "台南市",
+               "高雄市",
+               "澎湖縣",
+               "屏東縣",
+               "台東縣",
+               "花蓮縣",
+               "金門縣",
+               "連江縣",
+               "南海諸島",
+               "釣魚台列嶼",
+               "其它"
+            };}
+        <select name="County_@randomID" rename="OrderViewModel.Units[x].County" class="form-control">
+            @foreach (var item in addressList)
+            {
+                <option value="@item" @(Model.County == item ? "selected='selected'" : "")>@item</option>
+            }
+        </select>
+        @Html.ValidationMessage("County" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="text" name="Unit_@randomID" rename="OrderViewModel.Units[x].Unit" class="form-control" value="@Model.Unit"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequiredUnit ? "data-val-required='請輸入單位'" : ""))>
+        @Html.ValidationMessage("Unit_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="text" name="UnitShort_@randomID" rename="OrderViewModel.Units[x].UnitShort" class="form-control" value="@Model.UnitShort"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="50" @Html.Raw((isRequiredUnitShort ? "data-val-required='請輸入簡寫'" : ""))>
+        @Html.ValidationMessage("UnitShort_" + randomID, "", new { @class = "text-danger" })
+    </td>
+
+
+    <td>
+        <input type="text" name="Leader_@randomID" rename="OrderViewModel.Units[x].Leader" class="form-control" value="@Model.Leader"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="100" @Html.Raw((isRequiredLeader ? "data-val-required='請輸入領隊'" : ""))>
+        @Html.ValidationMessage("Leader_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="text" name="Coach_@randomID" rename="OrderViewModel.Units[x].Coach" class="form-control" value="@Model.Coach"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="100" @Html.Raw((isRequiredCoach ? "data-val-required='請輸入教練'" : ""))>
+        @Html.ValidationMessage("Coach_" + randomID, "", new { @class = "text-danger" })
+    </td>
+    <td>
+        <input type="text" name="Manager_@randomID" rename="OrderViewModel.Units[x].Manager" class="form-control" value="@Model.Manager"
+               data-val="true" data-val-length="不得大於50個字元" data-val-length-max="100" @Html.Raw((isRequiredManager ? "data-val-required='請輸入管理'" : ""))>
+        @Html.ValidationMessage("Manager_" + randomID, "", new { @class = "text-danger" })
+    </td>
+       
+    <td>@Model.mgt_UserProfile.Count</td>  
+    <td>
+        <input type="hidden" name="ID_@randomID" rename="OrderViewModel.Units[x].ID" value="@Model.ID">
+        <button type="button" class="rowDeleteBtn btn btn-danger btn-sm">x</button>
+    </td>
+</tr>

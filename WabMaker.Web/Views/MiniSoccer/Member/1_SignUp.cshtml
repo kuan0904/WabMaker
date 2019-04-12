@@ -1,0 +1,152 @@
+﻿@model WebMaker.Entity.ViewModels.SignUpViewModel
+
+@{
+    Layout = "../Shared/_Layout.cshtml";
+    ViewBag.Title = "註冊";
+}
+
+<section class="character-section mt-65">
+    <div class="character-back character-back2">
+        <div class="auto-container">
+            <h2></h2>
+        </div>
+    </div>
+</section>
+
+@using (Html.BeginForm(null, null, FormMethod.Post))
+{
+    <input type="hidden" id="returnUrl" value="@Url.Action("Login", "Member", new  { })" />
+    <input type="hidden" id="successMessage" data-title="@ViewBag.Title" value="@MyTool.Enums.MessageType.Confirm" />
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.ExternalType)
+
+    <section class="hotnews-section mt-md-250">
+        <div class="auto-container">
+            <div class="row w-back-g pb-15 pt-15">
+                <div class="col-md-offset-1 col-md-10 col-xs-12">
+                    <div class="hotnews-title">
+                        <span class="hotnews-title-inner mb-20 text-center">一般會員註冊</span>
+                        @if (Model.ExternalType == null)
+                        {
+                        }
+                        else
+                        {
+                            <p>使用 Facebook 登入，請填入以下資訊以完成註冊程序</p>
+                        }
+                    </div>
+                    <div class="singup-inner mb-20">
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">@(Model.ExternalType == null ? "登入帳號/" : "")Email</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-offset-2 col-sm-2 form-label text-right">姓名</label>
+                            <div class="col-sm-5">
+                                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", autocomplete = "off" })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        @if (Model.ExternalType == null)
+                        {
+                            <div class="form-group row">
+                                <label class="col-sm-offset-2 col-sm-2 form-label text-right">密碼</label>
+                                <div class="col-sm-5">
+                                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "請輸入 6-12 個英數字", autocomplete = "off" })
+                                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-offset-2 col-sm-2 form-label text-right">確認密碼</label>
+                                <div class="col-sm-5">
+                                    @Html.PasswordFor(model => model.PasswordConfirm, new { @class = "form-control", placeholder = "請再次輸入密碼", autocomplete = "off" })
+                                    @Html.ValidationMessageFor(model => model.PasswordConfirm, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-offset-2 col-sm-2 form-label text-right">驗證碼</label>
+                                <div class="col-sm-2">
+                                    @Html.TextBoxFor(model => model.Captcha, "", new { @class = "form-control", autocomplete = "off" })
+                                    @Html.ValidationMessageFor(model => model.Captcha, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-sm-2">
+                                    <img class="imgverifycode" src="@Url.Action("CaptchaImage", "Member")" alt="驗證碼" />
+                                </div>
+                                <div class="col-sm-3"><a class="btnnewcode" href="javascript:">重新產生驗證碼</a></div>
+                            </div>
+                        }
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <div class="singup-link  mb-20">
+                                <div class="checkbox">
+                                    <label>
+                                        <input id="IsArgee" name="IsArgee" type="checkbox" data-val="true" data-rule-required="true" data-msg-required="請勾選同意條款" required>
+                                        我已詳細閱讀並同意@*<a href="@Url.Content("~/PrivacyPolicy")" target="_blank">(開啟視窗)</a>*@
+                                    </label><a href="javascript:" data-toggle="modal" data-target="#PrivacyModal">資料使用政策與使用條款</a>
+                                </div>
+                                <span class="text-danger field-validation-valid" data-valmsg-for="IsArgee" data-valmsg-replace="true"></span>
+                            </div>
+                            <button id="SaveBtn" type="button" class="btn btn-style-fifteen btn-block">註　　冊</button>
+                            <div class="singup-link mt-20">
+                                <h4>已經有帳號了？<a href="@Url.Action("Login","Member")"> 快速登入</a></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="modal fade" id="PrivacyModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="padding: 20px;font-size: 24px;text-align: center;font-weight: 700;color: #666;">
+                    資料使用政策與使用條款
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body pb-20 pt-20">
+                    <p>
+                        @Html.Action("Get", "Item", new
+                   {
+                       routeName = "PrivacyPolicy",
+                       specViewName = "_DetailSingle_Part"
+                   })
+                    </p>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+                    <div class="checkbox">
+                        <button type="button" class="btn btn-style-sixteen" data-dismiss="modal" style="width: 100px;">確認</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+@section scripts{
+    <script>
+        $(function () {
+            $('#PrivacyModal').modal('show');
+        });
+    </script>
+}
+
+@section css{
+    <style>
+        #PrivacyModal .modal-body {
+            max-height: calc(100vh - 210px);
+            overflow-y: auto;
+        }
+    </style>
+}
